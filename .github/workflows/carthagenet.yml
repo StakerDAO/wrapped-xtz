@@ -1,4 +1,4 @@
-name: test
+name: Carthage
 
 on:
   push:
@@ -7,25 +7,19 @@ on:
     branches: [ dev ]
 
 jobs:
-  build:
-
+  migrate:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:      
     - uses: actions/checkout@v2
   
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 14.x
     - run: npm i
     - run: npm run sandbox:start &
     - name: Sleep for 15 seconds
       uses: jakejarvis/wait-action@master
       with:
         time: '15s'
-    - run: npm run test
+    - run: npm run migrate
