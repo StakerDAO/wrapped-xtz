@@ -4,6 +4,8 @@ const { UnitValue, MichelsonMap } = require('@taquito/taquito')
 
 module.exports = async (deployer, network, accounts) => {
     let lambdas = new MichelsonMap;
+    let ovens = new MichelsonMap;
+    
     lambdas.set('updateLambdas', 
         compileLambda(
             'contracts/partials/wxtz/core/lambdas/updateLambdas/updateLambdas.religo'
@@ -16,9 +18,29 @@ module.exports = async (deployer, network, accounts) => {
         ).bytes
     );
 
+    lambdas.set('onOvenDepositReceived', 
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/onOvenDepositReceived/onOvenDepositReceived.religo'
+        ).bytes
+    );
+
+    lambdas.set('onOvenWithdrawalRequested', 
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/onOvenWithdrawalRequested/onOvenWithdrawalRequested.religo'
+        ).bytes
+    );
+
+    lambdas.set('createOven', 
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/createOven/createOven.religo'
+        ).bytes
+    );
+
     const storage = {
         u: UnitValue,
-        lambdas
-    }
+        lambdas,
+        ovens,
+    };
+
     deployer.deploy(core, storage);
 }
