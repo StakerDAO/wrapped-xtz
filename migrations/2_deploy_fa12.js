@@ -5,13 +5,21 @@ const saveContractAddress = require('./../helpers/saveContractAddress');
 
 
 const initial_storage = {
-    tokens       : new MichelsonMap,
-    allowances   : new MichelsonMap,
-    total_amount : 100,
+    token : {
+        ledger:new MichelsonMap,
+        approvals: new MichelsonMap,
+        admin: alice.pkh,
+        paused: false,
+        totalSupply: 100,
+    },
     swaps 	     : new MichelsonMap,
     hashlock     : new MichelsonMap,
     status	     : new MichelsonMap,
     secrets      : new MichelsonMap,
+    bridge       : {
+        swaps       : new MichelsonMap,
+        outcomes    : new MichelsonMap
+    }
 }
 
 module.exports = async (deployer, network, accounts) => {
