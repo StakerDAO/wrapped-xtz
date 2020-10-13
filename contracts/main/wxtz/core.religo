@@ -3,14 +3,15 @@
 #include "../../partials/wxtz/core/storage/storage.religo"
 #include "../../partials/wxtz/core/errors.religo"
 
-#include "../../partials/wxtz/core/run/run.religo"
+#include "../../partials/wxtz/core/runEntrypointLambda/runEntrypointLambda.religo"
 #include "../../partials/wxtz/core/default/default.religo"
 
 /**
  * wXTZ Core
  */
-let main = ((parameter, storage): (parameter, storage)): (list(operation), storage) => {
-    switch (parameter) {
+let main = ((mainParameter, storage): (mainParameter, storage)): (list(operation), storage) => {
+    // TODO: create a 'wrapper/main' lambda that wraps all the other lambda invocations
+    switch (mainParameter) {
         /**
          * Default entrypoint
          */
@@ -19,7 +20,6 @@ let main = ((parameter, storage): (parameter, storage)): (list(operation), stora
          * Run entrypoint is used to run lambdas stored in the storage.
          * Those lambdas must confront to the entrypoint type signature.
          */
-        // TODO: create a 'run' lambda that wraps all the other lamba invocations
-        | Run(runParameter) => run((runParameter, storage))
+        | RunEntrypointLambda(runEntrypointLambdaParameter) => runEntrypointLambda((runEntrypointLambdaParameter, storage))
     };
 };

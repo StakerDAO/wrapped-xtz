@@ -1,4 +1,4 @@
-#include "../mockContracts/entrypoint.religo"
+#include "../../mockLambdaContracts/entrypoint.religo"
 type updateLambdasParameter = map(lambdaName, option(packedLambda));
 type lambdaUpdate = (lambdaName, option(packedLambda));
 type updateLambdasAccumulator = lambdas;

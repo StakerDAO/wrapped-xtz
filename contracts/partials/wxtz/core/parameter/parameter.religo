@@ -1,6 +1,6 @@
-#include "../run/parameter.religo"
+#include "../runEntrypointLambda/parameter.religo"
 type defaultParameter = unit;
 
-type parameter = 
+type mainParameter = 
 | Default(defaultParameter)
-| Run(runParameter)
+| RunEntrypointLambda(runEntrypointLambdaParameter)

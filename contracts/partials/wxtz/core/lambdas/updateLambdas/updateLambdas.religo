@@ -1,7 +1,7 @@
 /**
  * Lambda to add/remove/replace lambdas in the wXTZ Core
  */
-let lambda = ((lambdaParameter, storage): (lambdaParameter, storage)): entrypointReturn => {
+((lambdaParameter, storage): (lambdaParameter, storage)): entrypointReturn => {
     // Unpack the provided parameter
     let updateLambdasParameter: option(updateLambdasParameter) = Bytes.unpack(lambdaParameter);
     let updateLambdasParameter = switch (updateLambdasParameter) {

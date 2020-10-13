@@ -1,6 +1,6 @@
 type lambdaName = string;
 type lambdaParameter = bytes;
-type runParameter = {
+type runEntrypointLambdaParameter = {
     lambdaName: lambdaName,
     lambdaParameter: lambdaParameter
 };

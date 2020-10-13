@@ -1,2 +1,2 @@
-#include "../mockContracts/entrypoint.religo"
+#include "../../mockLambdaContracts/entrypoint.religo"
 type defaultParameter = unit;

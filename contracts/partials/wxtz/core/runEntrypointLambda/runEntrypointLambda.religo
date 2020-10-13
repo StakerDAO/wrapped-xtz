@@ -1,7 +1,7 @@
 #include "./types.religo"
 
-let run = ((runParameter, storage): (runParameter, storage)): entrypointReturn => {
-    let lambda: option(packedLambda) = Big_map.find_opt(runParameter.lambdaName, storage.lambdas);
+let runEntrypointLambda = ((runEntrypointLambdaParameter, storage): (runEntrypointLambdaParameter, storage)): entrypointReturn => {
+    let lambda: option(packedLambda) = Big_map.find_opt(runEntrypointLambdaParameter.lambdaName, storage.lambdas);
     let packedLambda: packedLambda = switch (lambda) {
         | None => (failwith(errorLambdaNotFound): packedLambda)
         | Some(packedLambda) => packedLambda
@@ -10,6 +10,6 @@ let run = ((runParameter, storage): (runParameter, storage)): entrypointReturn =
     let entrypointLambda: option(entrypointLambda) = Bytes.unpack(packedLambda);
     switch (entrypointLambda) {
         | None => (failwith(errorLambdaNotAnEntrypoint): entrypointReturn)
-        | Some(entrypointLambda) => entrypointLambda((runParameter.lambdaParameter, storage))
+        | Some(entrypointLambda) => entrypointLambda((runEntrypointLambdaParameter.lambdaParameter, storage))
     };
 }

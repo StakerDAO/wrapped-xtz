@@ -1,7 +1,7 @@
 let default = ((storage): (storage)): entrypointReturn => {
-    let runParameter: runParameter = {
+    let runEntrypointLambdaParameter: runEntrypointLambdaParameter = {
         lambdaName: "default",
         lambdaParameter: Bytes.pack(())
     };
-    run((runParameter, storage));
+    runEntrypointLambda((runEntrypointLambdaParameter, storage));
 };
