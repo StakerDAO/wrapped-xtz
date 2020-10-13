@@ -39,7 +39,8 @@
     "env:clean": "npm run tools:kill bbbox && npm run tools:clean bbbox",
     "commit": "git-cz",
     "compile:lambda": "node scripts/lambdaCompiler/compileLambdaCli.js",
-    "compile:lambda:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -- npm run compile:lambda"
+    "compile:lambda:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -- npm run compile:lambda",
+    "compile:lambda-parameter": "node scripts/lambdaCompiler/testCompileLambdaParameterCli.js"
   },
   "author": "matej.sima@stove-labs.com",
   "license": "MIT",

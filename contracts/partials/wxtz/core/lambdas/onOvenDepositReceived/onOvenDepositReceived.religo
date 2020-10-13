@@ -1,7 +1,7 @@
 /**
  * Lambda called when a wXTZ Oven receives a deposit of any kind
  */
-((lambdaParameter, storage): (lambdaParameter, storage)): entrypointReturn => {
+((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     // check if the `Tezos.sender` is a wXTZ Oven originated by the core
     let ovenOwner: option(ovenOwner) = Big_map.find_opt(Tezos.sender, storage.ovens);
 

@@ -1,19 +1,20 @@
 /**
  * Lambda to originate a new wXTZ Oven
  */
-((lambdaParameter, storage): (lambdaParameter, storage)): entrypointReturn => {
+((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     let createOvenParameter: option(createOvenParameter) = Bytes.unpack(lambdaParameter);
     let createOvenParameter: createOvenParameter = switch (createOvenParameter) {
         | None => (failwith(errorLambdaParameterWrongType): createOvenParameter)
         | Some(createOvenParameter) => createOvenParameter
     };
 
-    let ovenOwner: ovenOwner = Tezos.sender; // should the oven owner be parametrizable?
+    let ovenOwner: ovenOwner = createOvenParameter.ovenOwner; // TODO: should the oven owner be parametrizable?
 
     let (ovenOriginationOperation, newOvenAddress): (operation, address) = originateOven((
         Tezos.amount,
         createOvenParameter.delegate,
-        ovenOwner
+        ovenOwner,
+        lambdaExtras.selfAddress
     ));
     
     let ovens: ovens = storage.ovens;
