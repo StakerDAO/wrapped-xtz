@@ -1,33 +1,18 @@
-#include "../status.religo"
-
-let lock = ((p,s) : (lockParameter, storage)) : (list (operation), storage) => {
-  // TODO
-  // check status
-  
-	let status: string = switch (p.secretHash) {
-		| Some(hashlock) => statusHashRevealed
-		| None => statusNotInitialized
-	};
-
-	let secretHash: hashlock = switch (p.secretHash) {
+let lock = ((lockParameter, s) : (lockParameter, storage)) : (list (operation), storage) => {
+  	// TODO: check status
+	let secretHash: hashlock = switch (lockParameter.secretHash) {
 		| Some(hashlock) => hashlock
 		| None => "ff": bytes
 	};
 	
-	let newOutcome = Big_map.add(
-		p.lockId,
-		HashRevealed(secretHash),
-		s.bridge.outcomes
-	);
-	
 	let swapEntry: swap = {
-		address_to: p.address_to,
+		address_to: lockParameter.address_to,
 		address_from: Tezos.sender,
-		value: p.value,
-		releaseTime: p.releaseTime,
+		value: lockParameter.value,
+		releaseTime: lockParameter.releaseTime,
 	};
 	let newSwap = Big_map.add(
-		p.lockId,
+		lockParameter.lockId,
 		swapEntry,
 		s.bridge.swaps
 	);
@@ -37,10 +22,10 @@ let lock = ((p,s) : (lockParameter, storage)) : (list (operation), storage) => {
 	let transfer = {
 		address_to: Tezos.self_address,
 		address_from: Tezos.sender,
-		value: p.value,
+		value: lockParameter.value,
 	};
   
- 	let senderBalance = switch (Big_map.find_opt (Tezos.sender, s.token.ledger)) {
+ 	let senderBalance = switch (Big_map.find_opt(Tezos.sender, s.token.ledger)) {
 		| Some(value) => value
 		| None => 0n
 	};
@@ -60,8 +45,11 @@ let lock = ((p,s) : (lockParameter, storage)) : (list (operation), storage) => {
 		};
 		let newTokens = Big_map.update (transfer.address_to, (Some (receiver_balance + transfer.value)), newTokens);
 
-	
 		if (secretHash == "ff": bytes) {
+			/**
+			 * New swap is saved to storage
+			 * Tokens to be transferred are locked
+			*/
 			let newStorage = { 
 				...s, 
 				bridge: { 
@@ -74,7 +62,17 @@ let lock = ((p,s) : (lockParameter, storage)) : (list (operation), storage) => {
 				},
 			};
 			(([]: list (operation)), newStorage);
-		} else{
+		} else {
+			/**
+			 * New swap is saved to storage
+			 * Tokens to be transferred are locked
+			 * Hash was revealed and is saved to outcomes
+			 */
+			let newOutcome = Big_map.add(
+				lockParameter.lockId,
+				HashRevealed(secretHash),
+				s.bridge.outcomes
+			);
 			let newStorage = { 
 				...s, 
 				bridge: { 
@@ -88,8 +86,7 @@ let lock = ((p,s) : (lockParameter, storage)) : (list (operation), storage) => {
 				},
 			};			
 			(([]: list (operation)), newStorage);
-		}
-
+		};
 	};
 
 };

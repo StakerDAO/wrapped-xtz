@@ -11,7 +11,6 @@
 #include "../../partials/wxtz/tzip7/setPause/setPause.religo"
 #include "../../partials/wxtz/tzip7/setAdministrator/setAdministrator.religo"
 
-#include "../../partials/wxtz/tzip7/bridge/status.religo"
 #include "../../partials/wxtz/tzip7/bridge/lock/lock.religo"
 #include "../../partials/wxtz/tzip7/bridge/redeem/redeem.religo"
 #include "../../partials/wxtz/tzip7/bridge/claimRefund/claimRefund.religo"
