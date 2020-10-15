@@ -1,0 +1,3 @@
+type claimRefundParameter = {
+	lockId: lockId,
+};
