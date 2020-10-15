@@ -100,11 +100,11 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
 
     it("should lock 5 tokens for Alice", async() => {
         // call the token contract at the %lock entrypoint
-        await tzip7_instance.lock( 
-            bob.pkh, 
+        await tzip7_instance.lock(  
             lockId, 
             "2020-10-31T15:08:29.000Z", 
-            secretHash, 
+            secretHash,
+            bob.pkh, 
             amount
         );
         // read contract's storage
@@ -116,10 +116,10 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
     it("should not allow to reuse a lockId", async() => {
         // call the token contract at the %lock entrypoint with an already used lockId 
         await expect(tzip7_instance.lock( 
-            bob.pkh, 
             lockId, 
             "2020-10-31T15:08:29.000Z", 
             secretHash, 
+            bob.pkh,
             amount
         )).to.be.rejectedWith("SwapLockAlreadyExists");
     });
@@ -156,11 +156,11 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         const releasetimePast = "2020-09-30T15:08:29.000Z";
         const smallAmount = 1;
         // Alice locks 1 token with an expiration date in the past
-        await tzip7_instance.lock( 
-            bob.pkh, 
+        await tzip7_instance.lock(  
             newlockId, 
             releasetimePast, 
             secretHash, 
+            bob.pkh,
             smallAmount
         );
         // Bob tries to redeem token, but has surpassed the release date for the swap
