@@ -30,6 +30,16 @@ module.exports = async (deployer, network, accounts) => {
         ).bytes
     );
 
+    /**
+     * Compile the wXTZ Oven to Michelson so it can be included
+     * within the `createOven` lambda
+     */
+    compileLambda(
+        'contracts/partials/wxtz/core/lambdas/createOven/oven/oven.religo',
+        'michelson.code',
+        'contracts/partials/wxtz/core/lambdas/createOven/oven/oven.tz'
+    );
+
     lambdas.set('createOven', 
         compileLambda(
             'contracts/partials/wxtz/core/lambdas/createOven/createOven.religo'

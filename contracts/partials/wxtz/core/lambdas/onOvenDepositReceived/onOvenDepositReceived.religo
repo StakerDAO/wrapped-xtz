@@ -42,6 +42,5 @@
     ];
 
     (operations, storage);
-    // ([]: list(operation), storage);
 }
 
