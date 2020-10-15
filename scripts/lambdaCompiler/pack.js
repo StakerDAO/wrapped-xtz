@@ -5,4 +5,5 @@ const data = JSON.parse(args[0]);
 const type = JSON.parse(args[1]);
 
 Tezos.rpc.packData({ data, type })
-    .then(res => console.log(res.packed));
+    .then(res => console.log(res.packed))
+    .catch(e => console.error('failed to pack:', e));
