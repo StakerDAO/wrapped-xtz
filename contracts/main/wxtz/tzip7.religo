@@ -7,6 +7,7 @@
 #include "../../partials/wxtz/tzip7/getBalance/getBalance.religo"
 #include "../../partials/wxtz/tzip7/getTotalSupply/getTotalSupply.religo"
 #include "../../partials/wxtz/tzip7/mint/mint.religo"
+#include "../../partials/wxtz/tzip7/burn/burn.religo"
 #include "../../partials/wxtz/tzip7/setPause/setPause.religo"
 #include "../../partials/wxtz/tzip7/setAdministrator/setAdministrator.religo"
 
@@ -20,7 +21,8 @@ let main = ((p,s): (parameter, storage)) =>
 	switch (p) {
 		| Transfer(transferParameter) => transfer((transferParameter, s))
 		| Approve(approveParameter) => approve((approveParameter, s))
-		| Mint(mintParameter) => mint ((mintParameter, s))
+		| Mint(mintParameter) => mint((mintParameter, s))
+		| Burn(burnParameter) => burn((burnParameter, s))
 		| SetAdministrator(address_) => setAdministrator((address_, s))
 		| SetPause(bool) => setPause((bool, s))
 		| GetAllowance(getAllowanceParameter) => getAllowance((getAllowanceParameter, s))
