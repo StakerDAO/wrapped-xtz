@@ -1,4 +1,4 @@
 type mintParameter = {
-	address_to: address,
+	to_: address,
 	value: nat,
 };

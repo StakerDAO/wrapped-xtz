@@ -1,5 +1,5 @@
 type transferParameter = {
-	address_from: address,
-	address_to: address,
+	from_: address,
+	to_: address,
 	value: nat,
 };
