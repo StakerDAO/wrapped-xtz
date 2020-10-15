@@ -1,3 +1,0 @@
-type claimRefund = {
-	lockId 		: lockId
-}
