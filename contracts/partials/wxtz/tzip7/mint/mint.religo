@@ -1,23 +1,25 @@
 let mint = ((p,s): (mintParameter, storage)): (list(operation), storage) => {
-	// TODO
-	// needs to fail if not the admin is sending
-	let value = switch (Big_map.find_opt (p.address_to, s.token.ledger)) {
-		| Some(value) => value
-		| None => 0n
-	};
+	if (Tezos.sender == s.token.admin) {
+		let value = switch (Big_map.find_opt (p.to_, s.token.ledger)) {
+			| Some(value) => value
+			| None => 0n
+		};
 
-	let newBalance = value + p.value;
-	let newTokens = Big_map.update(
-		p.address_to,
-		Some(newBalance),
-		s.token.ledger
-	);
-	let newStorage = {
-		...s,
-		token: {
-			...s.token,
-			ledger: newTokens
-		}
+		let newBalance = value + p.value;
+		let newTokens = Big_map.update(
+			p.to_,
+			Some(newBalance),
+			s.token.ledger
+		);
+		let newStorage = {
+			...s,
+			token: {
+				...s.token,
+				ledger: newTokens
+			}
+		};
+		(([]: list (operation)), newStorage);
+	} else {
+		(failwith ("NoPermission"): (list(operation), storage))
 	};
-	(([]: list (operation)), newStorage);
 };
