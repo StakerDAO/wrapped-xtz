@@ -16,19 +16,70 @@
 #include "../../partials/wxtz/tzip7/bridge/claimRefund/claimRefund.religo"
 #include "../../partials/wxtz/tzip7/bridge/revealSecretHash/revealSecretHash.religo"
 
-let main = ((p,s): (parameter, storage)) =>  
-	switch (p) {
-		| Transfer(transferParameter) => transfer((transferParameter, s))
-		| Approve(approveParameter) => approve((approveParameter, s))
-		| Mint(mintParameter) => mint((mintParameter, s))
-		| Burn(burnParameter) => burn((burnParameter, s))
-		| SetAdministrator(address_) => setAdministrator((address_, s))
-		| SetPause(bool) => setPause((bool, s))
-		| GetAllowance(getAllowanceParameter) => getAllowance((getAllowanceParameter, s))
-		| GetBalance(getBalanceParameter) => getBalance((getBalanceParameter, s))
-		| GetTotalSupply(getTotalSupplyParameter) => getTotalSupply((getTotalSupplyParameter, s))
-		| Lock(lockParameter) => lock((lockParameter, s))
-		| RevealSecretHash(revealSecretHashParameter) => revealSecretHash((revealSecretHashParameter, s))
-		| Redeem(redeemParameter) => redeem((redeemParameter, s))
-		| ClaimRefund(claimRefundParameter) => (([]: list(operation)), s)
+let main = ((parameter, storage): (parameter, storage)) =>  
+	switch (parameter) {
+		| Transfer(transferParameter) => {
+			let (operations, tokenStorage) = transfer((transferParameter, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}
+		| Approve(approveParameter) => {
+			let (operations, tokenStorage) = approve((approveParameter, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		} 
+		| Mint(mintParameter) => {
+			let (operations, tokenStorage) = mint((mintParameter, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		} 
+		| Burn(burnParameter) => {
+			let (operations, tokenStorage) = burn((burnParameter, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}
+		| SetAdministrator(address_) => {
+			let (operations, tokenStorage) = setAdministrator((address_, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		} 
+		| SetPause(bool) => {
+			let (operations, tokenStorage) = setPause((bool, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}
+		| GetAllowance(getAllowanceParameter) => {
+			let (operations, _) = getAllowance((getAllowanceParameter, storage.token));
+			(operations: list(operation), storage)
+		}
+		| GetBalance(getBalanceParameter) => {
+			let (operations, _) = getBalance((getBalanceParameter, storage.token));
+			(operations: list(operation), storage)
+		}
+		| GetTotalSupply(getTotalSupplyParameter) => {
+			let (operations, _) = getTotalSupply((getTotalSupplyParameter, storage.token));
+			(operations: list(operation), storage)
+		}
+		| Lock(lockParameter) => lock((lockParameter, storage))
+		| RevealSecretHash(revealSecretHashParameter) => {
+			let (operations, bridgeStorage) = revealSecretHash((revealSecretHashParameter, storage.bridge));
+			(operations, {
+				...storage,
+				bridge: bridgeStorage
+			})
+		} 
+		| Redeem(redeemParameter) => redeem((redeemParameter, storage))
+		| ClaimRefund(claimRefundParameter) => (([]: list(operation)), storage)
 };

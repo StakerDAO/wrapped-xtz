@@ -1,84 +1,73 @@
-let redeem = ((p,s) : (redeemParameter, storage)) : (list (operation), storage) => {
-	
-	// check that p.secret is shorter than x
-	// otherwise failwith ("TooLongSecret")
-	
+let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(operation), storage) => {
+	/**
+	 * Provided secret needs to be below a certain length
+	 */
+	let secretByteLength = Bytes.length(redeemParameter.secret);
+	let islengthBelowThreshold = secretByteLength <= 32n;
+	let islengthBelowThreshold = switch (islengthBelowThreshold) {
+		| true => true
+		| false => (failwith("TooLongSecret"): bool)
+	};
 
-
-	// check time
-	// otherwise failwith ("SwapIsOver")
-
-	let swap = switch (Big_map.find_opt (p.lockId, s.bridge.swaps)) {
-	| Some(value) => value
+	let swap = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.swaps)) {
+	| Some(swap) => swap
 	| None => (failwith ("SwapLockDoesNotExist"): swap)
 	};
 
-	// check that sha256 of p.secret == swap.secretHash
-	// otherwise failwith ("InvalidSecret")	
+	/**
+	 * Check whether swap time period has experied
+	 */
+	switch (swap.releaseTime >= Tezos.now) {
+		| false => (failwith("SwapIsOver"): unit)
+		| true => unit
+	};
 
-	let calculatedHash = Crypto.sha256(p.secret);
-	let secretHash = switch (Big_map.find_opt (p.lockId, s.bridge.outcomes)) {
+	let secretHash = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.outcomes)) {
 		| Some(outcome) => {
 			switch (outcome) {
 			| HashRevealed(hashlock) => hashlock
-			| SecretRevealed(secret) => (failwith("swap already performed"): hashlock)
-			| Refunded(value) => (failwith("no hash"): hashlock)
-			}
+			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): hashlock)
+			| Refunded(value) => (failwith("SwapAlreadyRefunded"): hashlock)
+			};
 		}
-		| None => (failwith("no hash"): hashlock)
+		| None => (failwith("HashWasNotRevealed"): hashlock)
 	};
+	/**
+	 * Calculate SHA-256 hash of provided secret
+	 */
+	let calculatedHash = Crypto.sha256(redeemParameter.secret);
 
+	switch (calculatedHash == secretHash) {
+		| false => (failwith("InvalidSecret"): (list(operation), storage))
+		| true => {
+			/**
+			 * Constructing the transfer parameter to redeem locked-up tokens
+			 */
+			let transferParameter: transferParameter = {
+				to_: swap.to_,
+				from_: Tezos.self_address,
+				value: swap.value,
+			};
+			/**
+			 * Calling the transfer function to redeem the token amount specified in swap
+			 */
+			let (_, newTokenStorage) = transfer((transferParameter, storage.token));
 
-	if (calculatedHash == secretHash) {
-		let transfer = {
-			address_to: swap.address_to,
-			address_from: Tezos.self_address,
-			value: swap.value,
-		};
+			let newOutcome = Big_map.update(
+				redeemParameter.lockId,
+				Some(SecretRevealed(redeemParameter.secret)),
+				storage.bridge.outcomes
+			);
 	
-		let sender_balance = switch (Big_map.find_opt (transfer.address_from, s.token.ledger)) {
-		|	Some(value) => value
-		|	None => 0n
+			let newStorage = {
+				...storage,
+				token: newTokenStorage, 
+				bridge: {
+					...storage.bridge,
+					outcomes: newOutcome
+				}
+			};
+			(([]: list (operation)), newStorage);
 		};
-		// not performing check for enough balance, trusting that the smart contract is not sending around tokens
-		let newSenderBalance = abs(sender_balance - transfer.value);
-		let newTokens = Big_map.update(
-			transfer.address_from,
-			Some(newSenderBalance),
-			s.token.ledger
-		);
-		let receiverBalance = switch (Big_map.find_opt(transfer.address_to, s.token.ledger)) {
-		| Some(value) => value
-		| None => 0n
-		};
-		let newReceiverBalance = receiverBalance + transfer.value;
-		let newTokens = Big_map.update(
-			transfer.address_to,
-			Some(newReceiverBalance),
-			newTokens
-		);
-
-		let newOutcome = Big_map.update(
-			p.lockId,
-			Some(SecretRevealed(p.secret)),
-			s.bridge.outcomes
-		);
-
-		let newStorage = {
-			...s,
-			token: {
-				...s.token,
-				ledger: newTokens
-			}, 
-			bridge: {
-				...s.bridge,
-				outcomes: newOutcome
-			}
-		};
-		(([]: list (operation)), newStorage);
-	} else{
-		(failwith("InvalidSecret"): (list(operation), storage))
-	}
-
-	
+	};
 };

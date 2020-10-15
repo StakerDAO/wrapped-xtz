@@ -1,51 +1,57 @@
-let transfer = ((p,s): (transferParameter, storage)): (list(operation), storage) => {
-   let newAllowances =   
-		if (Tezos.sender == p.from_) { s.token.approvals; }
-		else {
-			let authorized_value = switch (Big_map.find_opt((Tezos.sender,p.from_), s.token.approvals)) {
+[@inline]
+let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): (list(operation), tokenStorage) => {
+	let isPaused = switch (tokenStorage.paused) {
+		| true => (failwith("TokenOperationsArePaused"): bool)
+		| false => false	
+	};
+	
+	let newAllowances = switch(Tezos.sender == transferParameter.from_ || Tezos.self_address == transferParameter.from_ ) {
+	   | true => tokenStorage.approvals
+	   | false => {
+		   let authorized_value = switch (Big_map.find_opt((Tezos.sender, transferParameter.from_), tokenStorage.approvals)) {
 				| Some(value) => value
 				| None => 0n
 			};
-			if (authorized_value < p.value) { (failwith ("Not Enough Allowance"): allowances); }
+			if (authorized_value < transferParameter.value) { (failwith("NotEnoughAllowance"): allowances); }
 			else { 
-				let newAuthorizeValue = abs(authorized_value - p.value);
+				let newAuthorizeValue = abs(authorized_value - transferParameter.value);
 				Big_map.update(
-					(Tezos.sender,p.from_), 
+					(Tezos.sender,transferParameter.from_), 
 					Some(newAuthorizeValue), 
-					s.token.approvals
+					tokenStorage.approvals
 				); 
 			};
-		};
-	let senderBalance = switch (Big_map.find_opt(p.from_, s.token.ledger)) {
+	   }
+	};
+	
+	let senderBalance = switch (Big_map.find_opt(transferParameter.from_, tokenStorage.ledger)) {
 		| Some(value) => value
 		| None => 0n
 	};
-	if (senderBalance < p.value) { (failwith ("Not Enough Balance"): (list(operation), storage)); }
+
+	if (senderBalance < transferParameter.value) { (failwith("NotEnoughBalance"): (list(operation), tokenStorage)); }
 	else {
-		let newSenderBalance = abs(senderBalance - p.value);
+		let newSenderBalance = abs(senderBalance - transferParameter.value);
 		let newTokens = Big_map.update(
-			p.from_,
+			transferParameter.from_,
 			Some(newSenderBalance),
-			s.token.ledger
+			tokenStorage.ledger
 		);
-		let receiverBalance = switch (Big_map.find_opt(p.to_, s.token.ledger)) {
-		| Some value => value
-		| None       => 0n
+		let receiverBalance = switch (Big_map.find_opt(transferParameter.to_, tokenStorage.ledger)) {
+		| Some(value) => value
+		| None => 0n
 		};
-		let newReceiverBalance = receiverBalance + p.value;
+		let newReceiverBalance = receiverBalance + transferParameter.value;
 		let newTokens = Big_map.update(
-			p.to_,
+			transferParameter.to_,
 			Some(newReceiverBalance),
 			newTokens
 		);
 		let newStorage = {
-			...s,
-			token: {
-				...s.token,
+				...tokenStorage,
 				ledger: newTokens,
 				approvals: newAllowances
-			}
 		};
-		(([]: list (operation)), newStorage);
+		(([]: list(operation)), newStorage)
 	};
 };

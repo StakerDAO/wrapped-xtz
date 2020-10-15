@@ -1,9 +1,9 @@
 type lockId = bytes;
 type swap = {
-	address_to: address,
-	address_from: address,
+	to_: address,
+	from_: address,
 	value: nat, // in ERC20 called amount
-	releaseTime: int,
+	releaseTime: timestamp,
 };
 type hashlock = bytes;
 type secret = bytes;

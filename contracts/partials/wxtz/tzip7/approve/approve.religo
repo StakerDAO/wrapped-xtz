@@ -1,18 +1,19 @@
-let approve = ((p,s) : (approveParameter, storage)) : (list(operation), storage) => {
-	let previousState = switch (Big_map.find_opt ((p.spender, Tezos.sender), s.token.approvals)){
-	| Some value => value
+let approve = ((approveParameter, tokenStorage) : (approveParameter, tokenStorage)) : (list(operation), tokenStorage) => {
+	let previousState = switch (Big_map.find_opt((approveParameter.spender, Tezos.sender), tokenStorage.approvals)){
+	| Some(value) => value
 	| None => 0n
 	};
-	if (previousState > 0n && p.value > 0n)
-	{ (failwith ("Unsafe Allowance Change"): (list(operation), storage)); }
+	if (previousState > 0n && approveParameter.value > 0n)
+	{ (failwith ("Unsafe Allowance Change"): (list(operation), tokenStorage)); }
 	else {
-		let newAllowances = Big_map.update ((p.spender, Tezos.sender), (Some (p.value)), s.token.approvals);
+		let newAllowances = Big_map.update(
+			(approveParameter.spender, Tezos.sender),
+			Some(approveParameter.value),
+			tokenStorage.approvals
+		);
 		let newStorage = {
-			...s,
-			token: {
-				...s.token,
+				...tokenStorage,
 				approvals: newAllowances
-			},
 		};
 		(([]: list(operation)), newStorage);
 	};

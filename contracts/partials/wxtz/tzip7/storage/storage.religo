@@ -7,10 +7,11 @@ type tokenStorage = {
   paused: bool,
   totalSupply: nat,
 };
-
+type swaps = big_map(lockId, swap);
+type outcomes = big_map(lockId, outcome);
 type bridgeStorage = {
-  swaps: big_map(lockId, swap),
-  outcomes: big_map(lockId, outcome),
+  swaps: swaps,
+  outcomes: outcomes,
 };
 
 type storage = {

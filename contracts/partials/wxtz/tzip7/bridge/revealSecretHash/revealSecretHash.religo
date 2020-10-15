@@ -1,4 +1,4 @@
-let revealSecretHash = ((p,s) : (revealSecretHashParameter, storage)) : (list (operation), storage) => {
-	//TODO
-	(([]: list (operation)), s);
+let revealSecretHash = ((revealSecretHashParameter, bridgeStorage) : (revealSecretHashParameter, bridgeStorage)) : (list (operation), bridgeStorage) => {
+	// TODO
+	(([]: list (operation)), bridgeStorage);
 };

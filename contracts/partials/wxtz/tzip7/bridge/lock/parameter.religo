@@ -1,7 +1,7 @@
 type lockParameter = {
 	lockId: lockId,
-	address_to: address,
+	to_: address,
 	value: nat,
-	releaseTime: int,
+	releaseTime: timestamp,
 	secretHash: option(hashlock),
 };

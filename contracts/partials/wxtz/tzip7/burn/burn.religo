@@ -1,27 +1,26 @@
-let burn = ((burnParameter, s): (burnParameter, storage)): (list(operation), storage) => {
-    if ( Tezos.sender == s.token.admin) {
-        let tokenBalance = switch (Big_map.find_opt(burnParameter.from_, s.token.ledger)) {
-            | Some(value) => value
-            | None => 0n
-	    };
-        if (tokenBalance < burnParameter.value) { (failwith ("NotEnoughBalance"): (list(operation), storage)); }
-        else {
-            let newTokenBalance = abs(tokenBalance - burnParameter.value);
-            let newTokens = Big_map.update(
-                burnParameter.from_,
-                Some(newTokenBalance),
-                s.token.ledger
-            );
-            let newStorage = {
-                ...s,
-                token: {
-                    ...s.token,
-                    ledger: newTokens
-                }
-            };
-            (([]: list (operation)), newStorage);
+let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (list(operation), tokenStorage) => {
+    let hasPermission = switch(Tezos.sender == tokenStorage.admin) {
+        | true => true
+        | false => (failwith("NoPermission"): bool)
+    };
+
+    let tokenBalance = switch (Big_map.find_opt(burnParameter.from_, tokenStorage.ledger)) {
+        | Some(value) => value
+        | None => 0n
+    };
+
+    if (tokenBalance < burnParameter.value) { (failwith ("NotEnoughBalance"): (list(operation), tokenStorage)); }
+    else {
+        let newTokenBalance = abs(tokenBalance - burnParameter.value);
+        let newTokens = Big_map.update(
+            burnParameter.from_,
+            Some(newTokenBalance),
+            tokenStorage.ledger
+        );
+        let newStorage = {
+            ...tokenStorage,
+            ledger: newTokens
         };
-    } else {
-        (failwith ("NoPermission"): (list(operation), storage))
+        (([]: list(operation)), newStorage);
     };
 };
