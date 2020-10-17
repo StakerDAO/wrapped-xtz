@@ -17,9 +17,11 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (list
             Some(newTokenBalance),
             tokenStorage.ledger
         );
+        let newTotalSupply = abs(tokenStorage.totalSupply - burnParameter.value);
         let newStorage = {
             ...tokenStorage,
-            ledger: newTokens
+            ledger: newTokens,
+            totalSupply: newTotalSupply,
         };
         (([]: list(operation)), newStorage);
     };

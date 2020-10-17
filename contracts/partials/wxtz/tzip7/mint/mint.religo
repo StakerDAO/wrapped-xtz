@@ -1,6 +1,6 @@
-let mint = ((mintParameter, storage): (mintParameter, tokenStorage)): (list(operation), tokenStorage) => {
-	if (Tezos.sender == storage.admin) {
-		let value = switch (Big_map.find_opt(mintParameter.to_, storage.ledger)) {
+let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (list(operation), tokenStorage) => {
+	if (Tezos.sender == tokenStorage.admin) {
+		let value = switch (Big_map.find_opt(mintParameter.to_, tokenStorage.ledger)) {
 			| Some(value) => value
 			| None => 0n
 		};
@@ -8,11 +8,13 @@ let mint = ((mintParameter, storage): (mintParameter, tokenStorage)): (list(oper
 		let newTokens = Big_map.update(
 			mintParameter.to_,
 			Some(newBalance),
-			storage.ledger
+			tokenStorage.ledger
 		);
+		let newTotalSupply = tokenStorage.totalSupply + mintParameter.value;
 		let newStorage = {
-			...storage,
-			ledger: newTokens
+			...tokenStorage,
+			ledger: newTokens,
+			totalSupply: newTotalSupply
 		};
 		([]: list(operation), newStorage)
 	} else {

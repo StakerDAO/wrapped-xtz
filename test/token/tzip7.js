@@ -47,6 +47,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         actualBalance = await storage.token.ledger.get(alice.pkh);
         expectedBalance = 20;
         expect(Number(actualBalance)).to.equal(expectedBalance);
+        expect(Number(storage.token.totalSupply)).to.equal(expectedBalance);
     });
 
     it("should not change the adminstrator's address for Bob", async() => {
