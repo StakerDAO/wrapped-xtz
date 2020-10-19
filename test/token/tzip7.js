@@ -234,4 +234,21 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         const outcome = await storage.bridge.outcomes.get(lockId03);
         expect(outcome).to.equal(secretHash);
     });
+
+    it.only("should pause all transfer and approve operations", async () => {
+        // call the token contract at the %setPause entrypoint to pause all operations
+        await tzip7_instance.setPause(true)
+        // read contract's storage
+        storage = await tzip7_instance.storage();
+        expect(storage.token.paused).to.be.true;
+        // send a transfer operation
+        const from_ = alice.pkh;
+        const to_ = bob.pkh;
+        const value = 1;
+        await expect(tzip7_instance.transfer(from_, to_, value)).to.be.rejectedWith("TokenOperationsArePaused");
+        // send an approve operation
+        await expect(tzip7_instance.approve(bob.pkh, 2)).to.be.rejectedWith("TokenOperationsArePaused");
+    });
+    
+    
 });
