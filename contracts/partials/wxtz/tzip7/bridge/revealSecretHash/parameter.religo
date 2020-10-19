@@ -1,4 +1,4 @@
 type revealSecretHashParameter = {
 	lockId: lockId,
-	secretHash: hashlock,
+	secretHash: secretHash,
 };

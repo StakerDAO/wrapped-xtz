@@ -11,11 +11,11 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 
 	let swap = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.swaps)) {
 	| Some(swap) => swap
-	| None => (failwith ("SwapLockDoesNotExist"): swap)
+	| None => (failwith("SwapLockDoesNotExist"): swap)
 	};
 
 	/**
-	 * Check whether swap time period has experied
+	 * Check whether swap time period has expired
 	 */
 	switch (swap.releaseTime >= Tezos.now) {
 		| false => (failwith("SwapIsOver"): unit)
@@ -25,12 +25,12 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 	let secretHash = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.outcomes)) {
 		| Some(outcome) => {
 			switch (outcome) {
-			| HashRevealed(hashlock) => hashlock
-			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): hashlock)
-			| Refunded(value) => (failwith("SwapAlreadyRefunded"): hashlock)
+			| HashRevealed(secretHash) => secretHash
+			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): secretHash)
+			| Refunded(value) => (failwith("SwapAlreadyRefunded"): secretHash)
 			};
 		}
-		| None => (failwith("HashWasNotRevealed"): hashlock)
+		| None => (failwith("HashWasNotRevealed"): secretHash)
 	};
 	/**
 	 * Calculate SHA-256 hash of provided secret

@@ -31,10 +31,10 @@ let lock = ((lockParameter, storage) : (lockParameter, storage)) : (list(operati
 	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
 
 	/**
-	 * Check whether the optional hashlock was provided as parameter
+	 * Check whether the optional secretHash was provided as parameter
 	 */
 	 switch (lockParameter.secretHash) {
-		| Some(hashlock) => {
+		| Some(secretHash) => {
 			/**
 			 * Hash was revealed and is saved to outcomes
 			 * New swap is saved to storage
@@ -42,7 +42,7 @@ let lock = ((lockParameter, storage) : (lockParameter, storage)) : (list(operati
 			 */
 			let newOutcome = Big_map.add(
 				lockParameter.lockId,
-				HashRevealed(hashlock),
+				HashRevealed(secretHash),
 				storage.bridge.outcomes
 			);
 			let newStorage = { 

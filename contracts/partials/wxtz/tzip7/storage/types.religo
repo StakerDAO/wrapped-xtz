@@ -5,11 +5,11 @@ type swap = {
 	value: nat, // in ERC20 called amount
 	releaseTime: timestamp,
 };
-type hashlock = bytes;
+type secretHash = bytes;
 type secret = bytes;
 type outcome = 
   | Refunded
-  | HashRevealed(hashlock) 
+  | HashRevealed(secretHash) 
   | SecretRevealed(secret);
 
 type tokens = big_map(address, nat)
