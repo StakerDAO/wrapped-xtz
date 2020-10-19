@@ -1,5 +1,5 @@
-let getAllowance = ((getAllowanceParameter, storage): (getAllowanceParameter, tokenStorage)): (list(operation), tokenStorage) => {
-	let value = switch (Big_map.find_opt((getAllowanceParameter.owner, getAllowanceParameter.spender), storage.approvals)) {
+let getAllowance = ((getAllowanceParameter, tokenStorage): (getAllowanceParameter, tokenStorage)): (list(operation), tokenStorage) => {
+	let value = switch (Big_map.find_opt((getAllowanceParameter.owner, getAllowanceParameter.spender), tokenStorage.approvals)) {
 		| Some(value) => value
 		| None => 0n
 	};
@@ -8,5 +8,5 @@ let getAllowance = ((getAllowanceParameter, storage): (getAllowanceParameter, to
 		0mutez,
 		getAllowanceParameter.callback
 	);
-	([op], storage)
+	([op], tokenStorage)
 };
