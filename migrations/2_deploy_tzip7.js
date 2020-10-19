@@ -11,7 +11,7 @@ const initialStorage = {
         approvals: new MichelsonMap,
         admin: alice.pkh,
         paused: false,
-        totalSupply: 100,
+        totalSupply: 10,
     },
     bridge: {
         swaps: new MichelsonMap,

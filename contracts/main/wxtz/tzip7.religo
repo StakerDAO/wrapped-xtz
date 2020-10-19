@@ -81,5 +81,5 @@ let main = ((parameter, storage): (parameter, storage)) =>
 			})
 		} 
 		| Redeem(redeemParameter) => redeem((redeemParameter, storage))
-		| ClaimRefund(claimRefundParameter) => (([]: list(operation)), storage)
+		| ClaimRefund(claimRefundParameter) => claimRefund((claimRefundParameter, storage))
 };

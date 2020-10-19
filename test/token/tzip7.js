@@ -40,7 +40,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
     /**
      *  Token tests
      */
-    it("should mint 10 tokens for Alice", async() => {
+    it("should mint 10 tokens for Alice", async () => {
         // calling the token contract %mint entrypoint
         await tzip7_instance.mint(alice.pkh, 10);
         storage = await tzip7_instance.storage();
@@ -59,16 +59,17 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         await expect(contract.methods.setAdministrator(bob.pkh).send()).to.be.rejectedWith("NoPermission");
     });
 
-    it("should burn 10 tokens for Alice", async() => {
+    it("should burn 10 tokens for Alice", async () => {
         // calling the token contract %burn entrypoint
         await tzip7_instance.burn(alice.pkh, 10);
         storage = await tzip7_instance.storage();
         actualBalance = await storage.token.ledger.get(alice.pkh);
         expectedBalance = 10;
         expect(Number(actualBalance)).to.equal(expectedBalance);
+        expect(Number(storage.token.totalSupply)).to.equal(expectedBalance);
     });
     
-    it("should fail for burning more tokens than Alice has", async() => {
+    it("should fail for burning more tokens than Alice has", async () => {
         // calling the token contract %burn entrypoint
         await expect(tzip7_instance.burn(alice.pkh, 20)).to.be.rejectedWith("NotEnoughBalance");
     });
@@ -99,7 +100,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         releaseTime: "2020-10-31T15:08:29.000Z"       
     }
 
-    it("should lock 5 tokens for Alice", async() => {
+    it("should lock 5 tokens for Alice", async () => {
         // call the token contract at the %lock entrypoint
         await tzip7_instance.lock(  
             lockId, 
@@ -114,7 +115,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         expect(Number(lockedBalance)).to.equal(amount);
     });
 
-    it("should not allow to reuse a lockId", async() => {
+    it("should not allow to reuse a lockId", async () => {
         // call the token contract at the %lock entrypoint with an already used lockId 
         await expect(tzip7_instance.lock( 
             lockId, 
@@ -128,7 +129,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
     /**
      * BOB checks secretHash on chain A using the lockId
      */
-    it("should validate the swap entry for Bob", async() => {
+    it("should validate the swap entry for Bob", async () => {
         storage = await tzip7_instance.storage()
         const swapsEntry = await storage.bridge.swaps.get(lockId)
         expect(swapsEntry.from).to.equal(expectedSwap.from)
@@ -166,5 +167,41 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         );
         // Bob tries to redeem token, but has surpassed the release date for the swap
         await expect(tzip7_instance.redeem(newlockId, secret)).to.be.rejectedWith("SwapIsOver");
+    });
+
+    it("should allow Alice to reclaim her funds after passing the time lock period", async () => {
+        const newlockId = "ffab";
+        const releasetimePast = "2020-09-30T15:08:29.000Z";
+        const smallAmount = 1;
+        // Alice locks 1 token with an expiration date in the past
+        await tzip7_instance.lock(  
+            newlockId, 
+            releasetimePast, 
+            secretHash, 
+            bob.pkh,
+            smallAmount
+        );
+        // Bob tries to redeem token, but has surpassed the release date for the swap
+        await tzip7_instance.claimRefund(newlockId);
+        storage = await tzip7_instance.storage();
+        console.log(storage.bridge.outcomes.get(newlockId))
+        const balanceAlice = await storage.token.ledger.get(alice.pkh);
+        return expect(Number(balanceAlice)).to.equal(4)
+    });
+
+    it("should not allow Alice to reclaim her funds before passing the time lock", async () => {
+        const newlockId = "ffac";
+        const releasetimePast = "2020-10-31T15:08:29.000Z";
+        const smallAmount = 1;
+        // Alice locks 1 token with an expiration date in the past
+        await tzip7_instance.lock(  
+            newlockId, 
+            releasetimePast, 
+            secretHash, 
+            bob.pkh,
+            smallAmount
+        );
+        // Bob tries to redeem token, but has surpassed the release date for the swap
+        await expect(tzip7_instance.claimRefund(newlockId)).to.be.rejectedWith("FundsLock");
     });
 });
