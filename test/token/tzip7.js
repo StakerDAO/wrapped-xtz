@@ -1,7 +1,7 @@
 const tzip7 = artifacts.require('tzip7');
 const crypto = require('crypto');
 const { expect } = require('chai').use(require('chai-as-promised'));
-const { Tezos } = require('@taquito/taquito')
+const { Tezos, UnitValue, ParameterSchema } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
@@ -184,7 +184,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         // Bob tries to redeem token, but has surpassed the release date for the swap
         await tzip7_instance.claimRefund(newlockId);
         storage = await tzip7_instance.storage();
-        console.log(storage.bridge.outcomes.get(newlockId))
+        console.log(await storage.bridge.outcomes.get(newlockId))
         const balanceAlice = await storage.token.ledger.get(alice.pkh);
         return expect(Number(balanceAlice)).to.equal(4)
     });
@@ -203,5 +203,35 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         );
         // Bob tries to redeem token, but has surpassed the release date for the swap
         await expect(tzip7_instance.claimRefund(newlockId)).to.be.rejectedWith("FundsLock");
+    });
+
+
+    const lockId03 = 'ffad';
+
+    it.skip("should allow Alice to lock tokens without revealing the secret hash", async () => {
+        // call the token contract at the %lock entrypoint
+        await tzip7_instance.lock(  
+            lockId03, 
+            "2020-10-31T15:08:29.000Z",
+            // TODO optional(bytes): None(), 
+            bob.pkh, 
+            amount
+        );
+        // read contract's storage
+        storage = await tzip7_instance.storage()
+        // swap entry exists
+        await storage.bridge.swaps.get(lockId03)
+    });
+
+    it.skip("should allow Alice to reveal secret hash for existing swap", async () => {
+        // call the token contract at the %lock entrypoint
+        await tzip7_instance.revealSecretHash(  
+            lockId03, 
+            secretHash
+        );
+        // read contract's storage
+        storage = await tzip7_instance.storage();
+        const outcome = await storage.bridge.outcomes.get(lockId03);
+        expect(outcome).to.equal(secretHash);
     });
 });
