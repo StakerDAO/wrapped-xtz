@@ -18,7 +18,7 @@ let main = ((mainParameter, storage): (mainParameter, storage)): (list(operation
         | Default => default((storage))
         /**
          * Run entrypoint is used to run lambdas stored in the storage.
-         * Those lambdas must confront to the entrypoint type signature.
+         * Those lambdas must conform to the entrypoint type signature.
          */
         | RunEntrypointLambda(runEntrypointLambdaParameter) => runEntrypointLambda((runEntrypointLambdaParameter, storage))
     };
