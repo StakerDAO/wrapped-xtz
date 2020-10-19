@@ -1,4 +1,9 @@
 let approve = ((approveParameter, tokenStorage) : (approveParameter, tokenStorage)) : (list(operation), tokenStorage) => {
+	let isPaused = switch (tokenStorage.paused) {
+		| true => (failwith("TokenOperationsArePaused"): bool)
+		| false => false	
+	};
+
 	let previousState = switch (Big_map.find_opt((approveParameter.spender, Tezos.sender), tokenStorage.approvals)){
 	| Some(value) => value
 	| None => 0n
