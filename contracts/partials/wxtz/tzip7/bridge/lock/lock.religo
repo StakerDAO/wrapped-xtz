@@ -1,4 +1,4 @@
-let lock = ((lockParameter, storage) : (lockParameter, storage)) : (list(operation), storage) => {
+let lock = ((lockParameter, storage): (lockParameter, storage)) : (list(operation), storage) => {
 	let swapEntry: swap = {
 		to_: lockParameter.to_,
 		from_: Tezos.sender,
@@ -6,7 +6,7 @@ let lock = ((lockParameter, storage) : (lockParameter, storage)) : (list(operati
 		releaseTime: lockParameter.releaseTime,
 	};
 	let newSwap = switch (Big_map.find_opt(lockParameter.lockId, storage.bridge.swaps)) {
-		| Some(value) => (failwith("SwapLockAlreadyExists"): swaps)
+		| Some(value) => (failwith(errorSwapLockAlreadyExists): swaps)
 		| None => {
 			Big_map.add(
 				lockParameter.lockId,
@@ -70,7 +70,7 @@ let lock = ((lockParameter, storage) : (lockParameter, storage)) : (list(operati
 				},
 				token: newTokenStorage,
 			};
-			(([]: list (operation)), newStorage);
+			(([]: list(operation)), newStorage);
 		}
 	};
 

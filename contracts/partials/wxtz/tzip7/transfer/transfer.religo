@@ -1,7 +1,7 @@
 [@inline]
 let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): (list(operation), tokenStorage) => {
 	let isPaused = switch (tokenStorage.paused) {
-		| true => (failwith("TokenOperationsArePaused"): bool)
+		| true => (failwith(errorTokenOperationsArePaused): bool)
 		| false => false	
 	};
 	
@@ -12,7 +12,9 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 				| Some(value) => value
 				| None => 0n
 			};
-			if (authorized_value < transferParameter.value) { (failwith("NotEnoughAllowance"): allowances); }
+			if (authorized_value < transferParameter.value) { 
+				(failwith(errorNotEnoughAllowance): allowances)
+			}
 			else { 
 				let newAuthorizeValue = abs(authorized_value - transferParameter.value);
 				Big_map.update(
@@ -29,7 +31,9 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 		| None => 0n
 	};
 
-	if (senderBalance < transferParameter.value) { (failwith("NotEnoughBalance"): (list(operation), tokenStorage)); }
+	if (senderBalance < transferParameter.value) { 
+		(failwith(errorNotEnoughBalance): (list(operation), tokenStorage))
+	}
 	else {
 		let newSenderBalance = abs(senderBalance - transferParameter.value);
 		let newTokens = Big_map.update(

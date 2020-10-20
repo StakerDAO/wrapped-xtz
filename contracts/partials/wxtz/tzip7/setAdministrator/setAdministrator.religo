@@ -6,6 +6,6 @@ let setAdministrator = ((setAdministratorParameter, tokenStorage): (address, tok
         };
         ([]: (list(operation)), newStorage)
     } else {
-        (failwith ("NoPermission"): (list(operation), tokenStorage));
+        (failwith (errorNoPermission): (list(operation), tokenStorage));
     };
 };

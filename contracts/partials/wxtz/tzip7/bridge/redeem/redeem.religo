@@ -6,19 +6,19 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 	let islengthBelowThreshold = secretByteLength <= 32n;
 	let islengthBelowThreshold = switch (islengthBelowThreshold) {
 		| true => true
-		| false => (failwith("TooLongSecret"): bool)
+		| false => (failwith(errorTooLongSecret): bool)
 	};
 
 	let swap = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.swaps)) {
 	| Some(swap) => swap
-	| None => (failwith("SwapLockDoesNotExist"): swap)
+	| None => (failwith(errorSwapLockDoesNotExist): swap)
 	};
 
 	/**
 	 * Check whether swap time period has expired
 	 */
 	switch (swap.releaseTime >= Tezos.now) {
-		| false => (failwith("SwapIsOver"): unit)
+		| false => (failwith(errorSwapIsOver): unit)
 		| true => unit
 	};
 
@@ -26,11 +26,11 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 		| Some(outcome) => {
 			switch (outcome) {
 			| HashRevealed(secretHash) => secretHash
-			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): secretHash)
-			| Refunded(value) => (failwith("SwapAlreadyRefunded"): secretHash)
+			| SecretRevealed(secret) => (failwith(errorSwapAlreadyPerformed): secretHash)
+			| Refunded(value) => (failwith(errorSwapAlreadyRefunded): secretHash)
 			};
 		}
-		| None => (failwith("HashWasNotRevealed"): secretHash)
+		| None => (failwith(errorHashWasNotRevealed): secretHash)
 	};
 	/**
 	 * Calculate SHA-256 hash of provided secret
@@ -38,7 +38,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 	let calculatedHash = Crypto.sha256(redeemParameter.secret);
 
 	switch (calculatedHash == secretHash) {
-		| false => (failwith("InvalidSecret"): (list(operation), storage))
+		| false => (failwith(errorInvalidSecret): (list(operation), storage))
 		| true => {
 			/**
 			 * Constructing the transfer parameter to redeem locked-up tokens
@@ -67,7 +67,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 					outcomes: newOutcome
 				}
 			};
-			(([]: list (operation)), newStorage);
+			(([]: list(operation)), newStorage);
 		};
 	};
 };

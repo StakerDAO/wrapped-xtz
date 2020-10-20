@@ -1,7 +1,7 @@
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (list(operation), storage) => {
     let swap = switch (Big_map.find_opt(claimRefundParameter.lockId, storage.bridge.swaps)) {
         | Some(swap) => swap
-        | None => (failwith("SwapLockDoesNotExist"): swap)
+        | None => (failwith(errorSwapLockDoesNotExist): swap)
     };
     
 	/**
@@ -9,18 +9,18 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
 	 */
 	switch (swap.releaseTime <= Tezos.now) {
 		| true => unit
-		| false => (failwith("FundsLock"): unit)
+		| false => (failwith(errorFundsLock): unit)
 	};
 
     let secretHash = switch (Big_map.find_opt(claimRefundParameter.lockId, storage.bridge.outcomes)) {
 		| Some(outcome) => {
 			switch (outcome) {
 			| HashRevealed(secretHash) => secretHash
-			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): secretHash)
-			| Refunded(value) => (failwith("SwapAlreadyRefunded"): secretHash)
+			| SecretRevealed(secret) => (failwith(errorSwapAlreadyPerformed): secretHash)
+			| Refunded(value) => (failwith(errorSwapAlreadyRefunded): secretHash)
 			};
 		}
-		| None => (failwith("HashWasNotRevealed"): secretHash)
+		| None => (failwith(errorHashWasNotRevealed): secretHash)
     };
     
     /**

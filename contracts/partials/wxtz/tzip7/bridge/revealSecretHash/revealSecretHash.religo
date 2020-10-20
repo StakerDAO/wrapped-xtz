@@ -1,18 +1,18 @@
-let revealSecretHash = ((revealSecretHashParameter, bridgeStorage) : (revealSecretHashParameter, bridgeStorage)) : (list (operation), bridgeStorage) => {
+let revealSecretHash = ((revealSecretHashParameter, bridgeStorage): (revealSecretHashParameter, bridgeStorage)) : (list (operation), bridgeStorage) => {
 	let swap = switch (Big_map.find_opt(revealSecretHashParameter.lockId, bridgeStorage.swaps)) {
 		| Some(swap) => swap
-		| None => (failwith("SwapLockDoesNotExist"): swap)
+		| None => (failwith(errorSwapLockDoesNotExist): swap)
     };
 	switch (Tezos.sender == swap.from_) {
 		| true => unit
-		| false => (failwith("SenderIsNotTheInitiator"): unit)
+		| false => (failwith(errorSenderIsNotInitiator): unit)
 	};
 	let newOutcomes = switch (Big_map.find_opt(revealSecretHashParameter.lockId, bridgeStorage.outcomes)) {
 		| Some(outcome) => {
 			switch (outcome) {
-			| HashRevealed(secretHash) => (failwith("SecretHashIsAlreadySet"): outcomes)
-			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): outcomes)
-			| Refunded(value) => (failwith("SwapAlreadyRefunded"): outcomes)
+			| HashRevealed(secretHash) => (failwith(errorSecretHashIsAlreadySet): outcomes)
+			| SecretRevealed(secret) => (failwith(errorSwapAlreadyPerformed): outcomes)
+			| Refunded(value) => (failwith(errorSwapAlreadyRefunded): outcomes)
 			};
 		}
 		| None => {
@@ -27,5 +27,5 @@ let revealSecretHash = ((revealSecretHashParameter, bridgeStorage) : (revealSecr
 		...bridgeStorage,
 		outcomes: newOutcomes,
 	};
-	(([]: list(operation)), newBridgeStorage);
+	(([]: list(operation)), newBridgeStorage)
 };

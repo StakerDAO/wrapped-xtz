@@ -1,5 +1,6 @@
 #include "../../partials/wxtz/tzip7/storage/storage.religo"
 #include "../../partials/wxtz/tzip7/parameter.religo"
+#include "../../partials/wxtz/tzip7/errors.religo"
 
 #include "../../partials/wxtz/tzip7/transfer/transfer.religo"
 #include "../../partials/wxtz/tzip7/getAllowance/getAllowance.religo"
