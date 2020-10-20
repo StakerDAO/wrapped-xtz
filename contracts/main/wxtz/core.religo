@@ -4,6 +4,7 @@
 #include "../../partials/wxtz/core/errors.religo"
 
 #include "../../partials/wxtz/core/runEntrypointLambda/runEntrypointLambda.religo"
+#include "../../partials/wxtz/core/runArbitraryValueLambda/runArbitraryValueLambda.religo"
 #include "../../partials/wxtz/core/default/default.religo"
 
 /**
