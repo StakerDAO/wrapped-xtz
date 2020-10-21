@@ -8,15 +8,16 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 	let newAllowances = switch(Tezos.sender == transferParameter.from_ || Tezos.self_address == transferParameter.from_ ) {
 	   | true => tokenStorage.approvals
 	   | false => {
-		   let authorized_value = switch (Big_map.find_opt((Tezos.sender, transferParameter.from_), tokenStorage.approvals)) {
+		   let optionalAuthorizedValue = Big_map.find_opt((Tezos.sender, transferParameter.from_), tokenStorage.approvals);
+		   let authorizedValue = switch (optionalAuthorizedValue) {
 				| Some(value) => value
 				| None => 0n
 			};
-			if (authorized_value < transferParameter.value) { 
+			if (authorizedValue < transferParameter.value) { 
 				(failwith(errorNotEnoughAllowance): allowances)
 			}
 			else { 
-				let newAuthorizeValue = abs(authorized_value - transferParameter.value);
+				let newAuthorizeValue = abs(authorizedValue - transferParameter.value);
 				Big_map.update(
 					(Tezos.sender,transferParameter.from_), 
 					Some(newAuthorizeValue), 
@@ -25,10 +26,10 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 			};
 	   }
 	};
-	
-	let senderBalance = switch (Big_map.find_opt(transferParameter.from_, tokenStorage.ledger)) {
+	let optionalSenderBalance = Big_map.find_opt(transferParameter.from_, tokenStorage.ledger);
+	let senderBalance = switch (optionalSenderBalance) {
 		| Some(value) => value
-		| None => 0n
+		| None => defaultBalance
 	};
 
 	if (senderBalance < transferParameter.value) { 
@@ -41,9 +42,10 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 			Some(newSenderBalance),
 			tokenStorage.ledger
 		);
-		let receiverBalance = switch (Big_map.find_opt(transferParameter.to_, tokenStorage.ledger)) {
+		let optionalReceiverBalance = Big_map.find_opt(transferParameter.to_, tokenStorage.ledger);
+		let receiverBalance = switch (optionalReceiverBalance) {
 		| Some(value) => value
-		| None => 0n
+		| None => defaultBalance
 		};
 		let newReceiverBalance = receiverBalance + transferParameter.value;
 		let newTokens = Big_map.update(
@@ -56,6 +58,6 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 				ledger: newTokens,
 				approvals: newAllowances
 		};
-		(([]: list(operation)), newStorage)
+		(emptyListOfOperations, newStorage)
 	};
 };

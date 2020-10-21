@@ -1,10 +1,14 @@
-let getAllowance = ((getAllowanceParameter, tokenStorage): (getAllowanceParameter, tokenStorage)): (list(operation), tokenStorage) => {
-	let value = switch (Big_map.find_opt((getAllowanceParameter.owner, getAllowanceParameter.spender), tokenStorage.approvals)) {
+let getAllowance = ((getAllowanceParameter, tokenStorage): (getAllowanceParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+	let optionalAllowanceValue = Big_map.find_opt(
+		(getAllowanceParameter.owner, getAllowanceParameter.spender),
+		tokenStorage.approvals
+	);
+	let allowanceValue = switch (optionalAllowanceValue) {
 		| Some(value) => value
-		| None => 0n
+		| None => defaultBalance
 	};
 	let op = Tezos.transaction(
-		value,
+		allowanceValue,
 		0mutez,
 		getAllowanceParameter.callback
 	);

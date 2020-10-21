@@ -1,4 +1,4 @@
-let lock = ((lockParameter, storage): (lockParameter, storage)) : (list(operation), storage) => {
+let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
 	let swapEntry: swap = {
 		to_: lockParameter.to_,
 		from_: Tezos.sender,
@@ -54,7 +54,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)) : (list(operatio
 				}, 
 				token: newTokenStorage,
 			};			
-			(([]: list (operation)), newStorage);
+			(emptyListOfOperations, newStorage);
 		}
 		| None => {
 			/**
@@ -70,7 +70,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)) : (list(operatio
 				},
 				token: newTokenStorage,
 			};
-			(([]: list(operation)), newStorage);
+			(emptyListOfOperations, newStorage);
 		}
 	};
 

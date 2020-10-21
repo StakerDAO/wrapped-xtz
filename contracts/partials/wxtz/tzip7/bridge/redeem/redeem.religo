@@ -1,4 +1,4 @@
-let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(operation), storage) => {
+let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypointReturn, storage) => {
 	/**
 	 * Provided secret needs to be below a certain length
 	 */
@@ -21,8 +21,8 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 		| false => (failwith(errorSwapIsOver): unit)
 		| true => unit
 	};
-
-	let secretHash = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.outcomes)) {
+	let optionalSecretHash = Big_map.find_opt(redeemParameter.lockId, storage.bridge.outcomes);
+	let secretHash = switch (optionalSecretHash) {
 		| Some(outcome) => {
 			switch (outcome) {
 			| HashRevealed(secretHash) => secretHash
@@ -38,7 +38,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 	let calculatedHash = Crypto.sha256(redeemParameter.secret);
 
 	switch (calculatedHash == secretHash) {
-		| false => (failwith(errorInvalidSecret): (list(operation), storage))
+		| false => (failwith(errorInvalidSecret): (entrypointReturn, storage))
 		| true => {
 			/**
 			 * Constructing the transfer parameter to redeem locked-up tokens
@@ -67,7 +67,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (list(ope
 					outcomes: newOutcome
 				}
 			};
-			(([]: list(operation)), newStorage);
+			(emptyListOfOperations, newStorage);
 		};
 	};
 };

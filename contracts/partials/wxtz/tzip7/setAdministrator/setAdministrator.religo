@@ -1,11 +1,11 @@
-let setAdministrator = ((setAdministratorParameter, tokenStorage): (address, tokenStorage)): (list(operation), tokenStorage) => {
+let setAdministrator = ((setAdministratorParameter, tokenStorage): (address, tokenStorage)): (entrypointReturn, tokenStorage) => {
     if (Tezos.sender == tokenStorage.admin) {
         let newStorage = {
             ...tokenStorage,
             admin: setAdministratorParameter
         };
-        ([]: (list(operation)), newStorage)
+        (emptyListOfOperations, newStorage)
     } else {
-        (failwith (errorNoPermission): (list(operation), tokenStorage));
+        (failwith (errorNoPermission): (entrypointReturn, tokenStorage));
     };
 };

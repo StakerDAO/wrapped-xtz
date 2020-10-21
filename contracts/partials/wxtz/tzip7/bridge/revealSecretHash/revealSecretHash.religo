@@ -1,4 +1,4 @@
-let revealSecretHash = ((revealSecretHashParameter, bridgeStorage): (revealSecretHashParameter, bridgeStorage)) : (list (operation), bridgeStorage) => {
+let revealSecretHash = ((revealSecretHashParameter, bridgeStorage): (revealSecretHashParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
 	let swap = switch (Big_map.find_opt(revealSecretHashParameter.lockId, bridgeStorage.swaps)) {
 		| Some(swap) => swap
 		| None => (failwith(errorSwapLockDoesNotExist): swap)
@@ -27,5 +27,5 @@ let revealSecretHash = ((revealSecretHashParameter, bridgeStorage): (revealSecre
 		...bridgeStorage,
 		outcomes: newOutcomes,
 	};
-	(([]: list(operation)), newBridgeStorage)
+	(emptyListOfOperations, newBridgeStorage)
 };

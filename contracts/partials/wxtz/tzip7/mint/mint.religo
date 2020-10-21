@@ -1,9 +1,9 @@
-let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (list(operation), tokenStorage) => {
+let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
 	if (Tezos.sender == tokenStorage.admin) {
 		let optionalTokenBalance = Big_map.find_opt(mintParameter.to_, tokenStorage.ledger);
 		let tokenBalance = switch (optionalTokenBalance) {
 			| Some(tokenBalance) => tokenBalance
-			| None => 0n
+			| None => defaultBalance
 		};
 		let newTokenBalance = tokenBalance + mintParameter.value;
 		let newTokens = Big_map.update(
@@ -17,8 +17,8 @@ let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (list
 			ledger: newTokens,
 			totalSupply: newTotalSupply
 		};
-		([]: list(operation), newStorage)
+		(emptyListOfOperations, newStorage)
 	} else {
-		(failwith (errorNoPermission): (list(operation), tokenStorage));
+		(failwith(errorNoPermission): (entrypointReturn, tokenStorage));
 	};
 };

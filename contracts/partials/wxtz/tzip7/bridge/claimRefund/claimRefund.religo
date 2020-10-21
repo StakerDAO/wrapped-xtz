@@ -1,4 +1,4 @@
-let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (list(operation), storage) => {
+let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
     let swap = switch (Big_map.find_opt(claimRefundParameter.lockId, storage.bridge.swaps)) {
         | Some(swap) => swap
         | None => (failwith(errorSwapLockDoesNotExist): swap)
@@ -50,5 +50,5 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
             outcomes: newOutcome
         },
     };
-    (([]: list (operation)), newStorage);
+    (emptyListOfOperations, newStorage);
 };

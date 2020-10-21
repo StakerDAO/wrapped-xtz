@@ -1,4 +1,4 @@
-let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (list(operation), tokenStorage) => {
+let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
     let hasPermission = switch(Tezos.sender == tokenStorage.admin) {
         | true => true
         | false => (failwith(errorNoPermission): bool)
@@ -7,11 +7,11 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (list
     let optionalTokenBalance = Big_map.find_opt(burnParameter.from_, tokenStorage.ledger);
     let tokenBalance = switch (optionalTokenBalance) {
         | Some(tokenBalance) => tokenBalance
-        | None => 0n
+        | None => defaultBalance
     };
 
     if (tokenBalance < burnParameter.value) { 
-        (failwith(errorNotEnoughBalance): (list(operation), tokenStorage))
+        (failwith(errorNotEnoughBalance): (entrypointReturn, tokenStorage))
     }
     else {
         let newTokenBalance = abs(tokenBalance - burnParameter.value);
@@ -26,6 +26,6 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (list
             ledger: newTokens,
             totalSupply: newTotalSupply,
         };
-        (([]: list(operation)), newStorage);
+        (emptyListOfOperations, newStorage);
     };
 };
