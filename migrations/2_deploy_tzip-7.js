@@ -1,4 +1,4 @@
-const tzip7 = artifacts.require('tzip7');
+const tzip7 = artifacts.require('tzip-7');
 const { alice } = require('./../scripts/sandbox/accounts');
 const { MichelsonMap } = require('@taquito/taquito');
 const saveContractAddress = require('./../helpers/saveContractAddress');
@@ -21,6 +21,6 @@ const initialStorage = {
 
 module.exports = async (deployer, network, accounts) => {
     deployer.deploy(tzip7, initialStorage)
-        .then(contract => saveContractAddress('tzip7', contract.address));
+        .then(contract => saveContractAddress('tzip-7', contract.address));
 };
 module.exports.initialStorage = initialStorage;

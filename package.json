@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "devDependencies": {
-    "@taquito/taquito": "^6.2.0-beta.1",
+    "@taquito/taquito": "^6.3.5-beta.0",
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
     "eztz.js": "git+https://github.com/TezTech/eztz.git",
@@ -41,7 +41,7 @@
     "compile:lambda": "node scripts/lambdaCompiler/compileLambdaCli.js",
     "compile:lambda:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -e '**/*.tz' -- npm run compile:lambda",
     "compile:lambda-parameter": "node scripts/lambdaCompiler/testCompileLambdaParameterCli.js"
-},
+  },
   "author": "matej.sima@stove-labs.com",
   "license": "MIT",
   "config": {
@@ -53,6 +53,7 @@
     "bignumber.js": "^9.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "ganache-cli": "^6.10.0-tezos.1"
+    "ganache-cli": "^6.10.0-tezos.1",
+    "random-bytes": "^1.0.0"
   }
 }
