@@ -3,15 +3,28 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	 * Provided secret needs to be below a certain length
 	 */
 	let secretByteLength = Bytes.length(redeemParameter.secret);
-	let islengthBelowThreshold = secretByteLength <= 32n;
-	let islengthBelowThreshold = switch (islengthBelowThreshold) {
+	let isLengthBelowThreshold = secretByteLength <= 32n;
+	let isLengthBelowThreshold = switch (isLengthBelowThreshold) {
 		| true => true
 		| false => (failwith(errorTooLongSecret): bool)
 	};
 
-	let swap = switch (Big_map.find_opt(redeemParameter.lockId, storage.bridge.swaps)) {
-	| Some(swap) => swap
-	| None => (failwith(errorSwapLockDoesNotExist): swap)
+	let optionalSecretHash = Big_map.find_opt(redeemParameter.lockId, storage.bridge.outcomes);
+	let secretHash = switch (optionalSecretHash) {
+		| Some(outcome) => {
+			switch (outcome) {
+				| HashRevealed(secretHash) => secretHash
+				| SecretRevealed(secret) => (failwith(errorSwapAlreadyPerformed): secretHash)
+				| Refunded(value) => (failwith(errorSwapAlreadyRefunded): secretHash)
+			};
+		}
+		| None => (failwith(errorHashWasNotRevealed): secretHash)
+	};
+
+	let optionalSwapEntry = Big_map.find_opt(redeemParameter.lockId, storage.bridge.swaps);
+	let swap = switch (optionalSwapEntry) {
+		| Some(swap) => swap
+		| None => (failwith(errorSwapLockDoesNotExist): swap)
 	};
 
 	/**
@@ -21,17 +34,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 		| false => (failwith(errorSwapIsOver): unit)
 		| true => unit
 	};
-	let optionalSecretHash = Big_map.find_opt(redeemParameter.lockId, storage.bridge.outcomes);
-	let secretHash = switch (optionalSecretHash) {
-		| Some(outcome) => {
-			switch (outcome) {
-			| HashRevealed(secretHash) => secretHash
-			| SecretRevealed(secret) => (failwith(errorSwapAlreadyPerformed): secretHash)
-			| Refunded(value) => (failwith(errorSwapAlreadyRefunded): secretHash)
-			};
-		}
-		| None => (failwith(errorHashWasNotRevealed): secretHash)
-	};
+
 	/**
 	 * Calculate SHA-256 hash of provided secret
 	 */

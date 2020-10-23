@@ -24,7 +24,6 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		to_:  Tezos.self_address,
 		value: lockParameter.value,
 	};
-  
 	/**
 	 * Calling the transfer function to lock up the token amount specified in swap
 	 */
@@ -32,46 +31,34 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 
 	/**
 	 * Check whether the optional secretHash was provided as parameter
+	 * If hash was revealed, saved it to outcomes
 	 */
-	 switch (lockParameter.secretHash) {
+	let newBridgeStorage = switch (lockParameter.secretHash) {
 		| Some(secretHash) => {
-			/**
-			 * Hash was revealed and is saved to outcomes
-			 * New swap is saved to storage
-			 * Tokens to be transferred are locked
-			 */
 			let newOutcome = Big_map.add(
 				lockParameter.lockId,
 				HashRevealed(secretHash),
 				storage.bridge.outcomes
 			);
-			let newStorage = { 
-				...storage, 
-				bridge: { 
-					...storage.bridge,
-					swaps: newSwap,
-					outcomes: newOutcome,
-				}, 
-				token: newTokenStorage,
-			};			
-			(emptyListOfOperations, newStorage);
+			{ 
+				...storage.bridge,
+				swaps: newSwap,
+				outcomes: newOutcome,
+			}
 		}
 		| None => {
-			/**
-			 * No secret hash was revealed
-			 * New swap is saved to storage
-			 * Tokens to be transferred are locked
-			 */
-			let newStorage = { 
-				...storage, 
-				bridge: { 
-					...storage.bridge,
-					swaps: newSwap, 
-				},
-				token: newTokenStorage,
-			};
-			(emptyListOfOperations, newStorage);
+			{ 
+				...storage.bridge,
+				swaps: newSwap, 
+			}
 		}
 	};
+
+	let newStorage = {
+		...storage,
+		bridge: newBridgeStorage,
+		token: newTokenStorage,
+	};
+	(emptyListOfOperations, newStorage)
 
 };
