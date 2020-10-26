@@ -1,57 +1,37 @@
 let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
 	let swapEntry: swap = {
-		to_: lockParameter.to_,
+		confirmed: lockParameter.confirmed,
+		fee: lockParameter.fee,
 		from_: Tezos.sender,
-		value: lockParameter.value,
 		releaseTime: lockParameter.releaseTime,
+		secretHash: lockParameter.secretHash,
+		to_: lockParameter.to_,
+		value: lockParameter.value,
 	};
-	let newSwap = switch (Big_map.find_opt(lockParameter.lockId, storage.bridge.swaps)) {
+	let newSwap = Big_map.find_opt(lockParameter.secretHash, storage.bridge.swaps);
+	let newSwap = switch (newSwap) {
 		| Some(value) => (failwith(errorSwapLockAlreadyExists): swaps)
 		| None => {
 			Big_map.add(
-				lockParameter.lockId,
+				lockParameter.secretHash,
 				swapEntry,
 				storage.bridge.swaps
 			);
 		}
 	};
 
-    /**
-	 * Constructing the transfer parameter for lock-up of tokens
-	 */
+	let totalAmount = lockParameter.value + lockParameter.fee;
 	let transferParameter: transferParameter = {
 		from_: Tezos.sender,
 		to_:  Tezos.self_address,
-		value: lockParameter.value,
+		value: totalAmount,
 	};
-	/**
-	 * Calling the transfer function to lock up the token amount specified in swap
-	 */
+	
 	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
 
-	/**
-	 * Check whether the optional secretHash was provided as parameter
-	 * If hash was revealed, saved it to outcomes
-	 */
-	let newBridgeStorage = switch (lockParameter.secretHash) {
-		| Some(secretHash) => {
-			let newOutcome = Big_map.add(
-				lockParameter.lockId,
-				HashRevealed(secretHash),
-				storage.bridge.outcomes
-			);
-			{ 
-				...storage.bridge,
-				swaps: newSwap,
-				outcomes: newOutcome,
-			}
-		}
-		| None => {
-			{ 
-				...storage.bridge,
-				swaps: newSwap, 
-			}
-		}
+	let newBridgeStorage = { 
+		...storage.bridge,
+		swaps: newSwap, 
 	};
 
 	let newStorage = {

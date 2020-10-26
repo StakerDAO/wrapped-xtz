@@ -1,7 +1,8 @@
 type lockParameter = {
-	lockId: lockId,
+	confirmed: bool,
+	fee: nat,
 	releaseTime: timestamp,
-	secretHash: option(secretHash),
+	secretHash: secretHash,
 	to_: address,
 	value: nat,
 };
