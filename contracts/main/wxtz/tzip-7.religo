@@ -17,6 +17,7 @@
 #include "../../partials/wxtz/tzip7/bridge/redeem/redeem.religo"
 #include "../../partials/wxtz/tzip7/bridge/claimRefund/claimRefund.religo"
 #include "../../partials/wxtz/tzip7/bridge/revealSecretHash/revealSecretHash.religo"
+#include "../../partials/wxtz/tzip7/bridge/confirmSwap/confirmSwap.religo"
 
 let main = ((parameter, storage): (parameter, storage)) =>  
 	switch (parameter) {
@@ -84,4 +85,11 @@ let main = ((parameter, storage): (parameter, storage)) =>
 		} 
 		| Redeem(redeemParameter) => redeem((redeemParameter, storage))
 		| ClaimRefund(claimRefundParameter) => claimRefund((claimRefundParameter, storage))
+		| ConfirmSwap(confirmSwapParameter) => {
+			let (operations, bridgeStorage) = confirmSwap((confirmSwapParameter, storage.bridge));
+			(operations, {
+				...storage,
+				bridge: bridgeStorage
+			})
+		} 
 };

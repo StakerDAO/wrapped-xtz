@@ -10,6 +10,7 @@
 #include "./bridge/revealSecretHash/parameter.religo"
 #include "./bridge/redeem/parameter.religo"
 #include "./bridge/claimRefund/parameter.religo"
+#include "./bridge/confirmSwap/parameter.religo"
 
 type parameter =
     | Transfer(transferParameter)
@@ -24,4 +25,5 @@ type parameter =
     | Lock(lockParameter)
     | RevealSecretHash(revealSecretHashParameter)
     | Redeem(redeemParameter)
-    | ClaimRefund(claimRefundParameter);
+    | ClaimRefund(claimRefundParameter)
+    | ConfirmSwap(confirmSwapParameter);

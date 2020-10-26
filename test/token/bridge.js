@@ -133,6 +133,14 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         )).to.be.rejectedWith("NotEnoughBalance");
     });
 
+    it.only("should not allow Bob to confirm swap", async () => {
+        // switching to Bob's secret key
+        Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
+        // load the contract for the Tezos Taquito instance
+        const contract = await Tezos.contract.at(tzip7Instance.address);
+        await expect(contract.methods.confirmSwap(expectedSwap.secretHash).send()).to.be.rejectedWith("NoPermission");
+    });
+
     it.only("should allow Alice to confirm swap", async () => {
         await tzip7Instance.confirmSwap(expectedSwap.secretHash);
         const swap = await storage.bridge.swaps.get(expectedSwap.secretHash);
