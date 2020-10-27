@@ -7,7 +7,6 @@
 #include "./burn/parameter.religo"
 
 #include "./bridge/lock/parameter.religo"
-#include "./bridge/revealSecretHash/parameter.religo"
 #include "./bridge/redeem/parameter.religo"
 #include "./bridge/claimRefund/parameter.religo"
 #include "./bridge/confirmSwap/parameter.religo"
@@ -23,7 +22,6 @@ type parameter =
     | GetBalance(getBalanceParameter)
     | GetTotalSupply(getTotalSupplyParameter)
     | Lock(lockParameter)
-    | RevealSecretHash(revealSecretHashParameter)
     | Redeem(redeemParameter)
     | ClaimRefund(claimRefundParameter)
     | ConfirmSwap(confirmSwapParameter);
