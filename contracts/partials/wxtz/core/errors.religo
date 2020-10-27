@@ -9,3 +9,8 @@ let errorOvenMissingDefaultEntrypoint: string = "4";
 let errorOvenNotTrusted: string = "5";
 
 let errorCoreContractEntrypointTypeMissmatch: string = "6"
+
+let errorArbitraryValueKeyNotFound: string = "7"
+let errorArbitraryValueWrongType: string = "8"
+
+let errorWXTZTokenContractWrongType: string = "9"

@@ -3,6 +3,7 @@
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     // check if the `Tezos.sender` is a wXTZ Oven originated by the core
+    // TODO: extract the oven 'trust check' into an arbitrary value lambda
     let ovenOwner: option(ovenOwner) = Big_map.find_opt(Tezos.sender, storage.ovens);
 
     /**
@@ -33,12 +34,24 @@
     };
 
     let sendBackXTZOperation: operation = Tezos.transaction((), Tezos.amount, oven);
-    // TODO: implement a real minting call once a token contract is in place
-    // let mintWXTZOperation: operation = Tezos.transaction((), 0mutez, oven);
-    
+
+    /**
+     * Compose the minting operation on the wXTZ Token contract
+     */
+    let composeMintOperationParameter: composeMintOperationParameter = ();
+    let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
+    let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
+        {
+            lambdaName: "composeMintOperation",
+            lambdaParameter: Bytes.pack(()), // TODO: extract a default packed bytes variable
+        },
+        storage
+    ));
+
+    // return all the required operations
     let operations: list(operation) = [
-        sendBackXTZOperation
-        // mintWXTZOperation
+        sendBackXTZOperation,
+        ...mintWXTZOperationList
     ];
 
     (operations, storage);

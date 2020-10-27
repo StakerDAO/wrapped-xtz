@@ -12,10 +12,14 @@ type ovenSet = set(oven);
  */
 type ovens = big_map(oven, ovenOwner);
 
+type arbitraryValueKey = string;
+type arbitraryValue = bytes;
+type arbitraryValues = big_map(arbitraryValueKey, arbitraryValue);
+
 type storage = {
     lambdas: lambdas,
     ovens: ovens,
-    u: unit,
+    arbitraryValues: arbitraryValues
 };
 
 type entrypointReturn = (list(operation), storage);
