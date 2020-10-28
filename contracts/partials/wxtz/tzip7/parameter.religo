@@ -10,6 +10,7 @@
 #include "./bridge/redeem/parameter.religo"
 #include "./bridge/claimRefund/parameter.religo"
 #include "./bridge/confirmSwap/parameter.religo"
+#include "./bridge/getOutcome/parameter.religo"
 
 type parameter =
     | Transfer(transferParameter)
@@ -25,4 +26,5 @@ type parameter =
     | Lock(lockParameter)
     | Redeem(redeemParameter)
     | ClaimRefund(claimRefundParameter)
-    | ConfirmSwap(confirmSwapParameter);
+    | ConfirmSwap(confirmSwapParameter)
+    | GetOutcome(getOutcomeParameter);
