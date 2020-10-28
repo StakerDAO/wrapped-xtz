@@ -34,13 +34,9 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
 
     before(async () => {
         tzip7Instance = await tzip7.deployed();
-
         // display the current contract address for debugging purposes
         console.log('Contract deployed at:', tzip7Instance.address);
-        /**
-         * Final setup for test suite
-         * Read host from TruffleContract
-         */
+        // read host from TruffleContract
         rpc = tzip7Instance.constructor.currentProvider.host;
     });
 
@@ -71,7 +67,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         releaseTime: deadlineIn2Hours,
     };
 
-    it.only("should lock 5 tokens for Alice with secret hash", async () => {
+    it("should lock 5 tokens for Alice with a secret hash", async () => {
         // call the token contract at the %lock entrypoint
         await tzip7Instance.lock(
             expectedSwap.confirmed,
@@ -89,7 +85,9 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         expect(Number(lockedBalance)).to.equal(amount + fee);
 
         // check that total supply did not change
-        expect(Number(storage.token.totalSupply)).to.equal(10);
+        let totalSupply = await initialStorage.token.totalSupply;
+        totalSupply = Number(totalSupply);
+        expect(Number(storage.token.totalSupply)).to.equal(totalSupply);
 
         // check that balance was locked for Alice
         const aliceStartingBalance = await initialStorage.token.ledger.get(alice.pkh);
@@ -107,7 +105,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         expect(Number(swap.value)).to.equal(expectedSwap.value);
     });
 
-    it.only("should not allow to reuse a lockId", async () => {
+    it("should not allow to reuse a secret hash", async () => {
         // call the token contract at the %lock entrypoint with an already used lockId 
         await expect(tzip7Instance.lock( 
             expectedSwap.confirmed,
@@ -119,7 +117,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         )).to.be.rejectedWith("SwapLockAlreadyExists");
     });
 
-    it.only("should not allow Alice to lock more funds than she has", async () => {
+    it("should not allow Alice to lock more funds than she has", async () => {
         const secretHash = "ffae";
         const bigAmount = 100;
         // Alice locks 1 token with an expiration date in the past
@@ -133,7 +131,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         )).to.be.rejectedWith("NotEnoughBalance");
     });
 
-    it.only("should not allow Bob to confirm swap", async () => {
+    it("should not allow Bob to confirm Alice' swap", async () => {
         // switching to Bob's secret key
         Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
         // load the contract for the Tezos Taquito instance
@@ -141,128 +139,150 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         await expect(contract.methods.confirmSwap(expectedSwap.secretHash).send()).to.be.rejectedWith("NoPermission");
     });
 
-    it.only("should allow Alice to confirm swap", async () => {
+    it("should allow Alice to confirm swap", async () => {
         await tzip7Instance.confirmSwap(expectedSwap.secretHash);
         const swap = await storage.bridge.swaps.get(expectedSwap.secretHash);
         expect(swap.confirmed).to.equal(true);
     });
 
-    it("should not allow Bob to redeem with the invalid secret", async () => {        
-        await expect(tzip7Instance.redeem(lockId, "fffb")).to.be.rejectedWith("InvalidSecret")
-    });
-
-    it("should not allow Bob to redeem for non-existing swap", async () => {        
-        await expect(tzip7Instance.redeem("ff", secret)).to.be.rejectedWith("SwapLockDoesNotExist")
+    it("should not allow Bob to redeem with the invalid secret/ non-existing swap", async () => {        
+        await expect(tzip7Instance.redeem("fffb")).to.be.rejectedWith("SwapLockDoesNotExist")
     });
 
     it("should not allow to redeem with too long secret", async () => {
         const byteArray = randomBytes.sync(33);
         const longSecret = toHexString(byteArray);
-        await expect(tzip7Instance.redeem(lockId, longSecret)).to.be.rejectedWith("TooLongSecret");
+        await expect(tzip7Instance.redeem(longSecret)).to.be.rejectedWith("TooLongSecret");
     });
 
     it("should allow Bob to redeem 5 tokens with the correct secret", async () => {
-        await tzip7Instance.redeem(lockId, secret)
+        await tzip7Instance.redeem(secret)
         storage = await tzip7Instance.storage();
         // Bob receives 5 tokens
         const balanceBob = await storage.token.ledger.get(bob.pkh);
-        expect(Number(balanceBob)).to.equal(5);
+        expect(Number(balanceBob)).to.equal(expectedSwap.value + expectedSwap.fee);
         // outcome updates to secret
-        const outcomeSecret = await storage.bridge.outcomes.get(lockId);
-        expect(outcomeSecret).to.equal(secret);
+        const savedOutcomeSecret = await storage.bridge.outcomes.get(expectedSwap.secretHash);
+        expect(savedOutcomeSecret).to.equal(secret);
+        // swap entry deleted
+        await storage.bridge.swaps.get(expectedSwap.secretHash);
     });
 
-
     it("should not allow Bob to redeem twice", async () => {
-        await expect(tzip7Instance.redeem(lockId, secret)).to.be.rejectedWith("SwapAlreadyPerformed");
+        await expect(tzip7Instance.redeem(secret)).to.be.rejectedWith("SwapLockDoesNotExist");
     });
 
     it("should not allow Bob to redeem past release time ", async () => {
-        const newlockId = "ffaa";
+        // TODO change lockID to secretHash
+        const secret = "ffaa";
+        const secretHash = hash(secret)
         const releasetimePast = getISOTimeWithDelay(-2);
-        console.log(releasetimePast)
         const smallAmount = 1;
         // Alice locks 1 token with an expiration date in the past
-        await tzip7Instance.lock(  
-            newlockId, 
+        await tzip7Instance.lock(
+            true, // confirmed set true
+            expectedSwap.fee, 
             releasetimePast, 
             secretHash, 
-            bob.pkh,
+            expectedSwap.to_,
             smallAmount
         );
         // Bob tries to redeem token, but has surpassed the release date for the swap
-        await expect(tzip7Instance.redeem(newlockId, secret)).to.be.rejectedWith("SwapIsOver");
+        await expect(tzip7Instance.redeem(secret)).to.be.rejectedWith("SwapIsOver");
     });
 
-    const newlockId = "ffab";
+    it("should allow to swap 5 tokens without a fee", async () => {
+        const secret = "ffaf";
+        const secretHash = hash(secret);
+        storage = await tzip7Instance.storage();
+        const balanceAliceBeforeSwap = Number(await storage.token.ledger.get(alice.pkh));
+        // it might be that Bob doesn't have a balance yet, that's why we are assigning 0 in this test
+        let balanceBobBeforeSwap = await storage.token.ledger.get(bob.pkh) || 0;
+        balanceBobBeforeSwap = Number(balanceBobBeforeSwap);
+        
+        // call the token contract at the %lock entrypoint
+        await tzip7Instance.lock(
+            expectedSwap.confirmed,
+            null,
+            expectedSwap.releaseTime,
+            secretHash,
+            expectedSwap.to_,
+            expectedSwap.value
+        );
+        await tzip7Instance.confirmSwap(secretHash)
+        // Bob redeems
+        await tzip7Instance.redeem(secret)
+        // read contract's storage
+        storage = await tzip7Instance.storage();
+        
+        // check that total supply did not change
+        let initialTotalSupply = Number(initialStorage.token.totalSupply);
+        let totalSupply = Number(storage.token.totalSupply);
+        expect(totalSupply).to.equal(initialTotalSupply);
+
+        // check that balance was locked for Alice
+        let aliceBalance = await storage.token.ledger.get(alice.pkh);
+        aliceBalance = Number(aliceBalance);
+        expect(aliceBalance).to.equal(balanceAliceBeforeSwap - expectedSwap.value);
+        let bobBalance = await storage.token.ledger.get(bob.pkh);
+        bobBalance = Number(bobBalance);
+        expect(bobBalance).to.equal(balanceBobBeforeSwap + expectedSwap.value)
+    
+        // read the outcome post swap
+        const savedOutcomeSecret = await storage.bridge.outcomes.get(secretHash);
+        expect(savedOutcomeSecret).to.equal(secret);
+        expect(await storage.bridge.swaps.get(secretHash)).to.be.undefined;
+    });
+
+    const newSecret = "ffab";
+    const newSecretHash = hash(newSecret);
     it("should allow Alice to claim a refund after passing the time lock period", async () => {
+        storage = await tzip7Instance.storage();
+        const balanceAliceBeforeSwap = Number(await storage.token.ledger.get(alice.pkh));
+        const balanceBobBeforeSwap = Number(await storage.token.ledger.get(bob.pkh));
+
         const releasetimePast = getISOTimeWithDelay(-1);
-        console.log(releasetimePast)
         const smallAmount = 1;
         // Alice locks 1 token with an expiration date in the past
-        await tzip7Instance.lock(  
-            newlockId, 
-            releasetimePast, 
-            secretHash, 
-            bob.pkh,
+        await tzip7Instance.lock(
+            true,  
+            expectedSwap.fee,
+            releasetimePast,
+            newSecretHash,
+            expectedSwap.to_,
             smallAmount
         );
         // Swap has surpassed the release date for the swap and Alice claims refund
-        await tzip7Instance.claimRefund(newlockId);
+        await tzip7Instance.claimRefund(newSecretHash);
         storage = await tzip7Instance.storage();
-        const balanceAlice = await storage.token.ledger.get(alice.pkh);
-        expect(Number(balanceAlice)).to.equal(4)
+        
+        const balanceAlice = Number(await storage.token.ledger.get(alice.pkh));
+        expect(balanceAlice).to.equal(balanceAliceBeforeSwap - expectedSwap.fee);
+        
+        const balanceBob = Number(await storage.token.ledger.get(bob.pkh));
+        expect(balanceBob).to.equal(balanceBobBeforeSwap + expectedSwap.fee);
+
     });
 
     it("should not allow Bob to redeem swap that was already refunded to Alice", async () => {
-        await expect(tzip7Instance.redeem(newlockId, secret)).to.be.rejectedWith("SwapAlreadyRefunded");
+        await expect(tzip7Instance.redeem(secret)).to.be.rejectedWith("SwapLockDoesNotExist");
     });
 
     it("should not allow Alice to claim refund before passing the time lock", async () => {
-        const newlockId = "ffac";
+        const newSecret = "ffac";
+        const newSecretHash = hash(newSecret);
         const releasetimePast = getISOTimeWithDelay(1);
         const smallAmount = 1;
         // Alice locks 1 token with an expiration date in the past
         await tzip7Instance.lock(  
-            newlockId, 
-            releasetimePast, 
-            secretHash, 
-            bob.pkh,
+            true,
+            expectedSwap.fee,
+            releasetimePast,
+            newSecretHash,
+            expectedSwap.to_,
             smallAmount
         );
         // Alice tries to redeem token, but has surpassed the release date for the swap
-        await expect(tzip7Instance.claimRefund(newlockId)).to.be.rejectedWith("FundsLock");
-    });
-
- 
-
-    const lockId03 = 'ffad';
-
-    it.skip("should allow Alice to lock tokens without revealing the secret hash", async () => {
-        // call the token contract at the %lock entrypoint
-        await tzip7Instance.lock(  
-            lockId03, 
-            getISOTimeWithDelay(1),
-            // TODO optional(bytes): None(), 
-            bob.pkh, 
-            amount
-        );
-        // read contract's storage
-        storage = await tzip7Instance.storage()
-        // swap entry exists
-        await storage.bridge.swaps.get(lockId03)
-    });
-
-    it.skip("should allow Alice to reveal secret hash for existing swap", async () => {
-        // call the token contract at the %lock entrypoint
-        await tzip7Instance.revealSecretHash(  
-            lockId03, 
-            secretHash
-        );
-        // read contract's storage
-        storage = await tzip7Instance.storage();
-        const outcome = await storage.bridge.outcomes.get(lockId03);
-        expect(outcome).to.equal(secretHash);
-    });
-   
+        await expect(tzip7Instance.claimRefund(newSecretHash)).to.be.rejectedWith("FundsLock");
+    });   
 });
