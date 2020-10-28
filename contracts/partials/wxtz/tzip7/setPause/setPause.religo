@@ -1,12 +1,22 @@
-let setPause = ((parameter, tokenStorage): (bool, tokenStorage)): (entrypointReturn, tokenStorage) => {
-    switch (Tezos.sender == tokenStorage.admin) {
-        | false => failwith(errorNoPermission): (entrypointReturn, tokenStorage)
+let setPause = ((setPauseParameter, tokenStorage): (bool, tokenStorage)): (entrypointReturn, tokenStorage) => {
+    switch (setPauseParameter) {
         | true => {
-            let newStorage = {
-                ...tokenStorage,
-                paused: parameter
-            };
-            (emptyListOfOperations, newStorage)
-        }
+            switch (Tezos.sender == tokenStorage.pauseGuardian) {
+                    | false => (failwith(errorNoPermission): unit)
+                    | true => unit
+                }
+            }
+        | false => {
+            switch (Tezos.sender == tokenStorage.admin) {
+                    | false => (failwith(errorNoPermission): unit)
+                    | true => unit
+                };
+            }
     };
+
+    let newStorage = {
+        ...tokenStorage,
+        paused: setPauseParameter
+    };
+    (emptyListOfOperations, newStorage)
 };

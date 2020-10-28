@@ -1,4 +1,10 @@
 let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+	// check for pause state
+	switch (tokenStorage.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): unit)
+		| false => unit	
+	};
+
 	if (Tezos.sender == tokenStorage.admin) {
 		let optionalTokenBalance = Big_map.find_opt(mintParameter.to_, tokenStorage.ledger);
 		let tokenBalance = switch (optionalTokenBalance) {

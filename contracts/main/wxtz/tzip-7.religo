@@ -10,8 +10,9 @@
 #include "../../partials/wxtz/tzip7/getTotalSupply/getTotalSupply.religo"
 #include "../../partials/wxtz/tzip7/mint/mint.religo"
 #include "../../partials/wxtz/tzip7/burn/burn.religo"
-#include "../../partials/wxtz/tzip7/setPause/setPause.religo"
 #include "../../partials/wxtz/tzip7/setAdministrator/setAdministrator.religo"
+#include "../../partials/wxtz/tzip7/setPauseGuardian/setPauseGuardian.religo"
+#include "../../partials/wxtz/tzip7/setPause/setPause.religo"
 
 #include "../../partials/wxtz/tzip7/bridge/lock/lock.religo"
 #include "../../partials/wxtz/tzip7/bridge/redeem/redeem.religo"
@@ -50,6 +51,13 @@ let main = ((parameter, storage): (parameter, storage)) =>
 		}
 		| SetAdministrator(address_) => {
 			let (operations, tokenStorage) = setAdministrator((address_, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}
+		| SetPauseGuardian(address_) => {
+			let (operations, tokenStorage) = setPauseGuardian((address_, storage.token));
 			(operations, {
 				...storage,
 				token: tokenStorage

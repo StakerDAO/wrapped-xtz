@@ -17,6 +17,7 @@ type parameter =
     | Mint(mintParameter)
     | Burn(burnParameter)
     | SetAdministrator(address)
+    | SetPauseGuardian(address)
     | SetPause(bool)
     | GetAllowance(getAllowanceParameter)
     | GetBalance(getBalanceParameter)

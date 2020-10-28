@@ -1,11 +1,17 @@
 let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
-    let hasPermission = switch(Tezos.sender == tokenStorage.admin) {
-        | true => true
-        | false => (failwith(errorNoPermission): bool)
+    // check for paused state
+    switch (tokenStorage.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): unit)
+		| false => unit	
+	};
+    // check for permission
+    switch(Tezos.sender == tokenStorage.admin) {
+        | true => unit
+        | false => (failwith(errorNoPermission): unit)
     };
 
-    let optionalTokenBalance = Big_map.find_opt(burnParameter.from_, tokenStorage.ledger);
-    let tokenBalance = switch (optionalTokenBalance) {
+    let tokenBalance = Big_map.find_opt(burnParameter.from_, tokenStorage.ledger);
+    let tokenBalance = switch (tokenBalance) {
         | Some(tokenBalance) => tokenBalance
         | None => defaultBalance
     };
@@ -26,6 +32,6 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entr
             ledger: newTokens,
             totalSupply: newTotalSupply,
         };
-        (emptyListOfOperations, newStorage);
+        (emptyListOfOperations, newStorage)
     };
 };
