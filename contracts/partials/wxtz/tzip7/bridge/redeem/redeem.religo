@@ -7,8 +7,8 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 		| false => (failwith(errorTooLongSecret): unit)
 	};
 
-	// calculate SHA-256 hash of provided secret
-	let secretHash = Crypto.sha256(redeemParameter.secret);
+	// calculate blake2b hash of provided secret
+	let secretHash = Crypto.blake2b(redeemParameter.secret);
 
 	let swap = Big_map.find_opt(secretHash, storage.bridge.swaps);
 	let swap = switch (swap) {
