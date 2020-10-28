@@ -1,3 +1,3 @@
 type claimRefundParameter = {
-	lockId: lockId,
+	secretHash: secretHash,
 };
