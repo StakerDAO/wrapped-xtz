@@ -20,13 +20,18 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		}
 	};
 
-	let totalAmount = lockParameter.value + lockParameter.fee;
+
+	let totalAmount = switch (lockParameter.fee) {
+		| Some(fee) => lockParameter.value + fee
+		| None => lockParameter.value
+	};
+	
 	let transferParameter: transferParameter = {
 		from_: Tezos.sender,
 		to_:  Tezos.self_address,
 		value: totalAmount,
 	};
-	
+
 	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
 
 	let newBridgeStorage = { 
