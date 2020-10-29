@@ -19,6 +19,7 @@
 #include "../../partials/wxtz/tzip7/bridge/claimRefund/claimRefund.religo"
 #include "../../partials/wxtz/tzip7/bridge/confirmSwap/confirmSwap.religo"
 #include "../../partials/wxtz/tzip7/bridge/getOutcome/getOutcome.religo"
+#include "../../partials/wxtz/tzip7/bridge/getSwap/getSwap.religo"
 
 let main = ((parameter, storage): (parameter, storage)) =>  
 	switch (parameter) {
@@ -95,6 +96,10 @@ let main = ((parameter, storage): (parameter, storage)) =>
 		} 
 		| GetOutcome(getOutcomeParameter) => {
 			let (operations, _) = getOutcome((getOutcomeParameter, storage.bridge));
+			(operations: list(operation), storage)
+		}
+		| GetSwap(getSwapParameter) => {
+			let (operations, _) = getSwap((getSwapParameter, storage.bridge));
 			(operations: list(operation), storage)
 		} 
 };
