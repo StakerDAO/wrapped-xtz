@@ -1,5 +1,5 @@
 [@inline]
-let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): (list(operation), tokenStorage) => {
+let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
 	let isPaused = switch (tokenStorage.paused) {
 		| true => (failwith(errorTokenOperationsArePaused): bool)
 		| false => false	
@@ -8,8 +8,11 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 	let newAllowances = switch(Tezos.sender == transferParameter.from_ || Tezos.self_address == transferParameter.from_ ) {
 	   | true => tokenStorage.approvals
 	   | false => {
-		   let optionalAuthorizedValue = Big_map.find_opt((Tezos.sender, transferParameter.from_), tokenStorage.approvals);
-		   let authorizedValue = switch (optionalAuthorizedValue) {
+		   let authorizedValue = Big_map.find_opt(
+			   (transferParameter.from_, Tezos.sender),
+			   tokenStorage.approvals
+			);
+		   let authorizedValue = switch (authorizedValue) {
 				| Some(value) => value
 				| None => 0n
 			};
@@ -19,21 +22,21 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 			else { 
 				let newAuthorizeValue = abs(authorizedValue - transferParameter.value);
 				Big_map.update(
-					(Tezos.sender,transferParameter.from_), 
+					(transferParameter.from_, Tezos.sender), 
 					Some(newAuthorizeValue), 
 					tokenStorage.approvals
 				); 
 			};
 	   }
 	};
-	let optionalSenderBalance = Big_map.find_opt(transferParameter.from_, tokenStorage.ledger);
-	let senderBalance = switch (optionalSenderBalance) {
+	let senderBalance = Big_map.find_opt(transferParameter.from_, tokenStorage.ledger);
+	let senderBalance = switch (senderBalance) {
 		| Some(value) => value
 		| None => defaultBalance
 	};
 
 	if (senderBalance < transferParameter.value) { 
-		(failwith(errorNotEnoughBalance): (list(operation), tokenStorage))
+		(failwith(errorNotEnoughBalance): (entrypointReturn, tokenStorage))
 	}
 	else {
 		let newSenderBalance = abs(senderBalance - transferParameter.value);

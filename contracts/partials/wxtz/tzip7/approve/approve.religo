@@ -5,7 +5,7 @@ let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage
 	};
 
 	let previousState = Big_map.find_opt(
-		(approveParameter.spender, Tezos.sender),
+		(Tezos.sender, approveParameter.spender),
 		tokenStorage.approvals
 	);
 	let previousState = switch (previousState) {
@@ -22,7 +22,7 @@ let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage
 		}
 	else {
 		let newAllowances = Big_map.update(
-			(approveParameter.spender, Tezos.sender),
+			(Tezos.sender, approveParameter.spender),
 			Some(approveParameter.value),
 			tokenStorage.approvals
 		);

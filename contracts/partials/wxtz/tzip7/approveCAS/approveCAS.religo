@@ -4,11 +4,15 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
 		| false => false	
 	};
 
-	let previousState = switch (Big_map.find_opt((approveCASParameter.spender, Tezos.sender), tokenStorage.approvals)){
-	| Some(value) => value
-	| None => defaultBalance
+    let previousState = Big_map.find_opt(
+        (Tezos.sender, approveCASParameter.spender),
+        tokenStorage.approvals
+    );
+	let previousState = switch (previousState) {
+        | Some(value) => value
+        | None => defaultBalance
 	};
-    
+
     /**
      * if the current amount of sender's tokens spender is allowed to spend is equal to the expected value
      * this function behaves as approve, but it does not prohibit changing allowance from non-zero to non-zero
@@ -19,7 +23,7 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
     }
 	else {
 		let newAllowances = Big_map.update(
-			(approveCASParameter.spender, Tezos.sender),
+			(Tezos.sender, approveCASParameter.spender),
 			Some(approveCASParameter.value),
 			tokenStorage.approvals
 		);
