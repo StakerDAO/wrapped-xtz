@@ -6,6 +6,7 @@
 #include "../../partials/wxtz/tzip7/transfer/transfer.religo"
 #include "../../partials/wxtz/tzip7/getAllowance/getAllowance.religo"
 #include "../../partials/wxtz/tzip7/approve/approve.religo"
+#include "../../partials/wxtz/tzip7/approveCAS/approveCAS.religo"
 #include "../../partials/wxtz/tzip7/getBalance/getBalance.religo"
 #include "../../partials/wxtz/tzip7/getTotalSupply/getTotalSupply.religo"
 #include "../../partials/wxtz/tzip7/mint/mint.religo"
@@ -36,7 +37,14 @@ let main = ((parameter, storage): (parameter, storage)) =>
 				...storage,
 				token: tokenStorage
 			})
-		} 
+		}
+		| ApproveCAS(approveCASParameter) => {
+			let (operations, tokenStorage) = approveCAS((approveCASParameter, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}  
 		| Mint(mintParameter) => {
 			let (operations, tokenStorage) = mint((mintParameter, storage.token));
 			(operations, {

@@ -1,5 +1,6 @@
 #include "./transfer/parameter.religo"
 #include "./approve/parameter.religo"
+#include "./approveCAS/parameter.religo"
 #include "./getAllowance/parameter.religo"
 #include "./getBalance/parameter.religo"
 #include "./getTotalSupply/parameter.religo"
@@ -16,6 +17,7 @@
 type parameter =
     | Transfer(transferParameter)
     | Approve(approveParameter)
+    | ApproveCAS(approveCASParameter)
     | Mint(mintParameter)
     | Burn(burnParameter)
     | SetAdministrator(address)
