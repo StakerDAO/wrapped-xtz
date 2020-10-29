@@ -1,14 +1,14 @@
 let getOutcome = ((getOutcomeParameter, bridgeStorage): (getOutcomeParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
-	let outcome = Big_map.find_opt(
+	let secret = Big_map.find_opt(
 		getOutcomeParameter.secretHash,
 		bridgeStorage.outcomes
 	);
-	let outcome = switch (outcome) {
+	let secret = switch (secret) {
 		| Some(value) => value
 		| None => (failwith("errorSwapLockDoesNotExist"): secret)
 	};
 	let op = Tezos.transaction(
-		outcome,
+		secret,
 		0mutez,
 		getOutcomeParameter.callback
 	);

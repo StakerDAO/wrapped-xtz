@@ -12,7 +12,7 @@
     "onchange": "^7.0.2",
     "promise-retry": "^1.1.1",
     "rimraf": "^3.0.2",
-    "truffle": "^5.3.0-tezos.2"
+    "truffle": "^5.5.0-tezos.4"
   },
   "scripts": {
     "clean": "rm -rf ./build",
@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "bignumber.js": "^9.0.1",
+    "blake2": "^4.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "ganache-cli": "^6.10.0-tezos.1",

@@ -20,7 +20,6 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		}
 	};
 
-
 	let totalAmount = switch (lockParameter.fee) {
 		| Some(fee) => lockParameter.value + fee
 		| None => lockParameter.value

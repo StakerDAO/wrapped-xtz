@@ -214,3 +214,4 @@ contract('TZIP-7 token contract', accounts => {
     });
   
 });
+    

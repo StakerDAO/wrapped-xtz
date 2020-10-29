@@ -15,3 +15,5 @@ let errorSwapIsOver: string = "SwapIsOver";
 let errorInvalidSecret: string = "InvalidSecret";
 let errorSenderIsNotInitiator: string = "SenderIsNotTheInitiator";
 let errorSecretHashIsAlreadySet: string = "SecretHashIsAlreadySet";
+let errorSwapIsNotConfirmed: string = "SwapIsNotConfirmed";
+let errorAllowanceMismatch: string = "AllowanceMismatch";
