@@ -6,13 +6,13 @@ const saveContractAddress = require('./../helpers/saveContractAddress');
 const initialStorage = {
     token: {
         ledger: MichelsonMap.fromLiteral({
-            [alice.pkh]: 20, 
+            [alice.pkh]: 30, 
         }),
         approvals: new MichelsonMap,
         admin: alice.pkh,
         pauseGuardian: alice.pkh,
         paused: false,
-        totalSupply: 20,
+        totalSupply: 30,
     },
     bridge: {
         swaps: new MichelsonMap,
