@@ -14,3 +14,9 @@ let errorArbitraryValueKeyNotFound: string = "7"
 let errorArbitraryValueWrongType: string = "8"
 
 let errorWXTZTokenContractWrongType: string = "9"
+let errorAdminAddressWrongType: string = "10"
+let errorSenderIsNotAdmin: string = "11"
+
+let errorOvenNotFound: string = "12"
+let errorNotAnOvenOwner: string = "13"
+let errorOvenOwnerDoesNotAcceptDeposits: string = "14";
