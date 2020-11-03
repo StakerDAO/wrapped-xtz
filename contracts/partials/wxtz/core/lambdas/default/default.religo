@@ -3,6 +3,7 @@
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     // If any XTZ is received, fail with an error
+    // TODO: extract this if statement into a helper function
     if (Tezos.amount > 0mutez) {
         (failwith(errorAmountNotZero): entrypointReturn)
     } 

@@ -18,6 +18,12 @@ type arbitraryValues = big_map(arbitraryValueKey, arbitraryValue);
 
 type storage = {
     lambdas: lambdas,
+    /**
+     * Ovens or any other big_map needs to be part of the storage directly,
+     * since big_maps can't be packed into arbitrary values
+     * 
+     * Solution would be to store ovens in an external contract.
+     */
     ovens: ovens,
     arbitraryValues: arbitraryValues
 };

@@ -2,6 +2,12 @@
  * Lambda to add/remove/replace lambdas in the wXTZ Core
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
+    // check if the Tezos.sender address is the admin
+    runArbitraryValueLambda({
+        lambdaName: "permissions/isAdmin",
+        lambdaParameter: Bytes.pack(Tezos.sender)
+    });
+
     // Unpack the provided parameter
     let updateLambdasParameter: option(updateLambdasParameter) = Bytes.unpack(lambdaParameter);
     let updateLambdasParameter = switch (updateLambdasParameter) {

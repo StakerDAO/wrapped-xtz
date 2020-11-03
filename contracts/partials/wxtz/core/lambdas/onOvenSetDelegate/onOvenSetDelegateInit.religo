@@ -1,3 +1,4 @@
 #include "../../mockLambdaContracts/entrypoint.religo"
+#include "../arbitrary/composeMintOperation/composeMintOperationInit.religo"
 #include "../../runArbitraryValueLambda/runArbitraryValueLambda.religo"
-type onOvenWithdrawalRequestedParameter = nat; // TODO: rename the type as tzip-7 amount/value
+type onOvenSetDelegateParameter = unit;

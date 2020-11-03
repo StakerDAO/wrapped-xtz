@@ -1,3 +1,4 @@
+#include "../storage/storage.religo"
 type lambdaName = string;
 type lambdaParameter = bytes;
 type runEntrypointLambdaParameter = {

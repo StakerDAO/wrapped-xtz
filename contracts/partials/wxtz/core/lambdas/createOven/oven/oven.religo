@@ -4,7 +4,7 @@
 ((ovenParameter, storage): (ovenParameter, ovenStorage)): (list(operation), ovenStorage) => {
     switch (ovenParameter) {
         | Default => default((), storage)
-        | Withdraw => (([]: list(operation)), storage) // TODO: implement Withdraw
+        | Withdraw(withdrawParameter) => withdraw((withdrawParameter, storage))
         | SetDelegate(setDelegateParameter) => setDelegate((setDelegateParameter, storage))
     };
 }

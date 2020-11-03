@@ -2,18 +2,11 @@
  * Lambda called when a wXTZ Oven receives a deposit of any kind
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
-    // check if the `Tezos.sender` is a wXTZ Oven originated by the core
-    // TODO: extract the oven 'trust check' into an arbitrary value lambda
-    let ovenOwner: option(ovenOwner) = Big_map.find_opt(Tezos.sender, storage.ovens);
-
-    /**
-     * Calling this entrypoint from contracts not oringated from
-     * the wXTZ Core is not allowed
-     */
-    switch (ovenOwner) {
-        | None => failwith(errorOvenNotTrusted)
-        | Some(ovenOwner) => ()
-    };
+    // check if the address calling this entrypoint is a trusted oven
+    let (_, _, _) = runArbitraryValueLambda(({
+        lambdaName: "permissions/isTrustedOven",
+        lambdaParameter: Bytes.pack(Tezos.sender)
+    }, storage));
 
     // send the received XTZ back to the sender
     /**
@@ -25,7 +18,7 @@
      * If this workaround does not work, substitute `contract(unit)` with the full
      * type of wXTZ Oven contract.
      * 
-     * Real solution is to use `Tezos.get_entrypoint_opt("%default", Tezos.sender)`
+     * Real solution would be to use `Tezos.get_entrypoint_opt("%default", Tezos.sender)`
      */
     let oven: option(contract(unit)) = Tezos.get_contract_opt(Tezos.sender);
     let oven: contract(unit) = switch (oven) {

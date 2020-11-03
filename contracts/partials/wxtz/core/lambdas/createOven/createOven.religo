@@ -45,8 +45,24 @@
         ovens: ovens
     };
 
+    /**
+     * Compose the minting operation on the wXTZ Token contract
+     */
+    let composeMintOperationParameter: composeMintOperationParameter = ();
+    let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
+    let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
+        {
+            lambdaName: "composeMintOperation",
+            lambdaParameter: Bytes.pack(()), // TODO: extract a default packed bytes variable
+        },
+        storage
+    ));
+
     (
-        [ovenOriginationOperation],
+        [
+            ovenOriginationOperation,
+            ...mintWXTZOperationList
+        ],
         storage
     );
 }
