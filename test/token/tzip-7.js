@@ -5,7 +5,7 @@ const { Tezos } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
-const { initialStorage } = require('./../../migrations/2_deploy_tzip-7');
+const { initialStorage } = require('./../../migrations/1_deploy_tzip-7');
 const { update } = require('lodash');
 
 contract('TZIP-7 token contract', accounts => {
