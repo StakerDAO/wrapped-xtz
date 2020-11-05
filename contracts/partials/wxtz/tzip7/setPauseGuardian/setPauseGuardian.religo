@@ -4,7 +4,7 @@ let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (address, tok
             ...tokenStorage,
             pauseGuardian: setPauseGuardianParameter
         };
-        (emptyListOfOperations, newStorage)
+        (emptyListOfOperations, newStorage);
     } else {
         (failwith (errorNoPermission): (entrypointReturn, tokenStorage));
     };

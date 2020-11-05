@@ -4,10 +4,10 @@ let getBalance = ((getBalanceParameter, tokenStorage): (getBalanceParameter, tok
 		| Some value => value
 		| None => defaultBalance
 	};
-	let op = Tezos.transaction(
+	let operation = Tezos.transaction(
 		balanceValue,
 		0mutez,
 		getBalanceParameter.callback
 	);
-	([op], tokenStorage)
+	([operation], tokenStorage)
 };

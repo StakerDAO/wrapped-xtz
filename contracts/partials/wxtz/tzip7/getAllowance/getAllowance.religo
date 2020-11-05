@@ -7,10 +7,10 @@ let getAllowance = ((getAllowanceParameter, tokenStorage): (getAllowanceParamete
 		| Some(value) => value
 		| None => defaultBalance
 	};
-	let op = Tezos.transaction(
+	let operation = Tezos.transaction(
 		allowanceValue,
 		0mutez,
 		getAllowanceParameter.callback
 	);
-	([op], tokenStorage)
+	([operation], tokenStorage)
 };

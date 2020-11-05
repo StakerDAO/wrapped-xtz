@@ -1,9 +1,10 @@
 let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
-    let isPaused = switch (tokenStorage.paused) {
+    // continue only if token operations are not paused
+	let isPaused = switch (tokenStorage.paused) {
 		| true => (failwith(errorTokenOperationsArePaused): bool)
 		| false => false	
 	};
-
+	// retrieve existing allowance and set default value if none was found
     let previousState = Big_map.find_opt(
         (Tezos.sender, approveCASParameter.spender),
         tokenStorage.approvals
@@ -14,11 +15,10 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
 	};
 
     /**
-     * if the current amount of sender's tokens spender is allowed to spend is equal to the expected value
-     * this function behaves as approve, but it does not prohibit changing allowance from non-zero to non-zero
+     * If the expected allowance matches the current amount this function behaves as approve,
+     * but it does not prohibit changing allowance from non-zero to non-zero
      */
-	if (previousState != approveCASParameter.expected)
-	{ 
+	if (previousState != approveCASParameter.expected) { 
         (failwith(errorAllowanceMismatch): (entrypointReturn, tokenStorage)) 
     }
 	else {
@@ -31,7 +31,8 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
 				...tokenStorage,
 				approvals: newAllowances
 		};
-		(emptyListOfOperations, newStorage)
+		// no operations are returned, only the updated storage
+		(emptyListOfOperations, newStorage);
 	};
  
 };

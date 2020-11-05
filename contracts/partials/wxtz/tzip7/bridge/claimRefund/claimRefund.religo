@@ -1,15 +1,18 @@
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
+    // continue only if token operations are not paused
     let isPaused = switch (storage.token.paused) {
 		| true => (failwith(errorTokenOperationsArePaused): bool)
 		| false => false	
 	};
     
-    let swap = switch (Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps)) {
+    // retrieve swap record from storage
+    let swap = Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps);
+    let swap = switch (swap) {
         | Some(swap) => swap
         | None => (failwith(errorSwapLockDoesNotExist): swap)
     };
-    
-	// swap protocol time condition
+
+	// check for swap protocol time condition
 	switch (swap.releaseTime <= Tezos.now) {
 		| true => unit
 		| false => (failwith(errorFundsLock): unit)
@@ -33,9 +36,10 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     // please note that the modified newTokenStorage from above is used here
     let (_, newTokenStorage) = transfer(transferFeeParameter, newTokenStorage);
     
-    // remove the swap record
+    // remove the swap record from storage
     let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
 
+    // update both token ledger storage and swap records in bridge storage
     let newStorage = {
         ...storage,
         token: newTokenStorage, 
@@ -44,5 +48,6 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
             swaps: newSwaps,
         },
     };
+    // no operations are returned, only the updated storage
     (emptyListOfOperations, newStorage);
 };

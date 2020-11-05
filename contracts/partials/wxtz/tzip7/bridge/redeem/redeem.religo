@@ -1,4 +1,5 @@
 let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypointReturn, storage) => {
+	// continue only if token operations are not paused
 	let isPaused = switch (storage.token.paused) {
 		| true => (failwith(errorTokenOperationsArePaused): bool)
 		| false => false	
@@ -15,6 +16,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	// calculate SHA-256 hash of provided secret
 	let secretHash = Crypto.sha256(redeemParameter.secret);
 
+	// use the calculated hash to retrieve swap record from bridge storage
 	let swap = Big_map.find_opt(secretHash, storage.bridge.swaps);
 	let swap = switch (swap) {
 		| Some(swap) => swap
@@ -27,42 +29,46 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 		| true => unit
 	};
 
+	// continue only if swap was confirmed
 	switch (swap.confirmed) {
 		| true => unit
 		| false => (failwith(errorSwapIsNotConfirmed): unit)
 	};
 
-	// constructing the transfer parameter to redeem locked-up tokens
+	// construct the transfer parameter to redeem locked-up tokens
 	let totalValue = swap.value + swap.fee;
 	let transferParameter: transferParameter = {
 		to_: swap.to_,
 		from_: Tezos.self_address,
 		value: totalValue,
 	};
-	
-	// calling the transfer function to redeem the token amount specified in swap
+
+	// calling the transfer function to redeem the total token amount specified in swap
 	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
 
-	// saving secret and secretHash to outcomes
+	// save secret and secretHash to outcomes in bridge storage
 	let newOutcome = Big_map.add(
 		secretHash,
 		redeemParameter.secret,
 		storage.bridge.outcomes
 	);
 
+	// remove swap record from bridge storage
 	let newSwap = Big_map.remove(
 		secretHash,
 		storage.bridge.swaps
 	);
 
+	// update token ledger storage and bridge storage
 	let newStorage = {
 		...storage,
 		token: newTokenStorage, 
 		bridge: {
 			...storage.bridge,
 			swaps: newSwap,
-			outcomes: newOutcome
+			outcomes: newOutcome,
 		}
 	};
+	// no operations are returned, only the updated storage
 	(emptyListOfOperations, newStorage);
 };
