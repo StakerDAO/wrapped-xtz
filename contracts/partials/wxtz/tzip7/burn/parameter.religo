@@ -1,4 +1,6 @@
-type burnParameter = {
-	from_: address,
+type burnParameter = 
+[@layout:comb]
+{
+	[@annot:from] from_: address,
 	value: nat,
 };

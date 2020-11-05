@@ -1,77 +1,52 @@
-let lock = ((lockParameter, storage) : (lockParameter, storage)) : (list(operation), storage) => {
-	let swapEntry: swap = {
-		to_: lockParameter.to_,
-		from_: Tezos.sender,
-		value: lockParameter.value,
-		releaseTime: lockParameter.releaseTime,
+let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
+	// continue only if token operations are not paused
+	let isPaused = switch (storage.token.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): bool)
+		| false => false	
 	};
-	let newSwap = switch (Big_map.find_opt(lockParameter.lockId, storage.bridge.swaps)) {
-		| Some(value) => (failwith("SwapLockAlreadyExists"): swaps)
+	
+	// create swap record entry from parameters and implicit values
+	let swapEntry: swap = {
+		confirmed: lockParameter.confirmed,
+		fee: lockParameter.fee,
+		from_: Tezos.sender,
+		releaseTime: lockParameter.releaseTime,
+		to_: lockParameter.to_,
+		value: lockParameter.value,
+	};
+	// save new swap record as value for the secretHash key, but only if is not already taken
+	let newSwap = Big_map.find_opt(lockParameter.secretHash, storage.bridge.swaps);
+	let newSwap = switch (newSwap) {
+		| Some(value) => (failwith(errorSwapLockAlreadyExists): swaps)
 		| None => {
 			Big_map.add(
-				lockParameter.lockId,
+				lockParameter.secretHash,
 				swapEntry,
 				storage.bridge.swaps
 			);
 		}
 	};
-
-    /**
-	 * Constructing the transfer parameter for lock-up of tokens
-	 */
+	
+	// lock up total swap amount, by transferring it to the smart contracts own address
+	let totalAmount = lockParameter.value + lockParameter.fee;
 	let transferParameter: transferParameter = {
 		from_: Tezos.sender,
 		to_:  Tezos.self_address,
-		value: lockParameter.value,
+		value: totalAmount,
 	};
-  
-	/**
-	 * Calling the transfer function to lock up the token amount specified in swap
-	 */
+	// call the transfer function of TZIP-7
 	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
-
-	/**
-	 * Check whether the optional secretHash was provided as parameter
-	 */
-	 switch (lockParameter.secretHash) {
-		| Some(secretHash) => {
-			/**
-			 * Hash was revealed and is saved to outcomes
-			 * New swap is saved to storage
-			 * Tokens to be transferred are locked
-			 */
-			let newOutcome = Big_map.add(
-				lockParameter.lockId,
-				HashRevealed(secretHash),
-				storage.bridge.outcomes
-			);
-			let newStorage = { 
-				...storage, 
-				bridge: { 
-					...storage.bridge,
-					swaps: newSwap,
-					outcomes: newOutcome,
-				}, 
-				token: newTokenStorage,
-			};			
-			(([]: list (operation)), newStorage);
-		}
-		| None => {
-			/**
-			 * No secret hash was revealed
-			 * New swap is saved to storage
-			 * Tokens to be transferred are locked
-			 */
-			let newStorage = { 
-				...storage, 
-				bridge: { 
-					...storage.bridge,
-					swaps: newSwap, 
-				},
-				token: newTokenStorage,
-			};
-			(([]: list (operation)), newStorage);
-		}
+	
+	// update both bridge and token ledger storage
+	let newBridgeStorage = { 
+		...storage.bridge,
+		swaps: newSwap, 
 	};
-
+	let newStorage = {
+		...storage,
+		bridge: newBridgeStorage,
+		token: newTokenStorage,
+	};
+	// no operations are returned, only the updated storage
+	(emptyListOfOperations, newStorage);
 };

@@ -23,3 +23,36 @@ jobs:
       with:
         time: '15s'
     - run: npm run migrate
+  test-tzip-7:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/checkout@v2
+  
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - run: npm i
+    - run: npm run sandbox:start &
+    - name: Sleep for 15 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '15s'
+    - run: npm run test -- ./test/token/tzip-7.js
+  test-bridge:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - run: npm i
+    - run: npm run sandbox:start &
+    - name: Sleep for 15 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '15s'
+    - run: npm run test -- ./test/token/bridge.js
+  

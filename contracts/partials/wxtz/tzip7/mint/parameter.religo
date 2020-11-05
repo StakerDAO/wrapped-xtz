@@ -1,4 +1,6 @@
-type mintParameter = {
-	to_: address,
+type mintParameter = 
+[@layout:comb]
+{
+	[@annot:to] to_: address,
 	value: nat,
 };

@@ -1,11 +1,13 @@
-let setAdministrator = ((setAdministratorParameter, tokenStorage): (address, tokenStorage)): (list(operation), tokenStorage) => {
+let setAdministrator = ((setAdministratorParameter, tokenStorage): (address, tokenStorage)): (entrypointReturn, tokenStorage) => {
+    // only the current administrator is allowed to change admin's address
     if (Tezos.sender == tokenStorage.admin) {
         let newStorage = {
             ...tokenStorage,
             admin: setAdministratorParameter
         };
-        ([]: (list(operation)), newStorage)
+        // no operations are returned, only the updated token storage
+        (emptyListOfOperations, newStorage);
     } else {
-        (failwith ("NoPermission"): (list(operation), tokenStorage));
+        (failwith (errorNoPermission): (entrypointReturn, tokenStorage));
     };
 };

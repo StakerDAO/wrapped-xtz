@@ -1,7 +1,10 @@
-type lockParameter = {
-	lockId: lockId,
-	value: nat,
+type lockParameter = 
+[@layout:comb]
+{
+	confirmed: bool,
+	fee: nat,
 	releaseTime: timestamp,
-	secretHash: option(secretHash),
-	to_: address,
+	secretHash: secretHash,
+	[@annot:to] to_: address,
+	value: nat,
 };

@@ -1,54 +1,53 @@
-let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (list(operation), storage) => {
-    let swap = switch (Big_map.find_opt(claimRefundParameter.lockId, storage.bridge.swaps)) {
-        | Some(swap) => swap
-        | None => (failwith("SwapLockDoesNotExist"): swap)
-    };
+let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
+    // continue only if token operations are not paused
+    let isPaused = switch (storage.token.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): bool)
+		| false => false	
+	};
     
-	/**
-	 * Check whether swap time condition is met
-	 */
+    // retrieve swap record from storage
+    let swap = Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps);
+    let swap = switch (swap) {
+        | Some(swap) => swap
+        | None => (failwith(errorSwapLockDoesNotExist): swap)
+    };
+
+	// check for swap protocol time condition
 	switch (swap.releaseTime <= Tezos.now) {
 		| true => unit
-		| false => (failwith("FundsLock"): unit)
+		| false => (failwith(errorFundsLock): unit)
 	};
 
-    let secretHash = switch (Big_map.find_opt(claimRefundParameter.lockId, storage.bridge.outcomes)) {
-		| Some(outcome) => {
-			switch (outcome) {
-			| HashRevealed(secretHash) => secretHash
-			| SecretRevealed(secret) => (failwith("SwapAlreadyPerformed"): secretHash)
-			| Refunded(value) => (failwith("SwapAlreadyRefunded"): secretHash)
-			};
-		}
-		| None => (failwith("HashWasNotRevealed"): secretHash)
-    };
-    
-    /**
-     * Constructing the transfer parameter to redeem locked-up tokens
-        */
-    let transferParameter: transferParameter = {
+    // constructing the transfer parameter to redeem locked-up tokens
+    let transferValueParameter: transferParameter = {
         to_: swap.from_,
         from_: Tezos.self_address,
         value: swap.value,
     };
-    /**
-     * Calling the transfer function to redeem the token amount specified in swap
-    */
-    let (_, newTokenStorage) = transfer((transferParameter, storage.token));
+    // calling the transfer function to redeem the token amount specified in swap
+    let (_, newTokenStorage) = transfer((transferValueParameter, storage.token));
 
-    let newOutcome = Big_map.update(
-        claimRefundParameter.lockId,
-        Some(Refunded),
-        storage.bridge.outcomes
-    );
+    // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
+    let transferFeeParameter: transferParameter = {
+        to_: swap.to_,
+        from_: Tezos.self_address,
+        value: swap.fee,
+    };
+    // please note that the modified newTokenStorage from above is used here
+    let (_, newTokenStorage) = transfer(transferFeeParameter, newTokenStorage);
+    
+    // remove the swap record from storage
+    let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
 
+    // update both token ledger storage and swap records in bridge storage
     let newStorage = {
         ...storage,
         token: newTokenStorage, 
         bridge: {
             ...storage.bridge,
-            outcomes: newOutcome
+            swaps: newSwaps,
         },
     };
-    (([]: list (operation)), newStorage);
+    // no operations are returned, only the updated storage
+    (emptyListOfOperations, newStorage);
 };

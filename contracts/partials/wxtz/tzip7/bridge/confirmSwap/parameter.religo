@@ -1,0 +1,3 @@
+type confirmSwapParameter = {
+    secretHash: secretHash
+};

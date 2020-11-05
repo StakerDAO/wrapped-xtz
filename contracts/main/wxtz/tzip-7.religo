@@ -1,20 +1,26 @@
 #include "../../partials/wxtz/tzip7/storage/storage.religo"
 #include "../../partials/wxtz/tzip7/parameter.religo"
+#include "../../partials/wxtz/tzip7/errors.religo"
+#include "../../partials/wxtz/tzip7/constants.religo"
 
 #include "../../partials/wxtz/tzip7/transfer/transfer.religo"
 #include "../../partials/wxtz/tzip7/getAllowance/getAllowance.religo"
 #include "../../partials/wxtz/tzip7/approve/approve.religo"
+#include "../../partials/wxtz/tzip7/approveCAS/approveCAS.religo"
 #include "../../partials/wxtz/tzip7/getBalance/getBalance.religo"
 #include "../../partials/wxtz/tzip7/getTotalSupply/getTotalSupply.religo"
 #include "../../partials/wxtz/tzip7/mint/mint.religo"
 #include "../../partials/wxtz/tzip7/burn/burn.religo"
-#include "../../partials/wxtz/tzip7/setPause/setPause.religo"
 #include "../../partials/wxtz/tzip7/setAdministrator/setAdministrator.religo"
+#include "../../partials/wxtz/tzip7/setPauseGuardian/setPauseGuardian.religo"
+#include "../../partials/wxtz/tzip7/setPause/setPause.religo"
 
 #include "../../partials/wxtz/tzip7/bridge/lock/lock.religo"
 #include "../../partials/wxtz/tzip7/bridge/redeem/redeem.religo"
 #include "../../partials/wxtz/tzip7/bridge/claimRefund/claimRefund.religo"
-#include "../../partials/wxtz/tzip7/bridge/revealSecretHash/revealSecretHash.religo"
+#include "../../partials/wxtz/tzip7/bridge/confirmSwap/confirmSwap.religo"
+#include "../../partials/wxtz/tzip7/bridge/getOutcome/getOutcome.religo"
+#include "../../partials/wxtz/tzip7/bridge/getSwap/getSwap.religo"
 
 let main = ((parameter, storage): (parameter, storage)) =>  
 	switch (parameter) {
@@ -31,7 +37,14 @@ let main = ((parameter, storage): (parameter, storage)) =>
 				...storage,
 				token: tokenStorage
 			})
-		} 
+		}
+		| ApproveCAS(approveCASParameter) => {
+			let (operations, tokenStorage) = approveCAS((approveCASParameter, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}  
 		| Mint(mintParameter) => {
 			let (operations, tokenStorage) = mint((mintParameter, storage.token));
 			(operations, {
@@ -48,6 +61,13 @@ let main = ((parameter, storage): (parameter, storage)) =>
 		}
 		| SetAdministrator(address_) => {
 			let (operations, tokenStorage) = setAdministrator((address_, storage.token));
+			(operations, {
+				...storage,
+				token: tokenStorage
+			})
+		}
+		| SetPauseGuardian(address_) => {
+			let (operations, tokenStorage) = setPauseGuardian((address_, storage.token));
 			(operations, {
 				...storage,
 				token: tokenStorage
@@ -73,13 +93,21 @@ let main = ((parameter, storage): (parameter, storage)) =>
 			(operations: list(operation), storage)
 		}
 		| Lock(lockParameter) => lock((lockParameter, storage))
-		| RevealSecretHash(revealSecretHashParameter) => {
-			let (operations, bridgeStorage) = revealSecretHash((revealSecretHashParameter, storage.bridge));
+		| Redeem(redeemParameter) => redeem((redeemParameter, storage))
+		| ClaimRefund(claimRefundParameter) => claimRefund((claimRefundParameter, storage))
+		| ConfirmSwap(confirmSwapParameter) => {
+			let (operations, bridgeStorage) = confirmSwap((confirmSwapParameter, storage.bridge));
 			(operations, {
 				...storage,
 				bridge: bridgeStorage
 			})
 		} 
-		| Redeem(redeemParameter) => redeem((redeemParameter, storage))
-		| ClaimRefund(claimRefundParameter) => claimRefund((claimRefundParameter, storage))
+		| GetOutcome(getOutcomeParameter) => {
+			let (operations, _) = getOutcome((getOutcomeParameter, storage.bridge));
+			(operations: list(operation), storage)
+		}
+		| GetSwap(getSwapParameter) => {
+			let (operations, _) = getSwap((getSwapParameter, storage.bridge));
+			(operations: list(operation), storage)
+		} 
 };
