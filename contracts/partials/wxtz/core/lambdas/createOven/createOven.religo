@@ -48,12 +48,15 @@
     /**
      * Compose the minting operation on the wXTZ Token contract
      */
-    let composeMintOperationParameter: composeMintOperationParameter = ();
+    let composeMintOperationParameter: composeMintOperationParameter = {
+        to_: Tezos.sender,
+        value: Tezos.amount / 1tez // TODO: extract as tezToNat(tez)
+    };
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
     let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
         {
             lambdaName: "arbitrary/composeMintOperation",
-            lambdaParameter: Bytes.pack(()), // TODO: extract a default packed bytes variable
+            lambdaParameter: composeMintOperationParameter,
         },
         storage
     ));

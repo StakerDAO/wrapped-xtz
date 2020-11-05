@@ -6,4 +6,4 @@
 #include "../../../../tzip7/mint/parameter.religo"
 #include "../../../helpers/getWXTZTokenContractAddress/getWXTZTokenContractAddress.religo"
 
-type composeMintOperationParameter = unit;
+type composeMintOperationParameter = mintParameter;

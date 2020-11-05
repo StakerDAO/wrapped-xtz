@@ -235,7 +235,7 @@ contract('TZIP7 extended with hashed time-lock swap', accounts => {
         expect(outcome).to.equal(secretHash);
     });
 
-    it.only("should pause all transfer and approve operations", async () => {
+    it("should pause all transfer and approve operations", async () => {
         // call the token contract at the %setPause entrypoint to pause all operations
         await tzip7_instance.setPause(true)
         // read contract's storage

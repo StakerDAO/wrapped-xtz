@@ -1,11 +1,25 @@
 const core = artifacts.require('core');
 const compileLambda = require('../scripts/lambdaCompiler/compileLambda');
-const { UnitValue, MichelsonMap } = require('@taquito/taquito')
+const { UnitValue, MichelsonMap } = require('@taquito/taquito');
+const testPackValue = require('../scripts/lambdaCompiler/testPackValue');
+const { alice } = require('./../scripts/sandbox/accounts');
 
 module.exports = async (deployer, network, accounts) => {
     let lambdas = new MichelsonMap;
     let ovens = new MichelsonMap;
     let arbitraryValues = new MichelsonMap;
+
+    arbitraryValues.set('wXTZTokenContractAddress', 
+        testPackValue(
+            `"${require('../deployments/tzip7')}": address`
+        )
+    );
+
+    arbitraryValues.set('admin', 
+        testPackValue(
+            `"${alice.pkh}": address`
+        )
+    );
     
     /**
      * Arbitrary lambdas

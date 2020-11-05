@@ -40,8 +40,8 @@
     "commit": "git-cz",
     "compile:lambda": "node scripts/lambdaCompiler/compileLambdaCli.js",
     "compile:lambda:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -e '**/*.tz' -- npm run compile:lambda",
-    "compile:lambda-parameter": "node scripts/lambdaCompiler/testCompileLambdaParameterCli.js"
-},
+    "compile:lambda-parameter": "node scripts/lambdaCompiler/testPackValueCli.js"
+  },
   "author": "matej.sima@stove-labs.com",
   "license": "MIT",
   "config": {

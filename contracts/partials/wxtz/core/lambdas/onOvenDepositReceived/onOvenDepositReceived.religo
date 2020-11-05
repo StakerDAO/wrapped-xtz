@@ -26,17 +26,26 @@
         | Some(oven) => oven
     };
 
+    let ovenOwner: option(address) = Big_map.find_opt(Tezos.sender, storage.ovens);
+    let ovenOwner: address = switch (ovenOwner) {
+        | None => (failwith(errorOvenNotFound): address)
+        | Some(ovenOwner) => ovenOwner
+    };
+
     let sendBackXTZOperation: operation = Tezos.transaction((), Tezos.amount, oven);
 
     /**
      * Compose the minting operation on the wXTZ Token contract
      */
-    let composeMintOperationParameter: composeMintOperationParameter = ();
+    let composeMintOperationParameter: composeMintOperationParameter = {
+        to_: ovenOwner,
+        value: Tezos.amount / 1tez // TODO: extract as tezToNat(tez)
+    };
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
     let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
         {
             lambdaName: "arbitrary/composeMintOperation",
-            lambdaParameter: Bytes.pack(()), // TODO: extract a default packed bytes variable
+            lambdaParameter: composeMintOperationParameter, 
         },
         storage
     ));

@@ -5,13 +5,20 @@
         | Some(wXTZTokenContract) => wXTZTokenContract
         | None => (failwith(errorWXTZTokenContractWrongType): contract(mintParameter))
     };
+
+    let composeMintOperationParameter: option(composeMintOperationParameter) = Bytes.unpack(arbitraryValueLambdaParameter);
+    let composeMintOperationParameter: composeMintOperationParameter = switch (composeMintOperationParameter) {
+        | None => (failwith(errorLambdaParameterWrongType): composeMintOperationParameter)
+        | Some(composeMintOperationParameter) => composeMintOperationParameter
+    };
+
     /**
      * Compose the mint operation
      */
     // TODO: use lambdaParameters to set the amound & address below
     let mintParameter: mintParameter = {
-        to_: Tezos.sender,
-        value: Tezos.amount / 1tez // TODO: extract as tezToNat(tez)
+        to_: composeMintOperationParameter.to_,
+        value: composeMintOperationParameter.value
     };
     let mintOperation: operation = Tezos.transaction(
         mintParameter,

@@ -2,11 +2,11 @@ const { execSync } = require('child_process');
 
 module.exports = (expression) => {
     const output = execSync(
-        `./scripts/lambdaCompiler/test-compile-lambda-parameter.sh '${expression}'`,
+        `./scripts/lambdaCompiler/test-pack-value.sh '${expression}'`,
         {
             encoding: 'utf8'
         }
-    ).bytes.replace('0x','')
+    )
 
-    return JSON.parse(output);
+    return JSON.parse(output).bytes.replace('0x','');
 }

@@ -1,7 +1,7 @@
 const tzip7 = artifacts.require('tzip7');
-const { alice } = require('./../scripts/sandbox/accounts');
+const { alice } = require('../scripts/sandbox/accounts');
 const { MichelsonMap } = require('@taquito/taquito');
-const saveContractAddress = require('./../helpers/saveContractAddress');
+const saveContractAddress = require('../helpers/saveContractAddress');
 
 const initialStorage = {
     token: {

@@ -24,7 +24,6 @@ let originateOven = ((xtzAmount, delegate, ovenOwner, coreContractAddress): orig
      * and address of the wXTZ Core that originated it
      */
     let ovenInitialStorage: ovenStorage = {
-        ownerAddress: ovenOwner,
         coreAddress: coreContractAddress
     };
 

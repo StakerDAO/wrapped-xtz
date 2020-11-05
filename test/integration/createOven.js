@@ -1,24 +1,33 @@
 const core = artifacts.require('core');
-const compileLambdaParameter = require('../../scripts/lambdaCompiler/testCompileLambdaParameter');
+const tzip7 = artifacts.require('tzip7');
+const testPackValue = require('../../scripts/lambdaCompiler/testPackValue');
 const { Tezos } = require('@taquito/taquito');
 const { InMemorySigner } = require('@taquito/signer');
 const { alice } = require('../../scripts/sandbox/accounts');
 
 contract('', () => {
-    describe('Oven creation with the first baker payout', () => {
+    describe.only('Oven creation with the first baker payout', () => {
 
         let instance;
         let storage;
         let ovenAddress;
+        let tzip7Instance;
+
         before(async () => {
             instance = await core.deployed();
+            tzip7Instance = await tzip7.deployed();
             storage = await instance.storage();
+
+            console.log('setting the administrator')
+            // set tzip-7 admin to be the core address
+            await tzip7Instance.setAdministrator(instance.address);
+            console.log('administrator set');
         });
 
         it('should create an oven with Alice as an owner', async () => {
             const createOvenOperation = await instance.runEntrypointLambda(
                 'createOven', // lambdaName
-                compileLambdaParameter(`
+                testPackValue(`
                     {
                         delegate: (None: option(key_hash)),
                         ovenOwner: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": address) 
