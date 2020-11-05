@@ -1,5 +1,5 @@
 const core = artifacts.require('core');
-const tzip7 = artifacts.require('tzip7');
+const tzip7 = artifacts.require('tzip-7'); 
 const testPackValue = require('../../scripts/lambdaCompiler/testPackValue');
 const { Tezos } = require('@taquito/taquito');
 const { InMemorySigner } = require('@taquito/signer');

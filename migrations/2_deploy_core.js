@@ -11,7 +11,7 @@ module.exports = async (deployer, network, accounts) => {
 
     arbitraryValues.set('wXTZTokenContractAddress', 
         testPackValue(
-            `"${require('../deployments/tzip7')}": address`
+            `"${require('../deployments/tzip-7')}": address`
         )
     );
 
