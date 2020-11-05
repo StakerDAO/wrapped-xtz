@@ -2,7 +2,7 @@ type secret = bytes;
 type secretHash = bytes;
 type swap = {
 	confirmed: bool,
-	fee: option(nat),
+	fee: nat,
 	[@annot:from] from_: address,
 	releaseTime: timestamp,
 	[@annot:to] to_: address,

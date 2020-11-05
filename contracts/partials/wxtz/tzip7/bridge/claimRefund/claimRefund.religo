@@ -24,19 +24,14 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     // calling the transfer function to redeem the token amount specified in swap
     let (_, newTokenStorage) = transfer((transferValueParameter, storage.token));
 
-    let (_, newTokenStorage) = switch(swap.fee) {
-        | Some(fee) => {
-            // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
-            let transferFeeParameter: transferParameter = {
-            to_: swap.to_,
-            from_: Tezos.self_address,
-            value: fee,
-            };
-            // calling the transfer function to send the swap fee to the recipient
-            transfer(transferFeeParameter, newTokenStorage);
-        }
-        | None => (emptyListOfOperations, newTokenStorage)
+    // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
+    let transferFeeParameter: transferParameter = {
+        to_: swap.to_,
+        from_: Tezos.self_address,
+        value: swap.fee,
     };
+    // please note that the modified newTokenStorage from above is used here
+    let (_, newTokenStorage) = transfer(transferFeeParameter, newTokenStorage);
     
     // remove the swap record
     let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
