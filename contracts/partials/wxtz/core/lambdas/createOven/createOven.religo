@@ -52,7 +52,7 @@
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
     let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
         {
-            lambdaName: "composeMintOperation",
+            lambdaName: "arbitrary/composeMintOperation",
             lambdaParameter: Bytes.pack(()), // TODO: extract a default packed bytes variable
         },
         storage

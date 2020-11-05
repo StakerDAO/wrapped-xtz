@@ -4,7 +4,7 @@
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     let (_, _, _) = runArbitraryValueLambda(({
-        lambdaName: "permissions/isOvenOwner",
+        lambdaName: "arbitrary/permissions/isOvenOwner",
         lambdaParameter: Bytes.pack({
             oven: Tezos.sender,
             owner: Tezos.source
@@ -19,7 +19,7 @@
 
     let value = onOvenWithdrawalRequestedParameter;
     let (burnWXTZOperationList, _, _) = runArbitraryValueLambda(({
-        lambdaName: "composeBurnOperation",
+        lambdaName: "arbitrary/composeBurnOperation",
         lambdaParameter: Bytes.pack({
             from_: Tezos.sender,
             value: value

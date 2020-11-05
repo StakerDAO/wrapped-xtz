@@ -1,4 +1,5 @@
 #include "./types.religo"
+#include "./../errors.religo"
 let runArbitraryValueLambda = ((runArbitraryValueLambdaParameter, storage): (runArbitraryValueLambdaParameter, storage)): arbitraryValueLambdaReturnValue => {
     let lambda: option(packedLambda) = Big_map.find_opt(runArbitraryValueLambdaParameter.lambdaName, storage.lambdas);
     let packedLambda: packedLambda = switch (lambda) {

@@ -7,4 +7,6 @@ const type = JSON.parse(args[1]);
 Tezos.rpc.packData({ data, type })
     .then(res => console.log(res.packed))
     // TODO: make the CLI compilation fail in case packing does not succeed;
-    // .catch(e => console.error('failed to pack:', e));
+    .catch(e => {
+        throw('failed to pack', e);
+    });

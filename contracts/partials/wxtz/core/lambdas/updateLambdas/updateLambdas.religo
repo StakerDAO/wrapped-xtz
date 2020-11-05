@@ -3,10 +3,10 @@
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     // check if the Tezos.sender address is the admin
-    runArbitraryValueLambda({
-        lambdaName: "permissions/isAdmin",
+    let (_, _, _) = runArbitraryValueLambda(({
+        lambdaName: "arbitrary/permissions/isAdmin",
         lambdaParameter: Bytes.pack(Tezos.sender)
-    });
+    }, storage));
 
     // Unpack the provided parameter
     let updateLambdasParameter: option(updateLambdasParameter) = Bytes.unpack(lambdaParameter);

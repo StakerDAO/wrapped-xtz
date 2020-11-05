@@ -5,7 +5,44 @@ const { UnitValue, MichelsonMap } = require('@taquito/taquito')
 module.exports = async (deployer, network, accounts) => {
     let lambdas = new MichelsonMap;
     let ovens = new MichelsonMap;
+    let arbitraryValues = new MichelsonMap;
     
+    /**
+     * Arbitrary lambdas
+     */
+    lambdas.set('arbitrary/composeBurnOperation',
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/arbitrary/composeBurnOperation/composeBurnOperation.religo'
+        ).bytes
+    );
+
+    lambdas.set('arbitrary/composeMintOperation',
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/arbitrary/composeMintOperation/composeMintOperation.religo'
+        ).bytes
+    );
+
+    lambdas.set('arbitrary/permissions/isAdmin',
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/arbitrary/permissions/isAdmin/isAdmin.religo'
+        ).bytes
+    );
+
+    lambdas.set('arbitrary/permissions/isOvenOwner',
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/arbitrary/permissions/isOvenOwner/isOvenOwner.religo'
+        ).bytes
+    );
+
+    lambdas.set('arbitrary/permissions/isTrustedOven',
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/arbitrary/permissions/isTrustedOven/isTrustedOven.religo '
+        ).bytes
+    );
+
+    /**
+     * Entrypoint lambdas
+     */
     lambdas.set('updateLambdas', 
         compileLambda(
             'contracts/partials/wxtz/core/lambdas/updateLambdas/updateLambdas.religo'
@@ -30,6 +67,13 @@ module.exports = async (deployer, network, accounts) => {
         ).bytes
     );
 
+
+    lambdas.set('onOvenSetDelegate', 
+        compileLambda(
+            'contracts/partials/wxtz/core/lambdas/onOvenSetDelegate/onOvenSetDelegate.religo'
+        ).bytes
+    );
+
     /**
      * Compile the wXTZ Oven to Michelson so it can be included
      * within the `createOven` lambda
@@ -50,6 +94,7 @@ module.exports = async (deployer, network, accounts) => {
         u: UnitValue,
         lambdas,
         ovens,
+        arbitraryValues
     };
 
     deployer.deploy(core, storage);

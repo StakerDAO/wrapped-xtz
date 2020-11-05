@@ -6,7 +6,7 @@ module.exports = (expression) => {
         {
             encoding: 'utf8'
         }
-    )
+    ).bytes.replace('0x','')
 
     return JSON.parse(output);
 }

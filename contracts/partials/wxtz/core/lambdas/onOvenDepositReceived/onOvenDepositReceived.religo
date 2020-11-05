@@ -4,7 +4,7 @@
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     // check if the address calling this entrypoint is a trusted oven
     let (_, _, _) = runArbitraryValueLambda(({
-        lambdaName: "permissions/isTrustedOven",
+        lambdaName: "arbitrary/permissions/isTrustedOven",
         lambdaParameter: Bytes.pack(Tezos.sender)
     }, storage));
 
@@ -35,7 +35,7 @@
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
     let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
         {
-            lambdaName: "composeMintOperation",
+            lambdaName: "arbitrary/composeMintOperation",
             lambdaParameter: Bytes.pack(()), // TODO: extract a default packed bytes variable
         },
         storage

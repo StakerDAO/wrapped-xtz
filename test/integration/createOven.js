@@ -23,7 +23,7 @@ contract('', () => {
                         delegate: (None: option(key_hash)),
                         ovenOwner: ("tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb": address) 
                     }
-                `).bytes.replace('0x','') // TODO: extract the 0x bytes replacement
+                `)
             );
             ovenAddress = createOvenOperation.receipt.results[0].metadata.internal_operation_results[0].result.originated_contracts[0];
             

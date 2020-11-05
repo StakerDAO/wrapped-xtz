@@ -1,8 +1,8 @@
-#include "../../mockLambdaContracts/entrypoint.religo"
 #include "./oven/parameter.religo"
 #include "./oven/storage.religo"
 #include "../arbitrary/composeMintOperation/composeMintOperationInit.religo"
 #include "../../runArbitraryValueLambda/runArbitraryValueLambda.religo"
+#include "../../mockLambdaContracts/entrypoint.religo"
 
 
 type delegate = key_hash;
