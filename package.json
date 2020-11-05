@@ -51,7 +51,6 @@
   },
   "dependencies": {
     "bignumber.js": "^9.0.1",
-    "blake2": "^4.0.2",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "ganache-cli": "^6.10.0-tezos.1",
