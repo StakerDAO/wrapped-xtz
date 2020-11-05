@@ -1,4 +1,5 @@
 const tzip7 = artifacts.require('tzip-7');
+const getViews = artifacts.require('getViews');
 const crypto = require('crypto');
 const { expect } = require('chai').use(require('chai-as-promised'));
 const { Tezos } = require('@taquito/taquito')
@@ -39,8 +40,9 @@ function getISOTimeWithDelay(hours) {
 contract('TZIP-7 extended with hashed time-lock swap', accounts => {
     let storage;
     let tzip7Instance;
+    let getViewsInstance;
     let rpc;
-
+    
     async function updateStorage() {
         storage = await tzip7Instance.storage();
     };
@@ -55,8 +57,10 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
 
     before(async () => {
         tzip7Instance = await tzip7.deployed();
+        getViewsInstance = await getViews.deployed();
         // display the current contract address for debugging purposes
-        console.log('Contract deployed at:', tzip7Instance.address);
+        console.log('Extended TZIP-7 deployed at:', tzip7Instance.address);
+        console.log('Get View contract deployed at:', getViewsInstance.address);
         // read host from TruffleContract
         rpc = tzip7Instance.constructor.currentProvider.host;
     });
@@ -76,7 +80,6 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         fee: fee,
         from: alice.pkh,
         to: bob.pkh,
-        secretHash: secretHash,
         value: amount,
         releaseTime: deadlineIn2Hours,
     };
@@ -261,5 +264,40 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
             // Alice tries to redeem token, but has surpassed the release date for the swap
             await expect(tzip7Instance.claimRefund(secretHashClaimRefund)).to.be.rejectedWith("FundsLock");
         });   
-    });    
+    });
+    
+    describe("Get Contract Views", () => {
+        it("should view outcome of a performed swap", async () => {
+            await getViewsInstance.requestOutcome(tzip7Instance.address, secretHash)
+            
+            let storageGetViewsInstance = await getViewsInstance.storage()
+            const secret = storageGetViewsInstance.outcome;
+            expect(secret).to.equal(secretHexString);
+        });
+
+        it("should view swap of a pending swap", async () => {
+            const secretGetView = toHexString(randomBytes.sync(32));
+            const secretHashGetView = hash(secretGetView);
+            
+            await tzip7Instance.lock(
+                swapRecord.confirmed,
+                swapRecord.fee,
+                swapRecord.releaseTime,
+                secretHashGetView,
+                swapRecord.to,
+                swapRecord.value
+            );
+
+            await getViewsInstance.requestSwap(tzip7Instance.address, secretHashGetView);
+
+            let storageGetViewsInstance = await getViewsInstance.storage()
+            const swap = storageGetViewsInstance.swap;
+            expect(swap.confirmed).to.equal(swapRecord.confirmed);
+            expect(Number(swap.fee)).to.equal(swapRecord.fee);
+            expect(swap.from).to.equal(swapRecord.from);
+            expect(swap.releaseTime).to.equal(swapRecord.releaseTime);
+            expect(swap.to).to.equal(swapRecord.to);
+            expect(Number(swap.value)).to.equal(swapRecord.value);
+        });
+    });
 });

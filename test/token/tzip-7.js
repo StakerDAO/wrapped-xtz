@@ -1,14 +1,17 @@
 const tzip7 = artifacts.require('tzip-7');
+const getViews = artifacts.require('getViews');
 const { expect } = require('chai').use(require('chai-as-promised'));
 const { Tezos } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
 const { initialStorage } = require('./../../migrations/2_deploy_tzip-7');
+const { update } = require('lodash');
 
 contract('TZIP-7 token contract', accounts => {
     let storage;
     let tzip7Instance;
+    let getViewsInstance;
     let rpc;
 
     async function updateStorage() {
@@ -25,8 +28,10 @@ contract('TZIP-7 token contract', accounts => {
 
     before(async () => {
         tzip7Instance = await tzip7.deployed();
+        getViewsInstance = await getViews.deployed();
         // display the current contract address for debugging purposes
-        console.log('Contract deployed at:', tzip7Instance.address);
+        console.log('Extended TZIP-7 contract deployed at:', tzip7Instance.address);
+        console.log('Get View contract deployed at:', getViewsInstance.address);
         // read host from TruffleContract
         rpc = tzip7Instance.constructor.currentProvider.host;
     });
@@ -283,10 +288,10 @@ contract('TZIP-7 token contract', accounts => {
             storage = await tzip7Instance.storage();
             expect(storage.token.paused).to.be.true;
             // send a transfer operation
-            const from_ = alice.pkh;
-            const to_ = bob.pkh;
+            const from = alice.pkh;
+            const to = bob.pkh;
             const value = 1;
-            await expect(tzip7Instance.transfer(from_, to_, value)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.transfer(from, to, value)).to.be.rejectedWith("TokenOperationsArePaused");
             // send an approve operation
             await expect(tzip7Instance.approve(bob.pkh, 2)).to.be.rejectedWith("TokenOperationsArePaused");
             // mint 5 tokens
@@ -306,10 +311,10 @@ contract('TZIP-7 token contract', accounts => {
             await updateStorage();
             expect(storage.token.paused).to.be.true;
             // send a transfer operation
-            const from_ = alice.pkh;
-            const to_ = bob.pkh;
+            const from = alice.pkh;
+            const to = bob.pkh;
             const value = 1;
-            await expect(tzip7Instance.transfer(from_, to_, value)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.transfer(from, to, value)).to.be.rejectedWith("TokenOperationsArePaused");
             // send an approve operation
             await expect(tzip7Instance.approve(bob.pkh, 2)).to.be.rejectedWith("TokenOperationsArePaused");
             // mint 5 tokens
@@ -331,12 +336,12 @@ contract('TZIP-7 token contract', accounts => {
     
             // operations are fulfilled
             // send a transfer operation
-            const from_ = alice.pkh;
-            const to_ = bob.pkh;
+            const from = alice.pkh;
+            const to = bob.pkh;
             const value = 1;
-            await tzip7Instance.transfer(from_, to_, value);
-            // send an approve operation
-            await tzip7Instance.approve(bob.pkh, 2);
+            await tzip7Instance.transfer(from, to, value);
+            // reset allowance
+            await tzip7Instance.approve(bob.pkh, 0);
             // mint 5 tokens
             await tzip7Instance.mint(alice.pkh, 5);
             // burn 5 tokens
@@ -346,8 +351,8 @@ contract('TZIP-7 token contract', accounts => {
 
     describe("Transfer", () => {
         const transferParam = {
-            from_: alice.pkh,
-            to_: bob.pkh,
+            from: alice.pkh,
+            to: bob.pkh,
             value: 2
         };
        
@@ -356,8 +361,8 @@ contract('TZIP-7 token contract', accounts => {
             const balanceBobBeforeTransfer = await getBalance(bob.pkh);
         
             await tzip7Instance.transfer(
-                transferParam.from_, 
-                transferParam.to_, 
+                transferParam.from, 
+                transferParam.to, 
                 transferParam.value
             );
 
@@ -371,16 +376,63 @@ contract('TZIP-7 token contract', accounts => {
         it("should not allow Alice to transfer more tokens than she owns", async () => {
             const balanceAliceBeforeTransfer = await getBalance(alice.pkh);
             const value = balanceAliceBeforeTransfer + transferParam.value;
-            await expect(tzip7Instance.transfer(transferParam.from_, transferParam.to_, value)).to.be.rejectedWith("NotEnoughBalance");
+            await expect(tzip7Instance.transfer(transferParam.from, transferParam.to, value)).to.be.rejectedWith("NotEnoughBalance");
         });
 
         it("should not allow Bob to spend Alice' tokens", async () => {
+            // Bob should not have any allowance
+            const allowance = Number(await storage.token.approvals.get({0: transferParam.from, 1: transferParam.to}));
+            expect(allowance).to.equal(0);
             // switching to guardian's (Bob's) secret key
             Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // Bob transfers Alice' tokens
-            await expect(contract.methods.transfer(transferParam.from_, transferParam.to_, transferParam.value).send()).to.be.rejectedWith("NotEnoughAllowance");
+            await expect(contract.methods.transfer(transferParam.from, transferParam.to, transferParam.value).send()).to.be.rejectedWith("NotEnoughAllowance");
+        });
+    });
+
+    describe("Get Contract Views", () => {
+        it("should view allowance given by Alice to Bob", async () => {
+            const contractAddress = tzip7Instance.address;
+            const owner = alice.pkh;
+            const spender = bob.pkh;
+            await getViewsInstance.requestAllowance(contractAddress, owner, spender);
+
+            let storageGetViewsInstance = await getViewsInstance.storage()
+            const allowanceAliceToBob = Number(storageGetViewsInstance.allowance);
+
+            await updateStorage();
+            const allowance = Number(await storage.token.approvals.get({0: owner, 1: spender}));
+            expect(allowanceAliceToBob).to.equal(allowance);
+        });
+        
+        it("should view Alice' balance", async () => {
+            await getViewsInstance.requestBalance(tzip7Instance.address, alice.pkh)
+            let storageGetViewsInstance = await getViewsInstance.storage()
+            let balanceAliceFromViewContract = Number(await storageGetViewsInstance.balance);
+
+            let balanceAlice = await getBalance(alice.pkh);
+            expect(balanceAliceFromViewContract).to.equal(balanceAlice);
+        });
+
+        it("should view Bob's balance", async () => {
+            await getViewsInstance.requestBalance(tzip7Instance.address, bob.pkh)
+            let storageGetViewsInstance = await getViewsInstance.storage()
+            let balanceBobFromViewContract = Number(await storageGetViewsInstance.balance);
+
+            let balanceBob = await getBalance(bob.pkh);
+            expect(balanceBobFromViewContract).to.equal(balanceBob);
+        });
+
+        it("should view total supply", async () => {
+            await getViewsInstance.requestTotalSupply(tzip7Instance.address);
+            let storageGetViewsInstance = await getViewsInstance.storage()
+            const totalSupplyFromViewContract = Number(storageGetViewsInstance.totalSupply);
+
+            await updateStorage();
+            const totalSupply = Number(storage.token.totalSupply)
+            expect(totalSupplyFromViewContract).to.equal(totalSupply);
         });
     });
 });
