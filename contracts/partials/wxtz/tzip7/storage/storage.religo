@@ -9,8 +9,6 @@ type tokenStorage = {
   totalSupply: nat,
 };
 
-type swaps = big_map(secretHash, swap);
-type outcomes = big_map(secretHash, secret);
 type bridgeStorage = {
   swaps: swaps,
   outcomes: outcomes,

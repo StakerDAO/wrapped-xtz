@@ -1,4 +1,9 @@
 let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
+    let isPaused = switch (storage.token.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): bool)
+		| false => false	
+	};
+    
     let optionalSwapEntry = Big_map.find_opt(confirmSwapParameter.secretHash, bridgeStorage.swaps);
 	let swap = switch (optionalSwapEntry) {
 		| Some(swap) => swap

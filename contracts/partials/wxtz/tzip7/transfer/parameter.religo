@@ -1,7 +1,7 @@
 type transferParameter = 
 [@layout:comb]
 {
-	from_: address,
-	to_: address,
+	[@annot:from] from_: address,
+	[@annot:to] to_: address,
 	value: nat,
 };

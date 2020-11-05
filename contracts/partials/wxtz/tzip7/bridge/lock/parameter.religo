@@ -5,6 +5,6 @@ type lockParameter =
 	fee: option(nat),
 	releaseTime: timestamp,
 	secretHash: secretHash,
-	to_: address,
+	[@annot:to] to_: address,
 	value: nat,
 };

@@ -1,4 +1,9 @@
 let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypointReturn, storage) => {
+	let isPaused = switch (storage.token.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): bool)
+		| false => false	
+	};
+	
 	// provided secret needs to be below a certain length
 	let secretByteLength = Bytes.length(redeemParameter.secret);
 	let isLengthBelowThreshold: bool = secretByteLength <= 32n;
@@ -7,8 +12,8 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 		| false => (failwith(errorTooLongSecret): unit)
 	};
 
-	// calculate blake2b hash of provided secret
-	let secretHash = Crypto.blake2b(redeemParameter.secret);
+	// calculate SHA-256 hash of provided secret
+	let secretHash = Crypto.sha256(redeemParameter.secret);
 
 	let swap = Big_map.find_opt(secretHash, storage.bridge.swaps);
 	let swap = switch (swap) {

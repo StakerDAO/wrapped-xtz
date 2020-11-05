@@ -1,4 +1,9 @@
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
+    let isPaused = switch (storage.token.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): bool)
+		| false => false	
+	};
+    
     let swap = switch (Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps)) {
         | Some(swap) => swap
         | None => (failwith(errorSwapLockDoesNotExist): swap)
@@ -10,12 +15,6 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
 		| false => (failwith(errorFundsLock): unit)
 	};
 
-    // TODO check with Serokell whether the specification was followed
-    // switch (Tezos.sender == swap.from_ || Tezos.sender == swap.to_) {
-    //     | true => unit
-    //     | false => (failwith(errorNoPermission): unit)
-    // };
-    
     // constructing the transfer parameter to redeem locked-up tokens
     let transferValueParameter: transferParameter = {
         to_: swap.from_,
@@ -40,7 +39,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     };
     
     // remove the swap record
-    let newSwaps = Big_map.remove(swap.secretHash, storage.bridge.swaps);
+    let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
 
     let newStorage = {
         ...storage,

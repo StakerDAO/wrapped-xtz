@@ -1,10 +1,14 @@
 let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
+	let isPaused = switch (storage.token.paused) {
+		| true => (failwith(errorTokenOperationsArePaused): bool)
+		| false => false	
+	};
+	
 	let swapEntry: swap = {
 		confirmed: lockParameter.confirmed,
 		fee: lockParameter.fee,
 		from_: Tezos.sender,
 		releaseTime: lockParameter.releaseTime,
-		secretHash: lockParameter.secretHash,
 		to_: lockParameter.to_,
 		value: lockParameter.value,
 	};
@@ -44,5 +48,4 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		token: newTokenStorage,
 	};
 	(emptyListOfOperations, newStorage)
-
 };

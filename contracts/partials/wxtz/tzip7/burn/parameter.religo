@@ -1,6 +1,6 @@
 type burnParameter = 
 [@layout:comb]
 {
-	from_: address,
+	[@annot:from] from_: address,
 	value: nat,
 };

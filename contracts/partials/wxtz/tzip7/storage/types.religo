@@ -1,15 +1,15 @@
-type lockId = bytes;
+type secret = bytes;
 type secretHash = bytes;
 type swap = {
 	confirmed: bool,
 	fee: option(nat),
-	from_: address,
+	[@annot:from] from_: address,
 	releaseTime: timestamp,
-	secretHash: secretHash,
-	to_: address,
+	[@annot:to] to_: address,
 	value: nat,
 };
-type secret = bytes;
+type swaps = big_map(secretHash, swap);
+type outcomes = big_map(secretHash, secret);
 
 type tokens = big_map(address, nat);
 type allowances = big_map((address, address), nat);
