@@ -28,4 +28,4 @@ LAMBDA_JSON=$(cat <<-END
 }
 END
 )
-echo $LAMBDA_JSON | jq
+echo $LAMBDA_JSON | jq .

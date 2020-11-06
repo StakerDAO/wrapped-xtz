@@ -10,4 +10,4 @@ OUTPUT=$(cat <<-END
 END
 )
 
-echo $OUTPUT | jq
+echo $OUTPUT | jq .
