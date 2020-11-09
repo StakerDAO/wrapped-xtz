@@ -5,7 +5,7 @@ const { Tezos } = require('@taquito/taquito');
 const { InMemorySigner } = require('@taquito/signer');
 const { alice } = require('../../scripts/sandbox/accounts');
 const coreHelpersFactory = require('../helpers/core');
-const tzip7HelpersFactory = require('../helpers/tzip7');
+const tzip7HelpersFactory = require('../helpers/tzip-7');
 const { expect } = require('chai');
 const { readFileSync } = require('fs')
 
