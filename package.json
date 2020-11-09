@@ -15,11 +15,12 @@
     "truffle": "^5.5.0-tezos.4"
   },
   "scripts": {
-    "clean": "rm -rf ./build",
+    "clean": "rm -rf ./build/contracts",
+    "clean:all": "rm -rf ./build",
     "test": "truffle test",
     "test:clean": "npm run clean && npm run test",
     "test:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -e '**/*.tz' -- npm run test:clean",
-    "compile": "truffle compile",
+    "compile": "truffle compile && npm run compile:lambdas-all",
     "compile:clean": "npm run clean && npm run compile",
     "compile:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -- npm run compile:clean",
     "migrate": "truffle migrate",
@@ -40,7 +41,8 @@
     "commit": "git-cz",
     "compile:lambda": "node scripts/lambdaCompiler/compileLambdaCli.js",
     "compile:lambda:watch": "onchange -i -k 'contracts/**' 'test/**' 'migrations/**' -e '**/*.tz' -- npm run compile:lambda",
-    "compile:lambda-parameter": "node scripts/lambdaCompiler/testPackValueCli.js"
+    "compile:lambda-parameter": "node scripts/lambdaCompiler/testPackValueCli.js",
+    "compile:lambdas-all": "node scripts/lambdaCompiler/compileAllLambdas.js"
   },
   "author": "matej.sima@stove-labs.com",
   "license": "MIT",

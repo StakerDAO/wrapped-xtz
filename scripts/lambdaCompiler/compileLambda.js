@@ -1,5 +1,5 @@
 const { execSync } = require('child_process');
-const { writeFileSync } = require('fs');
+const { outputFileSync } = require('fs-extra');
 const { get } = require('lodash');
 
 module.exports = (lambdaPath, selectFromJSONOutput, saveToFile) => {
@@ -24,7 +24,7 @@ module.exports = (lambdaPath, selectFromJSONOutput, saveToFile) => {
     }
 
     if (saveToFile) {
-        writeFileSync(
+        outputFileSync(
             saveToFile,
             // stringify if micheline code is being saved
             (typeof returnValue === 'object' ? JSON.stringify(returnValue) : returnValue)

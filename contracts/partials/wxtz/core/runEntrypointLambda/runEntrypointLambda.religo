@@ -7,7 +7,8 @@
  */
 [@inline]
 let runEntrypointLambda = ((runEntrypointLambdaParameter, storage): (runEntrypointLambdaParameter, storage)): entrypointReturn => {
-    let lambda: option(packedLambda) = Big_map.find_opt(runEntrypointLambdaParameter.lambdaName, storage.lambdas);
+    let entrypointLambdaPrefix = "entrypoint/"; // TODO: move to a separate file with constants
+    let lambda: option(packedLambda) = Big_map.find_opt(entrypointLambdaPrefix ++ runEntrypointLambdaParameter.lambdaName, storage.lambdas);
     let packedLambda: packedLambda = switch (lambda) {
         | None => (failwith(errorLambdaNotFound): packedLambda)
         | Some(packedLambda) => packedLambda

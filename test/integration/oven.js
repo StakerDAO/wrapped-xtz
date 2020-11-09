@@ -1,7 +1,7 @@
 const core = artifacts.require('core');
-const tzip7 = artifacts.require('tzip7');
+const tzip7 = artifacts.require('tzip-7');
 const coreHelpersFactory = require('../helpers/core');
-const tzip7HelpersFactory = require('../helpers/tzip7');
+const tzip7HelpersFactory = require('../helpers/tzip-7');
 const { Tezos } = require('@taquito/taquito');
 const { InMemorySigner } = require('@taquito/signer');
 const { alice } = require('./../../scripts/sandbox/accounts');
