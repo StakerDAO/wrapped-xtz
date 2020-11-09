@@ -15,7 +15,7 @@ type originateOvenParameter = (tez, option(key_hash), ovenOwner, address);
 
 /**
  * Helper function not included in the main lambda file
- * in order to acommodate `#include "./oven/oven.tz"` since
+ * in order to acommodate #include "./oven/oven.tz" since
  * directives are not supported in standalone expressions (lambdas in our case)
  */
 let originateOven = ((xtzAmount, delegate, ovenOwner, coreContractAddress): originateOvenParameter): (operation, address) => {
