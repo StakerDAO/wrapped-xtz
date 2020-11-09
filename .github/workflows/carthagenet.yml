@@ -52,8 +52,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
-    - name: Install command-line JSON processor
-      run: sudo apt-get install jq
+    - name: Remove core migration file
+      run: rm migrations/2_deploy_core.js
     - run: npm i
     - run: npm run sandbox:start &
     - name: Sleep for 15 seconds
@@ -70,8 +70,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
-    - name: Install command-line JSON processor
-      run: sudo apt-get install jq
+    - name: Remove core migration file
+      run: rm migrations/2_deploy_core.js
     - run: npm i
     - run: npm run sandbox:start &
     - name: Sleep for 15 seconds
