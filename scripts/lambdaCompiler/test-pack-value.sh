@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 EXPRESSION="$1"
-BYTES=`ligo interpret --syntax=reasonligo "Bytes.pack($EXPRESSION)"`
+BYTES=`docker run -v $PWD:/usr/project --rm -i ligolang/ligo:next interpret --syntax=reasonligo "Bytes.pack($EXPRESSION)"`
 
 OUTPUT=$(cat <<-END
 {
@@ -10,4 +10,4 @@ OUTPUT=$(cat <<-END
 END
 )
 
-echo $OUTPUT | jq
+echo $OUTPUT | jq .

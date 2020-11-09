@@ -1,4 +1,4 @@
-name: Delphinet
+name: Delphi
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         node-version: 14.x
     - run: npm i
     - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Sleep for 20 seconds
+    - name: Wait 20 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '20s'
@@ -34,7 +34,7 @@ jobs:
         node-version: 14.x
     - run: npm i
     - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Sleep for 20 seconds
+    - name: Wait 20 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '20s'
@@ -48,9 +48,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+    - name: Remove core migration file
+      run: rm migrations/2_deploy_core.js
     - run: npm i
     - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Sleep for 20 seconds
+    - name: Wait 20 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '20s'
@@ -64,9 +66,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+    - name: Remove core migration file
+      run: rm migrations/2_deploy_core.js
     - run: npm i
     - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Sleep for 20 seconds
+    - name: Wait 20 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '20s'

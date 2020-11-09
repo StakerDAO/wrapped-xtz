@@ -18,7 +18,7 @@ jobs:
         node-version: 14.x
     - run: npm i
     - run: npm run sandbox:start &
-    - name: Sleep for 15 seconds
+    - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '15s'
@@ -48,9 +48,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+    - name: Remove core migration file
+      run: rm migrations/2_deploy_core.js
     - run: npm i
     - run: npm run sandbox:start &
-    - name: Sleep for 15 seconds
+    - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '15s'
@@ -64,11 +66,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+    - name: Remove core migration file
+      run: rm migrations/2_deploy_core.js
     - run: npm i
     - run: npm run sandbox:start &
-    - name: Sleep for 15 seconds
+    - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
         time: '15s'
     - run: npm run test -- ./test/token/bridge.js
-  

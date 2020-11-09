@@ -1,3 +1,5 @@
+![Carthage](https://github.com/stove-labs/wrapped-xtz/workflows/Carthage/badge.svg?branch=dev) ![Delphi](https://github.com/stove-labs/wrapped-xtz/workflows/Delphi/badge.svg?branch=dev)
+
 # Wrapped XTZ
 
 ```
