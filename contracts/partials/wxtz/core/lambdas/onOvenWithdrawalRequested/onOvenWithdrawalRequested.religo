@@ -17,11 +17,17 @@
         | Some(onOvenWithdrawalRequestedParameter) => onOvenWithdrawalRequestedParameter
     };
 
+    let ovenOwner: option(address) = Big_map.find_opt(Tezos.sender, storage.ovens);
+    let ovenOwner: address = switch (ovenOwner) {
+        | None => (failwith(errorOvenNotFound): address)
+        | Some(ovenOwner) => ovenOwner
+    };
+
     let value = onOvenWithdrawalRequestedParameter;
     let (burnWXTZOperationList, _, _) = runArbitraryValueLambda(({
         lambdaName: "arbitrary/composeBurnOperation",
         lambdaParameter: Bytes.pack({
-            from_: Tezos.sender,
+            from_: ovenOwner,
             value: value
         })
     }, storage));

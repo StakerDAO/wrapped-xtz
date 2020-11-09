@@ -26,7 +26,8 @@ module.exports = (lambdaPath, selectFromJSONOutput, saveToFile) => {
     if (saveToFile) {
         writeFileSync(
             saveToFile,
-            returnValue
+            // stringify if micheline code is being saved
+            (typeof returnValue === 'object' ? JSON.stringify(returnValue) : returnValue)
         );
     }
 

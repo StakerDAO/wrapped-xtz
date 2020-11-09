@@ -3,6 +3,7 @@ const compileLambda = require('../scripts/lambdaCompiler/compileLambda');
 const { UnitValue, MichelsonMap } = require('@taquito/taquito');
 const testPackValue = require('../scripts/lambdaCompiler/testPackValue');
 const { alice } = require('./../scripts/sandbox/accounts');
+const saveContractAddress = require('../helpers/saveContractAddress');
 
 module.exports = async (deployer, network, accounts) => {
     let lambdas = new MichelsonMap;
@@ -111,5 +112,6 @@ module.exports = async (deployer, network, accounts) => {
         arbitraryValues
     };
 
-    deployer.deploy(core, storage);
+    deployer.deploy(core, storage)
+        .then(contract => saveContractAddress('core', contract.address));
 }
