@@ -34,6 +34,7 @@
     "tools:restart": "node ./scripts/tools.js restart",
     "wait-for-sandbox": "node ./scripts/sandbox/waitForNetwork.js",
     "sandbox:start": "./scripts/sandbox/start_ganache-cli.sh",
+    "fix-ligo-version": "./scripts/fix-ligo-version.sh", 
     "env:start": "npm run tools:start bbbox && npm run sandbox:start",
     "env:kill": "npm run tools:kill bbbox",
     "env:restart": "npm run tools:restart bbbox",
