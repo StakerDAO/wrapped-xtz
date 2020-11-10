@@ -13,9 +13,9 @@ contract('Core', () => {
 
     const ovenOwner = "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb";
     const ovenDelegate = "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb";
-    const ovenCode = readFileSync(`${process.cwd()}/contracts/partials/wxtz/core/lambdas/createOven/oven/oven.micheline.tz`, {
-        encoding: 'utf8'
-    });
+    // const ovenCode = readFileSync(`${process.cwd()}/contracts/partials/wxtz/core/lambdas/createOven/oven/oven.micheline.tz`, {
+    //     encoding: 'utf8'
+    // });
 
     describe('createOven', () => {
         let coreInstance;
