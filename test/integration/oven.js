@@ -89,8 +89,9 @@ contract('Core', () => {
                 // switching to Alice' secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
                 
-                const XTZBalanceAlice = await Tezos.tz.getBalance(alice.pkh);
-                const amountAboveBalance = XTZBalanceAlice + 1;
+                const wXTZBalanceAlice = await tzip7Helpers.getBalance(alice.pkh)
+                const amountAboveBalance = wXTZBalanceAlice + 1;
+            
                 await expect(ovenInstance.methods.withdraw(amountAboveBalance).send())
                         .to.be.rejectedWith(err.proto.balanceTooLow);
             });
@@ -101,14 +102,14 @@ contract('Core', () => {
                 const XTZBalanceBeforeAlice = await Tezos.tz.getBalance(alice.pkh);
                 const wXTZBalanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
                 
-              
-                const withdrawOperation = await ovenInstance.methods.withdraw(wXTZBalanceBeforeAlice).send();
+                const withdrawOperation = await ovenInstance.methods.withdraw(2000).send().catch(err => console.log(err));
                 await (withdrawOperation).confirmation(1);
                 
                 const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);
                 const XTZBalanceAfterAlice = await Tezos.tz.getBalance(alice.pkh);
     
-                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(0);
+                
+                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(30);
                 // TODO: check XTZ balance but include fees as well
             });
         });
@@ -138,15 +139,22 @@ contract('Core', () => {
 
         describe('Token operations paused', () => {
             before(async () => {
+                // need to fund oven
+                const xtzAmount = 1000;
+                await (await Tezos.contract.transfer({
+                    to: ovenInstance.address,
+                    amount: xtzAmount
+                })).confirmation(1);
+                
                 // stop all token operations, by pause guardian Alice
-                await tzip7Instance.setPause(true)
+                await tzip7Instance.setPause(true);
             });
 
             it('should not allow withdrawals', async () => {
                 // switching to Alice' secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-
-                await expect(ovenInstance.methods.withdraw(1).send()).to.be.rejectedWith(err.tzip7.tokenOperationsPaused);
+                
+                await expect(ovenInstance.methods.withdraw(1).send()).to.be.rejectedWith("TokenOperationsArePaused");
             });
 
             it('should not allow deposits', async () => {
@@ -157,6 +165,11 @@ contract('Core', () => {
                     amount: 100
                 })).to.be.rejectedWith(err.tzip7.tokenOperationsPaused);
             });
+
+            // after(async () => {
+            //     // clean-up after tests, unpausing token operations
+            //     await tzip7Instance.setPause(false);
+            // });
         });
     });
 })

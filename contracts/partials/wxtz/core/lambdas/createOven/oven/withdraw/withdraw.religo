@@ -27,7 +27,7 @@ let withdraw = ((withdrawParameter, storage): (withdrawParameter, ovenStorage)):
         | None => failwith(errorOvenOwnerDoesNotAcceptDeposits): vaultOwnerContract
     };
 
-    let amountOfXTZToWithdraw = withdrawParameter * 1mutez; // cast nat to tez
+    let amountOfXTZToWithdraw = withdrawParameter * 1tez; // cast nat to tez
     let withdrawXTZOperation = Tezos.transaction(
         (),
         amountOfXTZToWithdraw,
