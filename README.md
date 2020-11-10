@@ -12,6 +12,12 @@ npm i
 npm run sandbox:start
 ```
 
+## Testing Core and Oven Contracts
+
+```
+npm run test -- ./test/integration/oven.js
+```
+
 ## Testing Token and Bridge Contracts
 
 ```

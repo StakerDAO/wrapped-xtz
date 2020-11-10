@@ -33,7 +33,10 @@ contract('Core', () => {
             tzip7Helpers = tzip7HelpersFactory(tzip7Instance);
 
             // set tzip-7 admin to be the core address
-            const setAdmin = await tzip7Instance.setAdministrator(coreInstance.address);
+            const tzip7Admin = await (await tzip7Instance.storage()).token.admin;
+            if (tzip7Admin === alice.pkh) {
+                await tzip7Instance.setAdministrator(coreInstance.address);
+            };        
             
             // read host from TruffleContract
             rpc = tzip7Instance.constructor.currentProvider.host;
@@ -60,27 +63,6 @@ contract('Core', () => {
             
             expect(aliceBalanceBefore.plus(1000).toNumber()).to.be.equal(aliceBalanceAfter.toNumber());
             expect(await coreHelpers.getOvenOwner(ovenAddress)).to.be.equal(ovenOwner);
-        });
-
-        it('should not create an oven for someone other than admin', async () => {
-            // switching to Bob's secret key
-            Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
-            const contract = await Tezos.contract.at(coreInstance.address);
-            await contract.methods.runEntrypointLambda(
-                'createOven', // lambdaName
-                testPackValue(`
-                    {
-                        delegate: None: option(key_hash),
-                        ovenOwner: ("${bob.pkh}": address) 
-                    }
-                `)
-            ).send();
-            const createOvenResult = await coreHelpers.createOven(ovenDelegate, ovenOwner, {
-                amount: 1000
-            });
-            
-            ovenAddress = createOvenResult.ovenAddress;
-            console.log("Oven address", ovenAddress);
         });
         
         it('should be delegated to the predefined delegate', async () => {

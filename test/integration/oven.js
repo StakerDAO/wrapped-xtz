@@ -47,7 +47,10 @@ contract('Core', () => {
             });
 
             // set tzip-7 admin to be the core address
-            await tzip7Instance.setAdministrator(coreInstance.address);
+            const tzip7Admin = await (await tzip7Instance.storage()).token.admin;
+            if (tzip7Admin === alice.pkh) {
+                await tzip7Instance.setAdministrator(coreInstance.address);
+            };     
 
             // display smart contract addresses
             console.log("Core address", coreInstance.address);
@@ -99,17 +102,16 @@ contract('Core', () => {
             it('should allow withdrawals if enough wXTZ to burn is available', async () => {
                 // switching to Alice' secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-                const XTZBalanceBeforeAlice = await Tezos.tz.getBalance(alice.pkh);
                 const wXTZBalanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
-                
-                const withdrawOperation = await ovenInstance.methods.withdraw(2000).send().catch(err => console.log(err));
+                let XTZBalanceOven = await Tezos.tz.getBalance(ovenInstance.address);
+                // TODO: write tests for mutez
+                XTZBalanceOven = XTZBalanceOven.toNumber() / 1000000;
+                // withdraw total oven balance
+                const withdrawOperation = await ovenInstance.methods.withdraw(XTZBalanceOven).send();
                 await (withdrawOperation).confirmation(1);
                 
-                const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);
-                const XTZBalanceAfterAlice = await Tezos.tz.getBalance(alice.pkh);
-    
-                
-                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(30);
+                const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);                
+                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(wXTZBalanceBeforeAlice.minus(XTZBalanceOven).toNumber());
                 // TODO: check XTZ balance but include fees as well
             });
         });
