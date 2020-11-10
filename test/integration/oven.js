@@ -48,6 +48,10 @@ contract('Core', () => {
 
             // set tzip-7 admin to be the core address
             await tzip7Instance.setAdministrator(coreInstance.address);
+
+            // display smart contract addresses
+            console.log("Core address", coreInstance.address);
+            console.log("TZIP-7 address", tzip7Instance.address);
         });
 
         it('should deploy an oven for testing purposes', async () => {
@@ -55,53 +59,81 @@ contract('Core', () => {
                 amount: 1000
             });
             ovenInstance = await Tezos.contract.at(createOvenResult.ovenAddress);
+
+            console.log("Oven address", ovenInstance.address);
         });
 
-        it('should accept deposits and mint wXTZ 1:1 with XTZ deposited', async () => {
-            const xtzAmount = 1000;
-            const balanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
-            await (await Tezos.contract.transfer({
-                to: ovenInstance.address,
-                amount: xtzAmount
-            })).confirmation(1);
-            const balanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);
-            // compare wXTZ balance plus XTZ amount
-            expect(balanceBeforeAlice.plus(xtzAmount).toNumber()).to.be.equal(balanceAfterAlice.toNumber())
+        describe('Deposit XTZ (%default entrypoint)', () => {
+            it('should accept deposits and mint wXTZ 1:1 with XTZ deposited', async () => {
+                const xtzAmount = 1000;
+                const wXTZBalanceAliceBefore= await tzip7Helpers.getBalance(alice.pkh);
+                await (await Tezos.contract.transfer({
+                    to: ovenInstance.address,
+                    amount: xtzAmount
+                })).confirmation(1);
+    
+                const wXTZBalanceAliceAfter = await tzip7Helpers.getBalance(alice.pkh);
+                // check for increased wXTZ balance
+                expect(wXTZBalanceAliceBefore.plus(xtzAmount).toNumber()).to.be.equal(wXTZBalanceAliceAfter.toNumber())
+            });
         });
 
-        it('should not allow withdrawals for 3rd parties', async () => {
-            // switching to Bob's secret key
-            Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
-            await expect(ovenInstance.methods.withdraw(1000).send()).to.be.rejectedWith(err.notAnOvenOwner);
+        describe('Withdraw', () => {
+            it('should not allow withdrawals for 3rd parties', async () => {
+                // switching to Bob's secret key
+                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
+                await expect(ovenInstance.methods.withdraw(1000).send()).to.be.rejectedWith(err.notAnOvenOwner);
+            });
+    
+            it('should not allow withdrawals above available balance', async () => {
+                // switching to Alice' secret key
+                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
+                
+                const XTZBalanceAlice = await Tezos.tz.getBalance(alice.pkh);
+                const amountAboveBalance = XTZBalanceAlice + 1;
+                await expect(ovenInstance.methods.withdraw(amountAboveBalance).send())
+                        .to.be.rejectedWith(err.proto.balanceTooLow);
+            });
+    
+            it('should allow withdrawals if enough wXTZ to burn is available', async () => {
+                // switching to Alice' secret key
+                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
+                const XTZBalanceBeforeAlice = await Tezos.tz.getBalance(alice.pkh);
+                const wXTZBalanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
+                
+              
+                const withdrawOperation = await ovenInstance.methods.withdraw(wXTZBalanceBeforeAlice).send();
+                await (withdrawOperation).confirmation(1);
+                
+                const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);
+                const XTZBalanceAfterAlice = await Tezos.tz.getBalance(alice.pkh);
+    
+                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(0);
+                // TODO: check XTZ balance but include fees as well
+            });
         });
 
-        it('should not allow withdrawals above available balance', async () => {
-            // switching to Alice' secret key
-            Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-            
-            const XTZBalanceAlice = await Tezos.tz.getBalance(alice.pkh);
-            const amountMoreThanBalance = XTZBalanceAlice + 1;
-            await expect(
-                    ovenInstance.methods
-                    .withdraw(amountMoreThanBalance)
-                    .send()
-                ).to.be.rejectedWith(err.proto.balanceTooLow);
-        });
+        describe('SetDelegate', () => {
+            it("should delegate to Bob's address", async () => {
+                // read current delegate
+                const previousBakerDelegate = await Tezos.rpc.getDelegate(ovenInstance.address);
+                
+                // set Bob as new delegate for oven contract
+                const setDelegateOperation = await ovenInstance.methods.setDelegate(bob.pkh).send();
+                await setDelegateOperation.confirmation(1);
+                
+                const newBakerDelegate = await Tezos.rpc.getDelegate(ovenInstance.address);
+                expect(newBakerDelegate).not.to.equal(previousBakerDelegate);
+                expect(newBakerDelegate).to.equal(bob.pkh);
+            });
 
-        it('should allow withdrawals if enough wXTZ to burn is available', async () => {
-            // switching to Alice' secret key
-            Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-            const XTZBalanceBeforeAlice = await Tezos.tz.getBalance(alice.pkh);
-            const wXTZBalanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
-
-            const withdrawOperation = await ovenInstance.methods.withdraw(wXTZBalanceBeforeAlice).send();
-            await (withdrawOperation).confirmation(1);
-
-            const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);
-            const XTZBalanceAfterAlice = await Tezos.tz.getBalance(alice.pkh);
-
-            expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(0);
-            // TODO: check XTZ balance but include fees as well
+            it("should remove delegate", async () => {
+                // remove delegation to any address
+                const setDelegateOperation = await ovenInstance.methods.setDelegate(null).send();
+                await setDelegateOperation.confirmation(1);
+                // throws 404 error code if no delegate is set
+                await expect(Tezos.rpc.getDelegate(ovenInstance.address)).to.be.rejectedWith("(404)");
+            });
         });
 
         describe('Token operations paused', () => {
@@ -110,14 +142,14 @@ contract('Core', () => {
                 await tzip7Instance.setPause(true)
             });
 
-            it('should not allow to withdraw', async () => {
+            it('should not allow withdrawals', async () => {
                 // switching to Alice' secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
 
                 await expect(ovenInstance.methods.withdraw(1).send()).to.be.rejectedWith(err.tzip7.tokenOperationsPaused);
             });
 
-            it('should not allow to deposit', async () => {
+            it('should not allow deposits', async () => {
                 // switching to Bob's secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
                 await expect(Tezos.contract.transfer({

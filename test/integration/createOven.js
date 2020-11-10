@@ -43,8 +43,8 @@ contract('Core', () => {
             });
 
             // display smart contract address
-            console.log("Core instance address", coreInstance.address);
-            console.log("TZIP-7 instance", tzip7Instance.address);
+            console.log("Core address", coreInstance.address);
+            console.log("TZIP-7 address", tzip7Instance.address);
         });
 
         it('should create an oven with Alice as an owner and mint 1000 wXTZ', async () => {
@@ -61,7 +61,7 @@ contract('Core', () => {
             expect(await coreHelpers.getOvenOwner(ovenAddress)).to.be.equal(ovenOwner);
         });
 
-        it.only('should not create an oven for someone other than admin', async () => {
+        it('should not create an oven for someone other than admin', async () => {
             // switching to Bob's secret key
             Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
             const contract = await Tezos.contract.at(coreInstance.address);
