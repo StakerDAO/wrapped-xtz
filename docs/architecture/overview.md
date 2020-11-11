@@ -25,6 +25,7 @@ There are three main actors in the system:
   - Pays out rewards to the wXTZ Oven owned by Alice
 - `Admin` a.k.a. Staker Council
   - Can amend the wXTZ Core lambdas
+  - Can unpause operations on the wXTZ Token contract
 - `Pause guardian`
   - Can pause operations on the wXTZ Token contract
 
