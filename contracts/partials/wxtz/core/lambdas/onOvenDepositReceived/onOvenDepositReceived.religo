@@ -35,11 +35,13 @@
     let sendBackXTZOperation: operation = Tezos.transaction((), Tezos.amount, oven);
 
     /**
-     * Compose the minting operation on the wXTZ Token contract
+     * Compose the minting operation on the wXTZ Token contract.
+     * Dividing the amount by mutez adds 6 decimals, which is important for the 
+     * wXTZ TZIP-7 token representation.
      */
     let composeMintOperationParameter: composeMintOperationParameter = {
         to_: ovenOwner,
-        value: Tezos.amount / 1tez // TODO: extract as tezToNat(tez)
+        value: Tezos.amount / 1mutez // TODO: extract as tezToNat(tez)
     };
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
     let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((

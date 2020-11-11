@@ -15,7 +15,8 @@ const err = {
         balanceTooLow: "proto.006-PsCARTHA.contract.balance_too_low"
     },
     tzip7: {
-        tokenOperationsPaused: "TokenOperationsArePaused"
+        tokenOperationsPaused: "TokenOperationsArePaused",
+        notEnoughBalance: "NotEnoughBalance",
     }
 };
 
@@ -59,7 +60,7 @@ contract('Core', () => {
 
         it('should deploy an oven for testing purposes', async () => {
             const createOvenResult = await coreHelpers.createOven(ovenDelegate, ovenOwner, {
-                amount: 1000
+                amount: 0.02 // tez
             });
             ovenInstance = await Tezos.contract.at(createOvenResult.ovenAddress);
 
@@ -68,16 +69,17 @@ contract('Core', () => {
 
         describe('Deposit XTZ (%default entrypoint)', () => {
             it('should accept deposits and mint wXTZ 1:1 with XTZ deposited', async () => {
-                const xtzAmount = 1000;
+                const xtzAmount = 0.4;
+                const xtzAmountMutez = xtzAmount * 1000000;
                 const wXTZBalanceAliceBefore= await tzip7Helpers.getBalance(alice.pkh);
                 await (await Tezos.contract.transfer({
                     to: ovenInstance.address,
                     amount: xtzAmount
                 })).confirmation(1);
-    
+                
                 const wXTZBalanceAliceAfter = await tzip7Helpers.getBalance(alice.pkh);
                 // check for increased wXTZ balance
-                expect(wXTZBalanceAliceBefore.plus(xtzAmount).toNumber()).to.be.equal(wXTZBalanceAliceAfter.toNumber())
+                expect(wXTZBalanceAliceBefore.plus(xtzAmountMutez).toNumber()).to.be.equal(wXTZBalanceAliceAfter.toNumber())
             });
         });
 
@@ -94,7 +96,8 @@ contract('Core', () => {
                 
                 const wXTZBalanceAlice = await tzip7Helpers.getBalance(alice.pkh)
                 const amountAboveBalance = wXTZBalanceAlice + 1;
-            
+                
+                // it fails before it can hit TZIP-7 error
                 await expect(ovenInstance.methods.withdraw(amountAboveBalance).send())
                         .to.be.rejectedWith(err.proto.balanceTooLow);
             });
@@ -103,15 +106,14 @@ contract('Core', () => {
                 // switching to Alice' secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
                 const wXTZBalanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
-                let XTZBalanceOven = await Tezos.tz.getBalance(ovenInstance.address);
-                // TODO: write tests for mutez
-                XTZBalanceOven = XTZBalanceOven.toNumber() / 1000000;
+                let XTZBalanceOvenMutez = await Tezos.tz.getBalance(ovenInstance.address);
+                XTZBalanceOvenMutez = XTZBalanceOvenMutez.toNumber();
                 // withdraw total oven balance
-                const withdrawOperation = await ovenInstance.methods.withdraw(XTZBalanceOven).send();
+                const withdrawOperation = await ovenInstance.methods.withdraw(XTZBalanceOvenMutez).send();
                 await (withdrawOperation).confirmation(1);
                 
                 const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);                
-                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(wXTZBalanceBeforeAlice.minus(XTZBalanceOven).toNumber());
+                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(wXTZBalanceBeforeAlice.minus(XTZBalanceOvenMutez).toNumber());
                 // TODO: check XTZ balance but include fees as well
             });
         });
@@ -141,7 +143,7 @@ contract('Core', () => {
 
         describe('Token operations paused', () => {
             before(async () => {
-                // need to fund oven
+                // need to fund oven, otherwise the errors will not hit TZIP-7, but the protocol (balance_too_low)
                 const xtzAmount = 1000;
                 await (await Tezos.contract.transfer({
                     to: ovenInstance.address,

@@ -52,16 +52,18 @@ contract('Core', () => {
         });
 
         it('should create an oven with Alice as an owner and mint 1000 wXTZ', async () => {
-            const aliceBalanceBefore = await tzip7Helpers.getBalance(alice.pkh);
+            const wXTZaliceBalanceBefore = await tzip7Helpers.getBalance(alice.pkh);
+            const xtzAmountTez = 1000;
+            const xtzAmountMutez = xtzAmountTez * 1000000;
             const createOvenResult = await coreHelpers.createOven(ovenDelegate, ovenOwner, {
-                amount: 1000
+                amount: xtzAmountTez
             });
             
             ovenAddress = createOvenResult.ovenAddress;
             console.log("Oven address", ovenAddress);
-            let aliceBalanceAfter = await tzip7Helpers.getBalance(alice.pkh);
+            const wXTZaliceBalanceAfter = await tzip7Helpers.getBalance(alice.pkh);
             
-            expect(aliceBalanceBefore.plus(1000).toNumber()).to.be.equal(aliceBalanceAfter.toNumber());
+            expect(wXTZaliceBalanceBefore.plus(xtzAmountMutez).toNumber()).to.be.equal(wXTZaliceBalanceAfter.toNumber());
             expect(await coreHelpers.getOvenOwner(ovenAddress)).to.be.equal(ovenOwner);
         });
         

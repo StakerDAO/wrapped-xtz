@@ -15,7 +15,6 @@
     /**
      * Compose the mint operation
      */
-    // TODO: use lambdaParameters to set the amound & address below
     let mintParameter: mintParameter = {
         to_: composeMintOperationParameter.to_,
         value: composeMintOperationParameter.value

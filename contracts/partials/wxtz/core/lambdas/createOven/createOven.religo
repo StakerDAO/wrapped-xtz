@@ -50,7 +50,7 @@
      */
     let composeMintOperationParameter: composeMintOperationParameter = {
         to_: Tezos.sender,
-        value: Tezos.amount / 1tez // TODO: extract as tezToNat(tez)
+        value: Tezos.amount / 1mutez // TODO: extract as tezToNat(tez)
     };
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
     let (mintWXTZOperationList, _, _) = runArbitraryValueLambda((
