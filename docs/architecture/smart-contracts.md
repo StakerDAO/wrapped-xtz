@@ -25,7 +25,7 @@ The core itself is built around upgradable/amendable lambdas, those are stored i
 
 Entrypoint lambdas have a type signature of an entrypoint when unpacked and are meant to be called exclusively as entrypoints 'from the oustide world'.
 
-Arbitrary value lambdas have an extra value in the return touple, allowing them to pass more data than just a list of operation and storage.
+Arbitrary value lambdas have an extra value in the return tuple, allowing them to pass more data than just a list of operation and storage.
 
 List of all lambdas is maintained in `lambdas.js` and used for migration & compilation purposes.
 
