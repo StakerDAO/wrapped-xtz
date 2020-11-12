@@ -12,7 +12,6 @@ const coreHelpers = (instance) => {
             } else {
                 delegate = `Some("${delegateKeyHash}": key_hash): option(key_hash)`;
             }
-
             const operation = await instance.methods.runEntrypointLambda(
                 'createOven', // lambdaName
                 testPackValue(`
@@ -27,8 +26,7 @@ const coreHelpers = (instance) => {
             });
 
             await operation.confirmation(1);
-    
-            const ovenAddress = operation.receipt.results[0].metadata.internal_operation_results[0].result.originated_contracts[0]
+            const ovenAddress = operation.results[0].metadata.internal_operation_results[0].result.originated_contracts[0]
             console.log('Originated oven at', ovenAddress);
 
             return {

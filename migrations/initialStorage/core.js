@@ -7,14 +7,14 @@ const loadLambdaArtifact = require('./../../scripts/lambdaCompiler/loadLambdaArt
 
 const initialStorage = {};
 
-initialStorage.base = (() => {
+initialStorage.base = (tzip7Address) => {
     let lambdas = new MichelsonMap;
     let ovens = new MichelsonMap;
     let arbitraryValues = new MichelsonMap;
 
     arbitraryValues.set('wXTZTokenContractAddress', 
         testPackValue(
-            `"${require('../../deployments/tzip-7')}": address`
+            `"${tzip7Address}": address`
         )
     );
 
@@ -36,6 +36,6 @@ initialStorage.base = (() => {
         ovens,
         arbitraryValues,
     }
-})();
+};
 
 module.exports = initialStorage;

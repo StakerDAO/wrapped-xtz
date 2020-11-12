@@ -3,11 +3,17 @@ const { Tezos } = require('@taquito/taquito');
 
 const tzip7Helpers = (instance) => {
     return {
-        setAdministrator: async (administratorAddress) => {
+        setAdministrator: async function(administratorAddress) {
             const operation = await instance.methods
                 .setAdministrator(administratorAddress)
                 .send();
             return await operation.confirmation(1);
+        },
+        getStorage: async function() {
+            return await instance.storage();
+        },
+        getAdministrator: async function() {
+            return (await this.getStorage()).token.admin
         }
     }
 }

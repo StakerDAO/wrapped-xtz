@@ -9,6 +9,8 @@ const loadLambdaArtifact = require('./../scripts/lambdaCompiler/loadLambdaArtifa
 const initalStorage = require('./initialStorage/core');
 
 module.exports = async (deployer, network, accounts) => {
-    deployer.deploy(core, initalStorage.base)
+    deployer.deploy(core, initalStorage.base(
+        require('./../deployments/tzip-7')
+    ))
         .then(contract => saveContractAddress('core', contract.address));
 }

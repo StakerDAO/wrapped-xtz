@@ -1,6 +1,6 @@
 const _coreHelpers = require('../helpers/core');
 const coreInitialStorage = require('../../migrations/initialStorage/core');
-const { alice } = require('../../scripts/sandbox/accounts');
+const { alice, bob } = require('../../scripts/sandbox/accounts');
 const _taquitoHelpers = require('../helpers/taquito');
 const _ovenHelpers = require('../helpers/oven');
 const _tzip7Helpers = require('../helpers/tzip-7');
@@ -16,7 +16,9 @@ contract('core', () => {
             await _taquitoHelpers.setSigner(alice.sk);
 
             const { tzip7Address, tzip7Helpers } = await _tzip7Helpers.originate(tzip7InitialStorage.base);
-            const { coreAddress, coreHelpers } = await _coreHelpers.originate(coreInitialStorage.base);
+            const { coreAddress, coreHelpers } = await _coreHelpers.originate(
+                coreInitialStorage.base(tzip7Address)
+            );
             helpers = { tzip7Helpers, coreHelpers };
 
             await helpers.tzip7Helpers.setAdministrator(coreAddress);
@@ -30,8 +32,10 @@ contract('core', () => {
                     amount: 1000 // deposit
                 }
             );
-            
-            // await ovenHelpers.default(1000)
+
+            _taquitoHelpers.signAs(bob.sk, async () => {
+                await ovenHelpers.default(1000)
+            });
         });
 
     });
