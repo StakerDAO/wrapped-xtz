@@ -2,12 +2,22 @@ module.exports = {
     unit: undefined,
     rpcErrors: {
         michelson: {
-            scriptRejected: "proto.005-PsBabyM1.michelson_v1.script_rejected",
-            runtimeError: "proto.005-PsBabyM1.michelson_v1.runtime_error"
-        }
+            balanceTooLow: "proto.006-PsCARTHA.contract.balance_too_low"
+        },
     },
     contractErrors: {
-        fromEqualToSenderAddress: "Address from_ needs to be equal to the sender",
-        insufficientBalance: "Insufficient balance"
-    }
+        tzip7: {
+            noPermission: "NoPermission",
+            notEnoughAllowance: "NotEnoughAllowance",
+            notEnoughBalance: "NotEnoughBalance",
+            swapLockAlreadyExists: "SwapLockAlreadyExists",
+            swapLockDoesNotExist: "SwapLockDoesNotExist",
+            tokenOperationsPaused: "TokenOperationsArePaused",
+            tooLongSecret: "TooLongSecret",
+            unsafeAllowanceChange: "UnsafeAllowanceChange",
+        },
+        core: {
+            notAnOvenOwner: 13,
+        },
+    },
 };

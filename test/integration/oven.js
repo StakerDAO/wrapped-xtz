@@ -6,19 +6,8 @@ const { Tezos } = require('@taquito/taquito');
 const { InMemorySigner } = require('@taquito/signer');
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
 const { expect } = require('chai').use(require('chai-as-promised'));;
+const { rpcErrors, contractErrors } = require('./../../helpers/constants');
 
-const err = {
-    core: {
-        notAnOvenOwner: 13,
-    },
-    proto: {
-        balanceTooLow: "proto.006-PsCARTHA.contract.balance_too_low"
-    },
-    tzip7: {
-        tokenOperationsPaused: "TokenOperationsArePaused",
-        notEnoughBalance: "NotEnoughBalance",
-    }
-};
 
 contract('Core', () => {
     describe('Oven tests', () => {
@@ -87,7 +76,7 @@ contract('Core', () => {
             it('should not allow withdrawals for 3rd parties', async () => {
                 // switching to Bob's secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
-                await expect(ovenInstance.methods.withdraw(1000).send()).to.be.rejectedWith(err.notAnOvenOwner);
+                await expect(ovenInstance.methods.withdraw(1000).send()).to.be.rejectedWith(contractErrors.core.notAnOvenOwner);
             });
     
             it('should not allow withdrawals above available balance', async () => {
@@ -99,7 +88,7 @@ contract('Core', () => {
                 
                 // it fails before it can hit TZIP-7 error
                 await expect(ovenInstance.methods.withdraw(amountAboveBalance).send())
-                        .to.be.rejectedWith(err.proto.balanceTooLow);
+                        .to.be.rejectedWith(rpcErrors.michelson.balanceTooLow);
             });
     
             it('should allow withdrawals if enough wXTZ to burn is available', async () => {
@@ -158,7 +147,7 @@ contract('Core', () => {
                 // switching to Alice' secret key
                 Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
                 
-                await expect(ovenInstance.methods.withdraw(1).send()).to.be.rejectedWith("TokenOperationsArePaused");
+                await expect(ovenInstance.methods.withdraw(1).send()).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             });
 
             it('should not allow deposits', async () => {
@@ -167,7 +156,7 @@ contract('Core', () => {
                 await expect(Tezos.contract.transfer({
                     to: ovenInstance.address,
                     amount: 100
-                })).to.be.rejectedWith(err.tzip7.tokenOperationsPaused);
+                })).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             });
 
             // after(async () => {
