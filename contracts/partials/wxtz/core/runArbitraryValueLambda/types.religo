@@ -4,4 +4,5 @@ type arbitraryValueLambdaReturnValue = (list(operation), storage, bytes);
 // TODO: refactor lambda runner type names
 type runArbitraryValueLambdaParameter = runEntrypointLambdaParameter;
 // TODO: extract the parameter into its own type
+// TODO: add lambda extras
 type arbitraryValueLambda = ((arbitraryValueLambdaParameter, storage)) => arbitraryValueLambdaReturnValue;
