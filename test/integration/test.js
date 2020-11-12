@@ -1,37 +1,37 @@
 const _coreHelpers = require('../helpers/core');
 const coreInitialStorage = require('../../migrations/initialStorage/core');
-const { InMemorySigner } = require('@taquito/signer');
 const { alice } = require('../../scripts/sandbox/accounts');
-const { Tezos } = require('@taquito/taquito');
+const _taquitoHelpers = require('../helpers/taquito');
+const _ovenHelpers = require('../helpers/oven');
+const _tzip7Helpers = require('../helpers/tzip-7');
+const tzip7InitialStorage = require('../../migrations/initialStorage/tzip-7');
 
 contract('core', () => {
     describe('createOven', () => {
 
-        let coreHelpers;
+        let helpers = {};
 
         beforeEach(async () => {
-            // extract to misc helpers / config
-            const rpc = "http://localhost:8732";
-            const signer = (await InMemorySigner.fromSecretKey(alice.sk));
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
 
-            Tezos.setProvider({
-                rpc: rpc, 
-                signer: signer
-            });
+            const { tzip7Address, tzip7Helpers } = await _tzip7Helpers.originate(tzip7InitialStorage.base);
+            const { coreAddress, coreHelpers } = await _coreHelpers.originate(coreInitialStorage.base);
+            helpers = { tzip7Helpers, coreHelpers };
 
-            const coreInstance = await _coreHelpers.originate(coreInitialStorage.base);
-            console.log('coreInstance', coreInstance.address);
-            coreHelpers = await _coreHelpers.at(coreInstance.address);
+            await helpers.tzip7Helpers.setAdministrator(coreAddress);
         });
 
-        it('should do something with the core', async () => {
-            coreHelpers.createOven(
-                "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+        it('should create an oven and send a deposit to it', async () => {
+            const { ovenHelpers } = await helpers.coreHelpers.createOven(
+                "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb", // delegate
+                "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb", // owner
                 {
-                    amount: 1000 // set mutez mode to true first
+                    amount: 1000 // deposit
                 }
-            )
+            );
+            
+            // await ovenHelpers.default(1000)
         });
 
     });
