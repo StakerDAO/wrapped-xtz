@@ -5,7 +5,7 @@ const { Tezos } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
-const { initialStorage } = require('./../../migrations/1_deploy_tzip-7');
+const initialStorage = require('./../../migrations/initialStorage/tzip-7');
 const { contractErrors } = require('./../../helpers/constants');
 
 
@@ -45,7 +45,7 @@ contract('TZIP-7 token contract', accounts => {
     describe("Mint and Burn", () => {
         it("should mint 10 tokens for Alice", async () => {
             const initialBalance = await getBalance(alice.pkh);
-            const initialTotalSupply = initialStorage.token.totalSupply;
+            const initialTotalSupply = initialStorage.withBalances.token.totalSupply;
 
             // calling the token contract %mint entrypoint
             const tokensToMint = 10;

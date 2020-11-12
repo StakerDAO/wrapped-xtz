@@ -7,7 +7,7 @@ const { InMemorySigner } = require('@taquito/signer')
 const randomBytes = require('random-bytes');
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
-const { initialStorage } = require('./../../migrations/1_deploy_tzip-7');
+const initialStorage = require('./../../migrations/initialStorage/tzip-7');
 const { contractErrors } = require('./../../helpers/constants');
 
 function toHexString(byteArray) {
@@ -106,7 +106,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
             expect(lockedBalance).to.equal(lockedBalanceBeforeSwap + swapRecord.value + swapRecord.fee);
     
             // check that total supply did not change
-            let totalSupply = await initialStorage.token.totalSupply;
+            let totalSupply = initialStorage.withBalances.token.totalSupply;
             totalSupply = Number(totalSupply);
             expect(Number(storage.token.totalSupply)).to.equal(totalSupply);
     
