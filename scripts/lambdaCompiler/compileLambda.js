@@ -10,10 +10,12 @@ module.exports = (lambdaPath, selectFromJSONOutput, saveToFile) => {
         paths.pop();
         return paths.join('/') + `/${lambdaFileName.join('Init.')}`; 
     })();
+
     const output = execSync(
         `./scripts/lambdaCompiler/compile-lambda.sh ${mockContractPath} ${lambdaPath}`,
         {
-            encoding: 'utf8'
+            cwd: process.env.INIT_CWD,
+            encoding: 'utf8',
         }
     );
     let returnValue;
