@@ -34,6 +34,9 @@ const coreHelpers = (instance) => {
                 ovenAddress,
                 ovenHelpers: await _ovenHelpers.at(ovenAddress)
             };
+        },
+        getOvenOwner: async (ovenAddress) => {
+            return await (await instance.storage()).ovens.get(ovenAddress);
         }
     };
 }

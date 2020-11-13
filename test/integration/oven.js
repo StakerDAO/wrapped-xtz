@@ -1,168 +1,179 @@
-const core = artifacts.require('core');
-const tzip7 = artifacts.require('tzip-7');
-const coreHelpersFactory = require('../helpers/core');
-const tzip7HelpersFactory = require('../helpers/tzip-7');
+const _coreHelpers = require('../helpers/core');
+const coreInitialStorage = require('../../migrations/initialStorage/core');
+const { alice, bob, carline, stella, tabbie, mallory } = require('../../scripts/sandbox/accounts');
+const _taquitoHelpers = require('../helpers/taquito');
+const _tzip7Helpers = require('../helpers/tzip-7');
+const tzip7InitialStorage = require('../../migrations/initialStorage/tzip-7');
+const { expect } = require('chai').use(require('chai-as-promised'));;;
+const { contractErrors, rpcErrors } = require('./../../helpers/constants');
 const { Tezos } = require('@taquito/taquito');
-const { InMemorySigner } = require('@taquito/signer');
-const { alice, bob } = require('./../../scripts/sandbox/accounts');
-const { expect } = require('chai').use(require('chai-as-promised'));;
-const { rpcErrors, contractErrors } = require('./../../helpers/constants');
 
+contract('core', () => {
+    describe('oven', () => {
+        let helpers = {};
 
-contract('Core', () => {
-    describe('Oven tests', () => {
-        
-        let coreInstance;
-        let tzip7Instance;
-        let coreHelpers;
-        let tzip7Helpers;
-        let ovenInstance;
-        let rpc;
-        const ovenOwner = "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb";
-        const ovenDelegate = "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb";
+        beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
 
-        before(async () => {
-            coreInstance = await core.deployed();
-            tzip7Instance = await tzip7.deployed();
+            const { tzip7Address, tzip7Helpers } = await _tzip7Helpers.originate(tzip7InitialStorage.base);
+            const { coreAddress, coreHelpers } = await _coreHelpers.originate(
+                coreInitialStorage.base(tzip7Address)
+            );
             
-            coreHelpers = coreHelpersFactory(coreInstance);
-            tzip7Helpers = tzip7HelpersFactory(tzip7Instance);
+            await tzip7Helpers.setAdministrator(coreAddress);
 
-            // read host from TruffleContract
-            rpc = tzip7Instance.constructor.currentProvider.host;
-            // setup Taquito
-            Tezos.setProvider({
-                rpc: rpc, 
-                signer: await InMemorySigner.fromSecretKey(alice.sk)
-            });
-
-            // set tzip-7 admin to be the core address
-            const tzip7Admin = await (await tzip7Instance.storage()).token.admin;
-            if (tzip7Admin === alice.pkh) {
-                await tzip7Instance.setAdministrator(coreInstance.address);
-            };     
-
-            // display smart contract addresses
-            console.log("Core address", coreInstance.address);
-            console.log("TZIP-7 address", tzip7Instance.address);
+            // create oven with inital balance
+            const amountTez = 1000;
+            const amountMutez = amountTez * 1000000;
+            const owner = alice.pkh;
+            const delegate = alice.pkh;
+            const { ovenHelpers, ovenAddress } = await coreHelpers.createOven(
+                delegate,
+                owner,
+                {
+                    amount: amountMutez
+                }
+            );
+            helpers = { tzip7Helpers, coreHelpers, ovenHelpers, ovenAddress };
         });
 
-        it('should deploy an oven for testing purposes', async () => {
-            const createOvenResult = await coreHelpers.createOven(ovenDelegate, ovenOwner, {
-                amount: 0.02 // tez
+        describe('default (deposit XTZ)', () => {
+            it('should deposit XTZ and mint 1:1 wXTZ', async () => {
+                const owner = await helpers.coreHelpers.getOvenOwner(helpers.ovenAddress);
+                const amountTez = 1000;
+                const amountMutez = amountTez * 1000000;
+                const wXTZbalanceBefore = await helpers.tzip7Helpers.getBalance(owner);
+                const XTZBalanceBefore = await _taquitoHelpers.getXTZBalance(helpers.ovenAddress);
+
+                // deposit XTZ
+                await helpers.ovenHelpers.default(amountMutez);
+
+                const wXTZbalanceAfter = await helpers.tzip7Helpers.getBalance(owner);
+                expect(wXTZbalanceAfter).to.equal(wXTZbalanceBefore + amountMutez);
+
+                const XTZBalanceAfter = await _taquitoHelpers.getXTZBalance(helpers.ovenAddress);
+                expect(XTZBalanceAfter).to.equal(XTZBalanceBefore + amountMutez);
             });
-            ovenInstance = await Tezos.contract.at(createOvenResult.ovenAddress);
 
-            console.log("Oven address", ovenInstance.address);
-        });
+            it('should deposit XTZ by a 3rd party', async () => {
+                const owner = await helpers.coreHelpers.getOvenOwner(helpers.ovenAddress);
+                const amountTez = 1000;
+                const amountMutez = amountTez * 1000000;
+                const wXTZbalanceBefore = await helpers.tzip7Helpers.getBalance(owner);
+                const XTZBalanceBefore = await _taquitoHelpers.getXTZBalance(helpers.ovenAddress);
 
-        describe('Deposit XTZ (%default entrypoint)', () => {
-            it('should accept deposits and mint wXTZ 1:1 with XTZ deposited', async () => {
-                const xtzAmount = 0.4;
-                const xtzAmountMutez = xtzAmount * 1000000;
-                const wXTZBalanceAliceBefore= await tzip7Helpers.getBalance(alice.pkh);
-                await (await Tezos.contract.transfer({
-                    to: ovenInstance.address,
-                    amount: xtzAmount
-                })).confirmation(1);
-                
-                const wXTZBalanceAliceAfter = await tzip7Helpers.getBalance(alice.pkh);
-                // check for increased wXTZ balance
-                expect(wXTZBalanceAliceBefore.plus(xtzAmountMutez).toNumber()).to.be.equal(wXTZBalanceAliceAfter.toNumber())
+                // deposit XTZ
+                await _taquitoHelpers.signAs(stella.sk, async () => {
+                    await helpers.ovenHelpers.default(amountMutez);
+                });           
+
+                const wXTZbalanceAfter = await helpers.tzip7Helpers.getBalance(owner);
+                expect(wXTZbalanceAfter).to.equal(wXTZbalanceBefore + amountMutez);
+
+                const XTZBalanceAfter = await _taquitoHelpers.getXTZBalance(helpers.ovenAddress);
+                expect(XTZBalanceAfter).to.equal(XTZBalanceBefore + amountMutez);
             });
         });
-
-        describe('Withdraw', () => {
-            it('should not allow withdrawals for 3rd parties', async () => {
-                // switching to Bob's secret key
-                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
-                await expect(ovenInstance.methods.withdraw(1000).send()).to.be.rejectedWith(contractErrors.core.notAnOvenOwner);
+        
+        describe('withdraw', () => {
+        
+            it('should not allow withdrawals by 3rd parties', async () => {
+                // switching to Carline's secret key
+                await _taquitoHelpers.setSigner(carline.sk);
+                await expect(helpers.ovenHelpers.withdraw(1000)).to.be.rejectedWith(contractErrors.core.notAnOvenOwner);
             });
     
-            it('should not allow withdrawals above available balance', async () => {
-                // switching to Alice' secret key
-                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-                
-                const wXTZBalanceAlice = await tzip7Helpers.getBalance(alice.pkh)
+            it('should not allow withdrawals above available balance', async () => { 
+                const wXTZBalanceAlice = await helpers.tzip7Helpers.getBalance(alice.pkh);
                 const amountAboveBalance = wXTZBalanceAlice + 1;
                 
                 // it fails before it can hit TZIP-7 error
-                await expect(ovenInstance.methods.withdraw(amountAboveBalance).send())
+                await expect(helpers.ovenHelpers.withdraw(amountAboveBalance))
                         .to.be.rejectedWith(rpcErrors.michelson.balanceTooLow);
             });
     
             it('should allow withdrawals if enough wXTZ to burn is available', async () => {
-                // switching to Alice' secret key
-                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-                const wXTZBalanceBeforeAlice = await tzip7Helpers.getBalance(alice.pkh);
-                let XTZBalanceOvenMutez = await Tezos.tz.getBalance(ovenInstance.address);
-                XTZBalanceOvenMutez = XTZBalanceOvenMutez.toNumber();
+                const XTZBalanceAliceMutezBefore = await _taquitoHelpers.getXTZBalance(alice.pkh);
+                const wXTZBalanceBeforeAlice = await helpers.tzip7Helpers.getBalance(alice.pkh);
+                const XTZBalanceOvenMutezBefore = await _taquitoHelpers.getXTZBalance(helpers.ovenAddress);
                 // withdraw total oven balance
-                const withdrawOperation = await ovenInstance.methods.withdraw(XTZBalanceOvenMutez).send();
-                await (withdrawOperation).confirmation(1);
+                await helpers.ovenHelpers.withdraw(XTZBalanceOvenMutezBefore);
                 
-                const wXTZBalanceAfterAlice = await tzip7Helpers.getBalance(alice.pkh);                
-                expect(wXTZBalanceAfterAlice.toNumber()).to.be.equal(wXTZBalanceBeforeAlice.minus(XTZBalanceOvenMutez).toNumber());
+                // check wXTZ balance in TZIP-7
+                const wXTZBalanceAfterAlice = await helpers.tzip7Helpers.getBalance(alice.pkh);                
+                expect(wXTZBalanceAfterAlice).to.be.equal(wXTZBalanceBeforeAlice.minus(XTZBalanceOvenMutezBefore));
+                
+                // check XTZ balance of Alice
+                const XTZBalanceAliceMutezAfter = await _taquitoHelpers.getXTZBalance(alice.pkh);
+                expect(XTZBalanceAliceMutezAfter).to.equal(XTZBalanceAliceMutezBefore.plus(XTZBalanceOvenMutezBefore));
+
+                // check XTZ balance of oven
+                const XTZBalanceOvenMutezAfter = await _taquitoHelpers.getXTZBalance(helpers.ovenAddress);
+                expect(XTZBalanceOvenMutezAfter).to.equal(0);
+
                 // TODO: check XTZ balance but include fees as well
             });
+
+            it('should not allow a withdrawal request when the contract invocation carries XTZ', async () => {
+                const ovenInstance = await Tezos.contract.at(helpers.ovenAddress);
+                await expect(ovenInstance.methods.withdraw(100).send({ amount: 10 })).to.be.rejectedWith(contractErrors.core.amountNotZero);
+            });
+
+            it.skip('should fail when withdrawing to a smart contract that does not support %default entrypoint', async () => {
+                // TODO
+            });
+
+            it.skip('should withdraw to a smart contract', async () => {
+
+            });
+            
         });
 
-        describe('SetDelegate', () => {
+        describe('setDelegate', () => {
             it("should delegate to Bob's address", async () => {
+                const newDelegate = bob.pkh;
                 // read current delegate
-                const previousBakerDelegate = await Tezos.rpc.getDelegate(ovenInstance.address);
-                
+                const previousBakerDelegate = await helpers.ovenHelpers.getDelegate();
                 // set Bob as new delegate for oven contract
-                const setDelegateOperation = await ovenInstance.methods.setDelegate(bob.pkh).send();
-                await setDelegateOperation.confirmation(1);
+                await helpers.ovenHelpers.setDelegate(newDelegate);
                 
-                const newBakerDelegate = await Tezos.rpc.getDelegate(ovenInstance.address);
+                const newBakerDelegate = await helpers.ovenHelpers.getDelegate();
                 expect(newBakerDelegate).not.to.equal(previousBakerDelegate);
-                expect(newBakerDelegate).to.equal(bob.pkh);
+                expect(newBakerDelegate).to.equal(newDelegate);
             });
 
-            it("should remove delegate", async () => {
-                // remove delegation to any address
-                const setDelegateOperation = await ovenInstance.methods.setDelegate(null).send();
-                await setDelegateOperation.confirmation(1);
+            it('should remove delegate', async () => {
+                // remove delegation
+                await helpers.ovenHelpers.setDelegate(null);
                 // throws 404 error code if no delegate is set
-                await expect(Tezos.rpc.getDelegate(ovenInstance.address)).to.be.rejectedWith("(404)");
+                await expect(helpers.ovenHelpers.getDelegate()).to.be.rejectedWith(rpcErrors.notFound);
+            });
+
+            it('should not allow a 3rd party to change the delegation', async () => {
+                // switch to malicious actor's secret key
+                await _taquitoHelpers.setSigner(mallory.sk);
+                const newDelegate = bob.pkh;
+                await expect(helpers.ovenHelpers.setDelegate(newDelegate)).to.be.rejectedWith(contractErrors.core.notAnOvenOwner);
             });
         });
 
-        describe('Token operations paused', () => {
-            before(async () => {
-                // need to fund oven, otherwise the errors will not hit TZIP-7, but the protocol (balance_too_low)
-                const xtzAmount = 1000;
-                await (await Tezos.contract.transfer({
-                    to: ovenInstance.address,
-                    amount: xtzAmount
-                })).confirmation(1);
-                
-                // stop all token operations, by pause guardian Alice
-                await tzip7Instance.setPause(true);
-            });
-
+        describe('token operations are paused', () => {
             it('should not allow withdrawals', async () => {
-                // switching to Alice' secret key
-                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(alice.sk)});
-                
-                await expect(ovenInstance.methods.withdraw(1).send()).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
+                // stop all token operations, by pause guardian Alice
+                await helpers.tzip7Helpers.setPause(true);
+                await expect(helpers.ovenHelpers.withdraw(1)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             });
 
             it('should not allow deposits', async () => {
-                // switching to Bob's secret key
-                Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
-                await expect(Tezos.contract.transfer({
-                    to: ovenInstance.address,
-                    amount: 100
-                })).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
+                // stop all token operations, by pause guardian Alice
+                await helpers.tzip7Helpers.setPause(true);
+                await expect(helpers.ovenHelpers.default(1)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             });
 
-            // after(async () => {
-            //     // clean-up after tests, unpausing token operations
-            //     await tzip7Instance.setPause(false);
-            // });
         });
+
+        //TODO call oven by core contract
+
     });
-})
+});

@@ -10,6 +10,20 @@ const ovenHelpers = (instance) => {
             });
 
             return await operation.confirmation(1);
+        },
+        getDelegate: async () => {
+            return await Tezos.rpc.getDelegate(instance.address);
+        },
+        getCoreAddress: async () => {
+            return (await instance.storage()).address
+        },
+        withdraw: async (amount) => {
+            const operation = await instance.methods.withdraw(amount).send();
+            return operation.confirmation(1);
+        },
+        setDelegate: async (address) => {
+            const operation = await instance.methods.setDelegate(address).send();
+            return operation.confirmation(1);
         }
     };
 };

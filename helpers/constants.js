@@ -4,6 +4,9 @@ module.exports = {
         michelson: {
             balanceTooLow: "proto.006-PsCARTHA.contract.balance_too_low"
         },
+        http: {
+            notFound: "Http error response: (404)"
+        }
     },
     contractErrors: {
         tzip7: {
@@ -17,7 +20,8 @@ module.exports = {
             unsafeAllowanceChange: "UnsafeAllowanceChange",
         },
         core: {
-            notAnOvenOwner: 13,
+            amountNotZero: 4,
+            notAnOvenOwner: 14,
         },
     },
 };

@@ -14,6 +14,14 @@ const tzip7Helpers = (instance) => {
         },
         getAdministrator: async function() {
             return (await this.getStorage()).token.admin
+        },
+        getBalance: async function(address) {
+            const balance = await (await this.getStorage()).token.ledger.get(address)
+            return balance.toNumber();
+        },
+        setPause: async function(boolean) {
+            const operation = await instance.methods.setPause(boolean).send()
+            return operation.confirmation(1);
         }
     }
 }

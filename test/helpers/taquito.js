@@ -18,5 +18,8 @@ module.exports = {
         await fn();
         // revert the signer back to the old signer
         Tezos.setSignerProvider(oldSigner);
+    },
+    getXTZBalance: async (address) => {
+        return (await Tezos.tz.getBalance(address)).toNumber();
     }
 }
