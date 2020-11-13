@@ -1,3 +1,6 @@
+let oldContract;
+if (typeof contract !== 'undefined') oldContract = contract;
+
 const eztz = require('eztz.js').eztz;
 function generateAddress() {
     let mnemonic = eztz.crypto.generateMnemonic(); // generate mnemonic phrase
@@ -6,4 +9,6 @@ function generateAddress() {
     return wallet.pkh;
 };
 
+// eztz has a global contract variable that conflicts with Truffle's testing contract
+if (oldContract) contract = oldContract;
 module.exports = generateAddress

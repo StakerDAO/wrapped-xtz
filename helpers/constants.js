@@ -22,6 +22,8 @@ module.exports = {
         core: {
             amountNotZero: 4,
             notAnOvenOwner: 14,
+            errorLambdaNotFound: '0',
+            errorLambdaNotAnEntrypoint: '1',
         },
     },
 };

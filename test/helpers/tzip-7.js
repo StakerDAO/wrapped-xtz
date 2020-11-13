@@ -3,6 +3,7 @@ const { Tezos } = require('@taquito/taquito');
 
 const tzip7Helpers = (instance) => {
     return {
+        instance: instance,
         setAdministrator: async function(administratorAddress) {
             const operation = await instance.methods
                 .setAdministrator(administratorAddress)

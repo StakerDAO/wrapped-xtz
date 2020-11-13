@@ -5,7 +5,21 @@ const _ovenHelpers = require('./oven');
 
 const coreHelpers = (instance) => {
     return {
-        createOven: async (delegateKeyHash, ownerAddress, sendParams) => {
+        runEntrypointLambda: async function(lambdaName, lambdaParameter, sendParams) {
+            const operation = await instance.methods.runEntrypointLambda(
+                lambdaName,
+                testPackValue(lambdaParameter),
+            ).send({
+                mutez: true,
+                ...sendParams
+            });
+            await operation.confirmation(1);
+            return operation;
+        },
+        getArbitraryValue: async function(key) {
+            return await (await instance.storage()).arbitraryValues.get(key);
+        },
+        createOven: async function(delegateKeyHash, ownerAddress, sendParams) {
             let delegate;
             if (delegateKeyHash === null) {
                 delegate = 'None: option(key_hash)';

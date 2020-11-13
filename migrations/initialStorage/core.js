@@ -4,6 +4,8 @@ const testPackValue = require('../../scripts/lambdaCompiler/testPackValue');
 const { alice } = require('./../../scripts/sandbox/accounts');
 const lambdasList = require('./../../lambdas');
 const loadLambdaArtifact = require('./../../scripts/lambdaCompiler/loadLambdaArtifact');
+const generateAddress = require('./../../helpers/generateAddress');
+const compileLambdaAsArtifact = require('../../scripts/lambdaCompiler/compileLambdaAsArtifact');
 
 const initialStorage = {};
 
@@ -37,5 +39,32 @@ initialStorage.base = (tzip7Address) => {
         arbitraryValues,
     }
 };
+
+initialStorage.test = {};
+initialStorage.test.runEntrypointLambda = () => {
+    
+    let mockTzip7Address = generateAddress();
+    let storage = initialStorage.base(mockTzip7Address);
+
+    storage.lambdas.set(
+        'entrypoint/nonEntrypointLambda', 
+        storage.lambdas.get('arbitrary/permissions/isAdmin')
+    );
+
+    storage.lambdas.set(
+        'entrypoint/simpleEntrypointLambda',
+        loadLambdaArtifact(
+            'contracts/partials/wxtz/core/test/runEntrypointLambda/simpleEntrypointLambda.religo',
+            true
+        ).bytes
+    )
+
+    storage.ovens.set(
+        // alice owns a mock oven with the same pkh as alice
+        alice.pkh, alice.pkh
+    );
+
+    return storage;
+}
 
 module.exports = initialStorage;
