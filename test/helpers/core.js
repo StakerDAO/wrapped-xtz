@@ -52,6 +52,15 @@ const coreHelpers = (instance) => {
         },
         getOvenOwner: async (ovenAddress) => {
             return await (await instance.storage()).ovens.get(ovenAddress);
+        },
+        default: async (sendParams) => {
+            const operation = await Tezos.contract.transfer({
+                to: instance.address,
+                amount: sendParams.amount,
+                mutez: true
+            });
+            await operation.confirmation(1);
+            return operation;
         }
     };
 }

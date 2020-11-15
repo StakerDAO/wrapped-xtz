@@ -41,10 +41,13 @@ initialStorage.base = (tzip7Address) => {
 };
 
 initialStorage.test = {};
-initialStorage.test.runEntrypointLambda = () => {
-    
+initialStorage.test.base = () => {
     let mockTzip7Address = generateAddress();
     let storage = initialStorage.base(mockTzip7Address);
+    return storage;
+};
+initialStorage.test.runEntrypointLambda = () => {
+    let storage = initialStorage.test.base();
 
     storage.lambdas.set(
         'entrypoint/nonEntrypointLambda', 
