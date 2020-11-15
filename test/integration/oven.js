@@ -1,12 +1,13 @@
 const _coreHelpers = require('../helpers/core');
 const coreInitialStorage = require('../../migrations/initialStorage/core');
-const { alice, bob, carline, stella, tabbie, mallory } = require('../../scripts/sandbox/accounts');
+const { alice, bob, carol, chuck, walter } = require('../../scripts/sandbox/accounts');
 const _taquitoHelpers = require('../helpers/taquito');
 const _tzip7Helpers = require('../helpers/tzip-7');
 const tzip7InitialStorage = require('../../migrations/initialStorage/tzip-7');
 const { expect } = require('chai').use(require('chai-as-promised'));;;
 const { contractErrors, rpcErrors } = require('./../../helpers/constants');
 const { Tezos } = require('@taquito/taquito');
+const { TezosOperationError } = require("@taquito/taquito");
 
 contract('core', () => {
     describe('oven', () => {
@@ -115,65 +116,37 @@ contract('core', () => {
                 // TODO: check XTZ balance but include fees as well
             });
 
-            it('should not allow a withdrawal request when the contract invocation carries XTZ', async () => {
-                const ovenInstance = await Tezos.contract.at(helpers.ovenAddress);
-                await expect(ovenInstance.methods.withdraw(100).send({ amount: 10 })).to.be.rejectedWith(contractErrors.core.amountNotZero);
-            });
 
             it.skip('should fail when withdrawing to a smart contract that does not support %default entrypoint', async () => {
                 // TODO
             });
 
             it.skip('should withdraw to a smart contract', async () => {
-
+                // TODO
             });
             
         });
 
-        describe('setDelegate', () => {
-            it("should delegate to Bob's address", async () => {
-                const newDelegate = bob.pkh;
-                // read current delegate
-                const previousBakerDelegate = await helpers.ovenHelpers.getDelegate();
-                // set Bob as new delegate for oven contract
-                await helpers.ovenHelpers.setDelegate(newDelegate);
-                
-                const newBakerDelegate = await helpers.ovenHelpers.getDelegate();
-                expect(newBakerDelegate).not.to.equal(previousBakerDelegate);
-                expect(newBakerDelegate).to.equal(newDelegate);
-            });
-
-            it('should remove delegate', async () => {
-                // remove delegation
-                await helpers.ovenHelpers.setDelegate(null);
-                // throws 404 error code if no delegate is set
-                await expect(helpers.ovenHelpers.getDelegate()).to.be.rejectedWith(rpcErrors.notFound);
-            });
-
-            it('should not allow a 3rd party to change the delegation', async () => {
-                // switch to malicious actor's secret key
-                await _taquitoHelpers.setSigner(mallory.sk);
-                const newDelegate = bob.pkh;
-                await expect(helpers.ovenHelpers.setDelegate(newDelegate)).to.be.rejectedWith(contractErrors.core.notAnOvenOwner);
-            });
-        });
-
         describe('token operations are paused', () => {
+            before(async () => {
+                // stop all token operations, by pause guardian Walter
+                await _taquitoHelpers.signAs(walter.sk, async () => {
+                    await helpers.tzip7Helpers.setPause(true);
+                });
+            });
+            
             it('should not allow withdrawals', async () => {
-                // stop all token operations, by pause guardian Alice
-                await helpers.tzip7Helpers.setPause(true);
-                await expect(helpers.ovenHelpers.withdraw(1)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
+                
+                await expect(helpers.ovenHelpers.withdraw(1)).to.be.eventually.rejected
+                    .and.be.instanceOf(TezosOperationError)
+                    .and.have.property('message', contractErrors.tzip7.tokenOperationsPaused);
             });
 
             it('should not allow deposits', async () => {
-                // stop all token operations, by pause guardian Alice
-                await helpers.tzip7Helpers.setPause(true);
-                await expect(helpers.ovenHelpers.default(1)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
+                await expect(helpers.ovenHelpers.default(1)).to.be.eventually.rejected
+                    .and.be.instanceOf(TezosOperationError)
+                    .and.have.property('message', contractErrors.tzip7.tokenOperationsPaused);
             });
-
         });
-
-        //TODO call oven by core contract
-
     });
 });

@@ -5,6 +5,7 @@ const _ovenHelpers = require('./oven');
 
 const coreHelpers = (instance) => {
     return {
+        instance: instance,
         runEntrypointLambda: async function(lambdaName, lambdaParameter, sendParams) {
             const operation = await instance.methods.runEntrypointLambda(
                 lambdaName,

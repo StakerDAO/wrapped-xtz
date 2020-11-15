@@ -2,6 +2,7 @@ const { Tezos } = require('@taquito/taquito');
 
 const ovenHelpers = (instance) => {
     return {
+        instance: instance,
         default: async (xtzAmount) => {
             const operation = await Tezos.contract.transfer({
                 to: instance.address,
@@ -9,7 +10,8 @@ const ovenHelpers = (instance) => {
                 mutez: true
             });
 
-            return await operation.confirmation(1);
+            await operation.confirmation(1);
+            return operation
         },
         getDelegate: async () => {
             return await Tezos.rpc.getDelegate(instance.address);
@@ -19,11 +21,13 @@ const ovenHelpers = (instance) => {
         },
         withdraw: async (amount) => {
             const operation = await instance.methods.withdraw(amount).send();
-            return operation.confirmation(1);
+            await operation.confirmation(1);
+            return operation 
         },
         setDelegate: async (address) => {
             const operation = await instance.methods.setDelegate(address).send();
-            return operation.confirmation(1);
+            await operation.confirmation(1);
+            return operation
         }
     };
 };

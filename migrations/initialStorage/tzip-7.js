@@ -1,5 +1,5 @@
 const { MichelsonMap, UnitValue } = require('@taquito/taquito');
-const { alice, bob, charlie } = require('../../scripts/sandbox/accounts');
+const { alice, bob, walter } = require('../../scripts/sandbox/accounts');
 const initialStorage = {};
 
 initialStorage.base = {
@@ -7,7 +7,7 @@ initialStorage.base = {
         ledger: new MichelsonMap,
         approvals: new MichelsonMap,
         admin: alice.pkh,
-        pauseGuardian: alice.pkh,
+        pauseGuardian: walter.pkh,
         paused: false,
         totalSupply: 0,
     },
