@@ -1,50 +1,35 @@
-const { contractErrors, rpcErrors } = require("../../../helpers/constants");
-const _coreHelpers = require('../../helpers/core');
 const _taquitoHelpers = require('../../helpers/taquito');
-const _coreInitialStorage = require('../../../migrations/initialStorage/core');
-const { alice, bob, chuck, carol } = require('../../../scripts/sandbox/accounts');
-const { TezosOperationError } = require("@taquito/taquito");
+const { alice } = require('../../../scripts/sandbox/accounts');
 const { expect } = require('chai').use(require('chai-as-promised'));
-const _tzip7Helpers = require('../../helpers/tzip-7');
-const _tzip7InitialStorage = require('../../../migrations/initialStorage/tzip-7');
-const testPackValue = require("../../../scripts/lambdaCompiler/testPackValue");
+const setup = require('./before');
 
 contract('oven', () => {
     let helpers = {};
+    let amountTez = 100;
+    let amountMutez = amountTez * 1000000;    
 
     beforeEach(async () => {
         await _taquitoHelpers.initialize();
         await _taquitoHelpers.setSigner(alice.sk);
 
-        let { tzip7Helpers, tzip7Address } = await _tzip7Helpers.originate(_tzip7InitialStorage.base);
-        let { coreHelpers, coreAddress } = await _coreHelpers.originate(
-            _coreInitialStorage.base(tzip7Address)
+        helpers = await setup(
+            alice.pkh, //owner
+            amountMutez,
+            helpers
         );
-
-        await tzip7Helpers.setAdministrator(coreAddress);
-
-        let { ovenHelpers } = await coreHelpers.createOven(
-            null, // delegate, baker
-            alice.pkh, // owner
-        );
-
-        helpers = { coreHelpers, tzip7Helpers, ovenHelpers };
     });
 
     describe('default entrypoint', () => {
 
         describe('effects of sending tez to default', () => {
-            let amountTez = 100;
-            let amountMutez = amountTez * 1000000;    
-        
             let operation;
             let balanceBefore = {};
             
             beforeEach(async () => {
                 balanceBefore.alice = await _taquitoHelpers.getXTZBalance(alice.pkh);
-                balanceBefore.oven = await _taquitoHelpers.getXTZBalance(helpers.ovenHelpers.instance.address);
+                balanceBefore.oven = await _taquitoHelpers.getXTZBalance(helpers.oven.instance.address);
                 operation = await _taquitoHelpers.transfer(
-                    helpers.ovenHelpers.instance.address,
+                    helpers.oven.instance.address,
                     amountMutez
                 );
             });
@@ -52,7 +37,7 @@ contract('oven', () => {
             it("should increase oven's balance", async () => {
                 let balanceAfter = {};
                 balanceAfter.alice = await _taquitoHelpers.getXTZBalance(alice.pkh);
-                balanceAfter.oven = await _taquitoHelpers.getXTZBalance(helpers.ovenHelpers.instance.address);
+                balanceAfter.oven = await _taquitoHelpers.getXTZBalance(helpers.oven.instance.address);
                 
                 // TODO add fees to calculation
                 //expect(balanceAfter.alice).to.equal(balanceBefore.alice - amountMutez - fees);
@@ -72,11 +57,11 @@ contract('oven', () => {
         
                 expect(firstInternalOperationResult).to.deep.contain({
                     amount: `${amountMutez}`,
-                    destination: helpers.coreHelpers.instance.address,
+                    destination: helpers.core.instance.address,
                 });
             });
         });
     });
 
-    //TODO call oven by core contract
-})
+    //TODO send operation from core contract and show that oven does nothing
+});

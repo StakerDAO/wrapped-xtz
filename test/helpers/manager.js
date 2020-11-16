@@ -35,7 +35,6 @@ module.exports = {
         };
     },
     at: async function(address) {
-        console.log("address used for tezos contract", address)
         const instance = await Tezos.contract.at(address);
         return managerHelpers(instance);
     }

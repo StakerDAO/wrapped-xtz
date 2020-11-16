@@ -1,33 +1,24 @@
-const { contractErrors, rpcErrors } = require("../../../helpers/constants");
-const _coreHelpers = require('../../helpers/core');
+const { rpcErrors } = require("../../../helpers/constants");
 const _taquitoHelpers = require('../../helpers/taquito');
-const _coreInitialStorage = require('../../../migrations/initialStorage/core');
-const { alice, bob, chuck, carol } = require('../../../scripts/sandbox/accounts');
-const { TezosOperationError } = require("@taquito/taquito");
+const { alice, bob } = require('../../../scripts/sandbox/accounts');
 const { expect } = require('chai').use(require('chai-as-promised'));
-const _tzip7Helpers = require('../../helpers/tzip-7');
-const _tzip7InitialStorage = require('../../../migrations/initialStorage/tzip-7');
+const _managerHelpers = require('../../helpers/manager');
+const setup = require('./before');
 
 contract('oven', () => {
     let helpers = {};
+    let amountTez = 100;
+    let amountMutez = amountTez * 1000000;
 
     beforeEach(async () => {
         await _taquitoHelpers.initialize();
         await _taquitoHelpers.setSigner(alice.sk);
-
-        let { tzip7Helpers, tzip7Address } = await _tzip7Helpers.originate(_tzip7InitialStorage.base);
-        let { coreHelpers, coreAddress } = await _coreHelpers.originate(
-            _coreInitialStorage.base(tzip7Address)
+        
+        helpers = await setup(
+            alice.pkh, //owner
+            amountMutez,
+            helpers
         );
-
-        await tzip7Helpers.setAdministrator(coreAddress);
-
-        let { ovenHelpers } = await coreHelpers.createOven(
-            null, // delegate
-            alice.pkh, // owner
-        );
-
-        helpers = { coreHelpers, tzip7Helpers, ovenHelpers };
     });
 
     describe('setDelegate with an implicit account', () => {
@@ -35,19 +26,19 @@ contract('oven', () => {
 
         it('should delegate to baker Bob', async () => {     
             // set new delegate        
-            await expect(helpers.ovenHelpers.setDelegate(baker)).to.be.fulfilled;
+            await expect(helpers.oven.setDelegate(baker)).to.be.fulfilled;
             // get new delegate
-            const newDelegate = await helpers.ovenHelpers.getDelegate();
+            const newDelegate = await helpers.oven.getDelegate();
             expect(newDelegate).to.equal(baker);
         });
 
         it('should remove delegate', async () => {
             // set new delegate
-            await expect(helpers.ovenHelpers.setDelegate(baker)).to.be.fulfilled;
+            await expect(helpers.oven.setDelegate(baker)).to.be.fulfilled;
             // remove delegation
-            await helpers.ovenHelpers.setDelegate(null);
+            await helpers.oven.setDelegate(null);
             // throws 404 error code if no delegate is set
-            await expect(helpers.ovenHelpers.getDelegate()).to.be.rejectedWith(rpcErrors.notFound);
+            await expect(helpers.oven.getDelegate()).to.be.rejectedWith(rpcErrors.notFound);
         });
 
         describe('effects of setting delegate for oven contract', () => {
@@ -55,7 +46,7 @@ contract('oven', () => {
             
             beforeEach(async () => {
                 // set delegate
-                operation = await helpers.ovenHelpers.setDelegate(baker);
+                operation = await helpers.oven.setDelegate(baker);
             });
 
             it('should invoke core%onOvenSetDelegate', async () => {    
@@ -65,7 +56,7 @@ contract('oven', () => {
                 expect(secondInternalOperationResult).to.deep.contain({
                     kind: 'transaction',
                     amount: '0',
-                    destination: helpers.coreHelpers.instance.address,
+                    destination: helpers.core.instance.address,
                 });
         
                 expect(secondInternalOperationResult.parameters.value.args[0]).to.deep.contain({
@@ -85,61 +76,51 @@ contract('oven', () => {
         });
     });
 
-    describe('setdelegate with an originated account', () => {
+    describe('setDelegate with an originated account', () => {
         
         beforeEach(async () => {
             await _taquitoHelpers.initialize();
             await _taquitoHelpers.setSigner(alice.sk);
-    
-            let { tzip7Helpers, tzip7Address } = await _tzip7Helpers.originate(_tzip7InitialStorage.base);
-            let { coreHelpers, coreAddress } = await _coreHelpers.originate(
-                _coreInitialStorage.base(tzip7Address)
-            );
 
-            await tzip7Helpers.setAdministrator(coreAddress);
-            
-            const brokenManagerContract = true;
-            let { managerHelpers, managerAddress } = await _managerHelpers.originate(brokenManagerContract);
-            
-            let { ovenHelpers } = await coreHelpers.createOven(
-                null, // delegate
+            let { managerHelpers, managerAddress } = await _managerHelpers.originate();
+
+            helpers = await setup(
                 managerAddress, // owner
-                {
-                    amount: amountMutez
-                }
+                amountMutez, 
+                helpers
             );
-    
-            helpers = { coreHelpers, ovenHelpers, managerHelpers };
+            
+            helpers.manager = managerHelpers;
         });
 
         const baker = bob.pkh;   
 
         it('should delegate to baker Bob', async () => {     
-            const ovenAddress = helpers.ovenHelpers.instance.address;
+            const ovenAddress = helpers.oven.instance.address;
             // set new delegate        
-            await expect(helpers.managerHelpers.setDelegate(baker, ovenAddress)).to.be.fulfilled;
+            await expect(helpers.manager.setDelegate(baker, ovenAddress)).to.be.fulfilled;
             // get new delegate
-            const newDelegate = await helpers.ovenHelpers.getDelegate();
+            const newDelegate = await helpers.oven.getDelegate();
             expect(newDelegate).to.equal(baker);
         });
 
         it('should remove delegate', async () => {
-            const ovenAddress = helpers.ovenHelpers.instance.address;
+            const ovenAddress = helpers.oven.instance.address;
             // set new delegate
-            await expect(helpers.managerHelpers.setDelegate(baker, ovenAddress)).to.be.fulfilled;
+            await expect(helpers.manager.setDelegate(baker, ovenAddress)).to.be.fulfilled;
             // remove delegation
-            await helpers.managerHelpers.setDelegate(null, ovenAddress);
+            await helpers.manager.setDelegate(null, ovenAddress);
             // throws 404 error code if no delegate is set
-            await expect(helpers.ovenHelpers.getDelegate()).to.be.rejectedWith(rpcErrors.notFound);
+            await expect(helpers.oven.getDelegate()).to.be.rejectedWith(rpcErrors.notFound);
         });
 
         describe('effects of setting delegate for oven contract', () => {
             let operation;
             
             beforeEach(async () => {
-                const ovenAddress = helpers.ovenHelpers.instance.address;
+                const ovenAddress = helpers.oven.instance.address;
                 // set delegate
-                operation = await helpers.managerHelpers.setDelegate(baker, ovenAddress);
+                operation = await helpers.manager.setDelegate(baker, ovenAddress);
             });
 
             it('should invoke core%onOvenSetDelegate', async () => {    
@@ -149,7 +130,7 @@ contract('oven', () => {
                 expect(secondInternalOperationResult).to.deep.contain({
                     kind: 'transaction',
                     amount: '0',
-                    destination: helpers.coreHelpers.instance.address,
+                    destination: helpers.core.instance.address,
                 });
         
                 expect(secondInternalOperationResult.parameters.value.args[0]).to.deep.contain({
