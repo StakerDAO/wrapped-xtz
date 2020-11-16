@@ -46,6 +46,7 @@ initialStorage.test.base = () => {
     let storage = initialStorage.base(mockTzip7Address);
     return storage;
 };
+
 initialStorage.test.runEntrypointLambda = () => {
     let storage = initialStorage.test.base();
 
@@ -68,7 +69,8 @@ initialStorage.test.runEntrypointLambda = () => {
     );
 
     return storage;
-}
+};
+
 initialStorage.test.createOven = (tzip7Address) => {
     let storage = initialStorage.base(tzip7Address);
     return storage;
@@ -81,8 +83,26 @@ initialStorage.test.onOvenDepositReceived = (ovens) => (tzip7Address) => {
 
     ovens.forEach(ovenAndOwner => {
         storage.ovens.set(ovenAndOwner.oven, ovenAndOwner.owner);
-    });
+    })
+  
+    return storage;
+};
 
+initialStorage.test.onOvenWithdrawalRequested = (tzip7Address) => {
+    let storage = initialStorage.base(tzip7Address);
+    storage.ovens.set(
+        // alice owns a mock oven with the same pkh as alice
+        alice.pkh, alice.pkh
+    );
+    return storage;
+};
+
+initialStorage.test.onOvenSetDelegate = () => {
+    let storage = initialStorage.test.base();
+    storage.ovens.set(
+        // alice owns a mock oven with the same pkh as alice
+        alice.pkh, alice.pkh
+    );
     return storage;
 };
 
