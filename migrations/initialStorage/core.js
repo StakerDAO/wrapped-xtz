@@ -58,7 +58,7 @@ initialStorage.test.runEntrypointLambda = () => {
         'entrypoint/simpleEntrypointLambda',
         loadLambdaArtifact(
             'contracts/partials/wxtz/core/test/runEntrypointLambda/simpleEntrypointLambda.religo',
-            true
+            false
         ).bytes
     )
 
@@ -67,6 +67,10 @@ initialStorage.test.runEntrypointLambda = () => {
         alice.pkh, alice.pkh
     );
 
+    return storage;
+}
+initialStorage.test.createOven = (tzip7Address) => {
+    let storage = initialStorage.base(tzip7Address);
     return storage;
 }
 

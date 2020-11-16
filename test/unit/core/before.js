@@ -14,8 +14,18 @@ module.exports = async (initialStorage, helpers) => {
         helpers.tzip7 = tzip7Helpers;
     }
     
-    let { coreHelpers } = await _coreHelpers.originate(initialStorage.core);
-    helpers.core = coreHelpers;
+    if (typeof initialStorage.core === 'function') {
+        const initialStorageCore = initialStorage.core(helpers.tzip7.instance.address);
+        let { coreHelpers } = await _coreHelpers.originate(initialStorageCore);
+        helpers.core = coreHelpers;
+    } else {
+        let { coreHelpers } = await _coreHelpers.originate(initialStorage.core);
+        helpers.core = coreHelpers;
+    }
+
+    if (helpers.tzip7) {
+        await helpers.tzip7.setAdministrator(helpers.core.instance.address);
+    }
 
     return helpers;
 };

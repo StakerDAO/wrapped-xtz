@@ -15,9 +15,10 @@ module.exports = {
         const signer = (await InMemorySigner.fromSecretKey(secretKey));
         Tezos.setSignerProvider(signer);
         // run the function using the new temporary signer
-        await fn();
+        const output = await fn();
         // revert the signer back to the old signer
         Tezos.setSignerProvider(oldSigner);
+        return output;
     },
     getXTZBalance: async (address) => {
         return (await Tezos.tz.getBalance(address)).toNumber();

@@ -4,6 +4,9 @@ module.exports = {
         michelson: {
             balanceTooLow: "proto.006-PsCARTHA.contract.balance_too_low"
         },
+        proto: {
+            unregistredDelegate: "(permanent) proto.006-PsCARTHA.contract.manager.unregistered_delegate"
+        },
         http: {
             notFound: "Http error response: (404)"
         }
@@ -25,6 +28,7 @@ module.exports = {
             ovenOwnerDoesNotAcceptDeposits: '15',
             lambdaNotFound: '0',
             lambdaNotAnEntrypoint: '1',
+            lambdaParameterWrongType: '2',
         },
     },
 };

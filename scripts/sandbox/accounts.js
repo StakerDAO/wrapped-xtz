@@ -14,6 +14,7 @@ module.exports = {
         sk: "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq",
         pk: "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn"
     },
+    // baker
     bob: {
         pkh: "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
         sk: "edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt",

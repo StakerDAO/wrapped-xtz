@@ -16,7 +16,8 @@ const ovenHelpers = (instance) => {
             return await Tezos.rpc.getDelegate(instance.address);
         },
         getCoreAddress: async () => {
-            return (await instance.storage()).address
+            // oven storage is a single address, not a full record
+            return (await instance.storage())
         },
         withdraw: async (amount, sendParams) => {
             const operation = await instance.methods.withdraw(amount).send({
