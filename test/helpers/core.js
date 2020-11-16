@@ -61,6 +61,23 @@ const coreHelpers = (instance) => {
             });
             await operation.confirmation(1);
             return operation;
+        },
+        withdraw: async function(amount, sender, sendParams) {
+            const operation = await instance.methods.runEntrypointLambda(
+                'onOvenWithdrawalRequested', //lambdaName
+                testPackValue(`
+                    {
+                        sender: ("${sender}": address),
+                        value: ${amount}
+                    }
+                `)
+            ).send({
+                mutez: true,
+                ...sendParams
+            });
+
+            await operation.confirmation(1);
+            return operation
         }
     };
 }
