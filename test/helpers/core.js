@@ -62,7 +62,7 @@ const coreHelpers = (instance) => {
             await operation.confirmation(1);
             return operation;
         },
-        withdraw: async function(amount, sender, sendParams) {
+        onOvenWithdrawalRequested: async function(amount, sender, sendParams) {
             const operation = await instance.methods.runEntrypointLambda(
                 'onOvenWithdrawalRequested', //lambdaName
                 testPackValue(`

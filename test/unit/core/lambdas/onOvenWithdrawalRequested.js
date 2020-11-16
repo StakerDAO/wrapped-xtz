@@ -5,7 +5,7 @@ const _coreInitialStorage = require('../../../../migrations/initialStorage/core'
 const _tzip7InitialStorage = require('../../../../migrations/initialStorage/tzip-7');
 const { TezosOperationError, Tezos } = require('@taquito/taquito');
 const { contractErrors } = require('../../../../helpers/constants');
-const { alice, bob, chuck, carol } = require('../../../../scripts/sandbox/accounts');
+const { alice, chuck } = require('../../../../scripts/sandbox/accounts');
 const testPackValue = require("../../../../scripts/lambdaCompiler/testPackValue");
 
 contract('core', () => {
@@ -17,14 +17,14 @@ contract('core', () => {
             helpers = {}
             await before({
                 tzip7: _tzip7InitialStorage.withBalances,
-                core: _coreInitialStorage.test.withdraw
+                core: _coreInitialStorage.test.onOvenWithdrawalRequested
             }, helpers)
             
             wXTZBalance = await _tzip7InitialStorage.withBalances.token.ledger.get(alice.pkh);
         });
 
         it('should not be callable with xtzAmount > 0mutez', async () => {
-            const operationPromise = helpers.core.withdraw(
+            const operationPromise = helpers.core.onOvenWithdrawalRequested(
                 wXTZBalance, // amount
                 alice.pkh, // mock here the sender of the operation
                 {
@@ -38,7 +38,7 @@ contract('core', () => {
         });
 
         it('should be callable with xtzAmount = 0mutez', async () => {
-            const operationPromise = helpers.core.withdraw(
+            const operationPromise = helpers.core.onOvenWithdrawalRequested(
                 wXTZBalance,
                 alice.pkh,
                 {
@@ -50,7 +50,7 @@ contract('core', () => {
         });
 
         it('should not be callable by anyone other than oven owner', async () => {
-            const operationPromise = helpers.core.withdraw(
+            const operationPromise = helpers.core.onOvenWithdrawalRequested(
                 wXTZBalance, 
                 chuck.pkh, // mock here the sender of the operation
                 {
@@ -68,7 +68,7 @@ contract('core', () => {
 
             beforeEach(async () => {
                 wXTZBalance = await _tzip7InitialStorage.withBalances.token.ledger.get(alice.pkh);
-                operation = await helpers.core.withdraw(
+                operation = await helpers.core.onOvenWithdrawalRequested(
                     wXTZBalance, // wXTZ
                     alice.pkh, // mock here the sender of the operation
                     {

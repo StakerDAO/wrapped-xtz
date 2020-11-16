@@ -76,7 +76,7 @@ initialStorage.test.createOven = (tzip7Address) => {
     return storage;
 };
 
-initialStorage.test.withdraw = (tzip7Address) => {
+initialStorage.test.onOvenWithdrawalRequested = (tzip7Address) => {
     let storage = initialStorage.base(tzip7Address);
     storage.ovens.set(
         // alice owns a mock oven with the same pkh as alice
