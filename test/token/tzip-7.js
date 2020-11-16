@@ -5,8 +5,9 @@ const { Tezos } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
-const { initialStorage } = require('./../../migrations/1_deploy_tzip-7');
-const { update } = require('lodash');
+const initialStorage = require('./../../migrations/initialStorage/tzip-7');
+const { contractErrors } = require('./../../helpers/constants');
+
 
 contract('TZIP-7 token contract', accounts => {
     let storage;
@@ -44,7 +45,7 @@ contract('TZIP-7 token contract', accounts => {
     describe("Mint and Burn", () => {
         it("should mint 10 tokens for Alice", async () => {
             const initialBalance = await getBalance(alice.pkh);
-            const initialTotalSupply = initialStorage.token.totalSupply;
+            const initialTotalSupply = initialStorage.withBalances.token.totalSupply;
 
             // calling the token contract %mint entrypoint
             const tokensToMint = 10;
@@ -80,7 +81,7 @@ contract('TZIP-7 token contract', accounts => {
         
         it("should fail for burning more tokens than Alice has", async () => {
             // calling the token contract %burn entrypoint
-            await expect(tzip7Instance.burn(alice.pkh, 100)).to.be.rejectedWith("NotEnoughBalance");
+            await expect(tzip7Instance.burn(alice.pkh, 100)).to.be.rejectedWith(contractErrors.tzip7.notEnoughBalance);
         });
     
         it("should not burn any tokens for someone other than the admin", async () => {
@@ -89,7 +90,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %burn entrypoint
-            await expect(contract.methods.burn(alice.pkh, 5).send()).to.be.rejectedWith("NoPermission");
+            await expect(contract.methods.burn(alice.pkh, 5).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
         });
     });
 
@@ -146,7 +147,7 @@ contract('TZIP-7 token contract', accounts => {
                 transferParam.from, 
                 transferParam.to, 
                 transferParam.value
-            ).send()).to.be.rejectedWith("NotEnoughAllowance");
+            ).send()).to.be.rejectedWith(contractErrors.tzip7.notEnoughAllowance);
         });
 
         it("should allow Bob to transfer his full allowance", async () => {
@@ -202,7 +203,7 @@ contract('TZIP-7 token contract', accounts => {
             };
             // Alice gives Bob an allowance to spend
             await tzip7Instance.approve(approveParam.spender, approveParam.value);
-            await expect(tzip7Instance.approve(approveParam.spender, approveParam.value)).to.be.rejectedWith("UnsafeAllowanceChange");
+            await expect(tzip7Instance.approve(approveParam.spender, approveParam.value)).to.be.rejectedWith(contractErrors.tzip7.unsafeAllowanceChange);
         });
 
         it("should change the allowance value from a non-zero value to a non-zero value using approveCAS", async () => {
@@ -234,7 +235,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %setAdministrator entrypoint and passing Bob's address
-            await expect(contract.methods.setAdministrator(bob.pkh).send()).to.be.rejectedWith("NoPermission");
+            await expect(contract.methods.setAdministrator(bob.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
         });
     
         it("should fail to change guardian address by third party", async () => {
@@ -243,7 +244,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %burn entrypoint
-            await expect(contract.methods.setPauseGuardian(bob.pkh).send()).to.be.rejectedWith("NoPermission");
+            await expect(contract.methods.setPauseGuardian(bob.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
         });
     
         it("should change the (pause) guardian to Bob's address", async () => {
@@ -268,7 +269,7 @@ contract('TZIP-7 token contract', accounts => {
             // check that Alice is not the pause guardian
             expect(storage.token.pauseGuardian).not.to.equal(alice.pkh)
             // call the token contract at the %setPause entrypoint to pause all operations
-            await expect(tzip7Instance.setPause(true)).to.be.rejectedWith("NoPermission");
+            await expect(tzip7Instance.setPause(true)).to.be.rejectedWith(contractErrors.tzip7.noPermission);
             // read contract's storage after the operation
             storage = await tzip7Instance.storage();
             expect(storage.token.paused).to.be.false;
@@ -291,13 +292,13 @@ contract('TZIP-7 token contract', accounts => {
             const from = alice.pkh;
             const to = bob.pkh;
             const value = 1;
-            await expect(tzip7Instance.transfer(from, to, value)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.transfer(from, to, value)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             // send an approve operation
-            await expect(tzip7Instance.approve(bob.pkh, 2)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.approve(bob.pkh, 2)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             // mint 5 tokens
-            await expect(tzip7Instance.mint(alice.pkh, 5)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.mint(alice.pkh, 5)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             // burn 5 tokens
-            await expect(tzip7Instance.burn(alice.pkh, 5)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.burn(alice.pkh, 5)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
         });
     
         it("should not allow the guardian to unpause all transfer, approve, mint and burn operations", async () => {
@@ -306,7 +307,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %setPause entrypoint to pause all operations
-            await expect(contract.methods.setPause(false).send()).to.be.rejectedWith("NoPermission");
+            await expect(contract.methods.setPause(false).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
             // read contract's storage
             await updateStorage();
             expect(storage.token.paused).to.be.true;
@@ -314,13 +315,13 @@ contract('TZIP-7 token contract', accounts => {
             const from = alice.pkh;
             const to = bob.pkh;
             const value = 1;
-            await expect(tzip7Instance.transfer(from, to, value)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.transfer(from, to, value)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             // send an approve operation
-            await expect(tzip7Instance.approve(bob.pkh, 2)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.approve(bob.pkh, 2)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             // mint 5 tokens
-            await expect(tzip7Instance.mint(alice.pkh, 5)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.mint(alice.pkh, 5)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             // burn 5 tokens
-            await expect(tzip7Instance.burn(alice.pkh, 5)).to.be.rejectedWith("TokenOperationsArePaused");
+            await expect(tzip7Instance.burn(alice.pkh, 5)).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
         });
     
         it("should allow the admin to unpause all transfer, approve, mint and burn operations", async () => {
@@ -376,7 +377,7 @@ contract('TZIP-7 token contract', accounts => {
         it("should not allow Alice to transfer more tokens than she owns", async () => {
             const balanceAliceBeforeTransfer = await getBalance(alice.pkh);
             const value = balanceAliceBeforeTransfer + transferParam.value;
-            await expect(tzip7Instance.transfer(transferParam.from, transferParam.to, value)).to.be.rejectedWith("NotEnoughBalance");
+            await expect(tzip7Instance.transfer(transferParam.from, transferParam.to, value)).to.be.rejectedWith(contractErrors.tzip7.notEnoughBalance);
         });
 
         it("should not allow Bob to spend Alice' tokens", async () => {
@@ -388,7 +389,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // Bob transfers Alice' tokens
-            await expect(contract.methods.transfer(transferParam.from, transferParam.to, transferParam.value).send()).to.be.rejectedWith("NotEnoughAllowance");
+            await expect(contract.methods.transfer(transferParam.from, transferParam.to, transferParam.value).send()).to.be.rejectedWith(contractErrors.tzip7.notEnoughAllowance);
         });
     });
 

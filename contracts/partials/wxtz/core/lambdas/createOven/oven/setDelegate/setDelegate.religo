@@ -2,9 +2,8 @@
 #include "../../../onOvenSetDelegate/onOvenSetDelegateInit.religo"
 
 let setDelegate = ((setDelegateParameter, storage): (setDelegateParameter, ovenStorage)): (list(operation), ovenStorage) => {
-    // TODO: do not allow sending XTZ in this entrypoint
     let coreContractAddress: address = storage.coreAddress;
-    let onOvenSetDelegateParameter: onOvenSetDelegateParameter = ();
+    let onOvenSetDelegateParameter: onOvenSetDelegateParameter = Tezos.sender;
 
     let coreRunEntrypointLambdaParameter: runEntrypointLambdaParameter = {
         lambdaName: "onOvenSetDelegate",

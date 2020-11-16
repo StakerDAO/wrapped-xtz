@@ -4,10 +4,11 @@ const crypto = require('crypto');
 const { expect } = require('chai').use(require('chai-as-promised'));
 const { Tezos } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
+const randomBytes = require('random-bytes');
 
 const { alice, bob } = require('./../../scripts/sandbox/accounts');
-const { initialStorage } = require('./../../migrations/1_deploy_tzip-7');
-const randomBytes = require('random-bytes');
+const initialStorage = require('./../../migrations/initialStorage/tzip-7');
+const { contractErrors } = require('./../../helpers/constants');
 
 function toHexString(byteArray) {
     return Array.prototype.map.call(byteArray, function(byte) {
@@ -105,7 +106,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
             expect(lockedBalance).to.equal(lockedBalanceBeforeSwap + swapRecord.value + swapRecord.fee);
     
             // check that total supply did not change
-            let totalSupply = await initialStorage.token.totalSupply;
+            let totalSupply = initialStorage.withBalances.token.totalSupply;
             totalSupply = Number(totalSupply);
             expect(Number(storage.token.totalSupply)).to.equal(totalSupply);
     
@@ -132,7 +133,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
                 secretHash,
                 swapRecord.to,
                 swapRecord.value
-            )).to.be.rejectedWith("SwapLockAlreadyExists");
+            )).to.be.rejectedWith(contractErrors.tzip7.swapLockAlreadyExists);
         });
 
         it("should not allow Alice to lock more funds than she has", async () => {
@@ -146,7 +147,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
                 secretHash,
                 swapRecord.to,
                 bigAmount
-            )).to.be.rejectedWith("NotEnoughBalance");
+            )).to.be.rejectedWith(contractErrors.tzip7.notEnoughBalance);
         });
     });
     
@@ -156,7 +157,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
             Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
-            await expect(contract.methods.confirmSwap(secretHash).send()).to.be.rejectedWith("NoPermission");
+            await expect(contract.methods.confirmSwap(secretHash).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
         });
     
         it("should allow Alice to confirm swap", async () => {
@@ -168,13 +169,13 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
    
     describe("Redeem", () => {
         it("should not allow Bob to redeem with the invalid secret/ non-existing swap", async () => {        
-            await expect(tzip7Instance.redeem("fffb")).to.be.rejectedWith("SwapLockDoesNotExist")
+            await expect(tzip7Instance.redeem("fffb")).to.be.rejectedWith(contractErrors.tzip7.swapLockDoesNotExist)
         });
     
         it("should not allow to redeem with too long secret", async () => {
             const byteArray = randomBytes.sync(33);
             const longSecret = toHexString(byteArray);
-            await expect(tzip7Instance.redeem(longSecret)).to.be.rejectedWith("TooLongSecret");
+            await expect(tzip7Instance.redeem(longSecret)).to.be.rejectedWith(contractErrors.tzip7.tooLongSecret);
         });
     
         it("should allow Bob to redeem 5 tokens with the correct secret", async () => {
@@ -191,7 +192,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         });
     
         it("should not allow Bob to redeem twice", async () => {
-            await expect(tzip7Instance.redeem(secretHexString)).to.be.rejectedWith("SwapLockDoesNotExist");
+            await expect(tzip7Instance.redeem(secretHexString)).to.be.rejectedWith(contractErrors.tzip7.swapLockDoesNotExist);
         });
     
         it("should not allow Bob to redeem past release time ", async () => {
@@ -244,7 +245,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
         });
 
         it("should not allow Bob to redeem swap that was already refunded to Alice", async () => {
-            await expect(tzip7Instance.redeem(secretHexString)).to.be.rejectedWith("SwapLockDoesNotExist");
+            await expect(tzip7Instance.redeem(secretHexString)).to.be.rejectedWith(contractErrors.tzip7.swapLockDoesNotExist);
         });
 
         it("should not allow Alice to claim refund before passing the time lock", async () => {
@@ -262,7 +263,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
                 smallAmount
             );
             // Alice tries to redeem token, but has surpassed the release date for the swap
-            await expect(tzip7Instance.claimRefund(secretHashClaimRefund)).to.be.rejectedWith("FundsLock");
+            await expect(tzip7Instance.claimRefund(secretHashClaimRefund)).to.be.rejectedWith(contractErrors.tzip7.fundsLock);
         });   
     });
     

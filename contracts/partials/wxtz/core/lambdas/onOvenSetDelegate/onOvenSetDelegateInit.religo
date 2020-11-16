@@ -1,4 +1,5 @@
 #include "../arbitrary/composeMintOperation/composeMintOperationInit.religo"
 #include "../../runArbitraryValueLambda/runArbitraryValueLambda.religo"
 #include "../../mockLambdaContracts/entrypoint.religo"
-type onOvenSetDelegateParameter = unit;
+// Tezos.sender is passed as parameter and eventually the oven owner
+type onOvenSetDelegateParameter = address;

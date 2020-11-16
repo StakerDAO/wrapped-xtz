@@ -49,7 +49,7 @@
      * Compose the minting operation on the wXTZ Token contract
      */
     let composeMintOperationParameter: composeMintOperationParameter = {
-        to_: Tezos.sender,
+        to_: ovenOwner,
         value: Tezos.amount / 1mutez // TODO: extract as tezToNat(tez)
     };
     let composeMintOperationParameter: arbitraryValueLambdaParameter = Bytes.pack(composeMintOperationParameter);
