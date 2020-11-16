@@ -85,4 +85,13 @@ initialStorage.test.onOvenWithdrawalRequested = (tzip7Address) => {
     return storage;
 };
 
+initialStorage.test.onOvenSetDelegate = () => {
+    let storage = initialStorage.test.base();
+    storage.ovens.set(
+        // alice owns a mock oven with the same pkh as alice
+        alice.pkh, alice.pkh
+    );
+    return storage;
+};
+
 module.exports = initialStorage;

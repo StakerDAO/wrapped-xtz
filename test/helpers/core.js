@@ -78,6 +78,20 @@ const coreHelpers = (instance) => {
 
             await operation.confirmation(1);
             return operation
+        },
+        onOvenSetDelegate: async function(ovenOwnerAddress, sendParams) {
+            const operation = await instance.methods.runEntrypointLambda(
+                'onOvenSetDelegate', //lambdaName
+                testPackValue(`
+                    ("${address}": address)
+                `)
+            ).send({
+                mutez: true,
+                ...sendParams
+            });
+
+            await operation.confirmation(1);
+            return operation
         }
     };
 }
