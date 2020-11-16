@@ -22,6 +22,7 @@ module.exports = {
         core: {
             amountNotZero: '4',
             notAnOvenOwner: '14',
+            ovenOwnerDoesNotAcceptDeposits: '15',
             lambdaNotFound: '0',
             lambdaNotAnEntrypoint: '1',
         },

@@ -9,7 +9,6 @@ const ovenHelpers = (instance) => {
                 amount: xtzAmount,
                 mutez: true
             });
-
             await operation.confirmation(1);
             return operation
         },
@@ -19,8 +18,11 @@ const ovenHelpers = (instance) => {
         getCoreAddress: async () => {
             return (await instance.storage()).address
         },
-        withdraw: async (amount) => {
-            const operation = await instance.methods.withdraw(amount).send();
+        withdraw: async (amount, sendParams) => {
+            const operation = await instance.methods.withdraw(amount).send({
+                mutez: true,
+                ...sendParams
+            });
             await operation.confirmation(1);
             return operation 
         },

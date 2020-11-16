@@ -22,7 +22,8 @@ const tzip7Helpers = (instance) => {
         },
         setPause: async function(boolean) {
             const operation = await instance.methods.setPause(boolean).send()
-            return operation.confirmation(1);
+            operation.confirmation(1);
+            return operation
         }
     }
 }

@@ -21,5 +21,14 @@ module.exports = {
     },
     getXTZBalance: async (address) => {
         return (await Tezos.tz.getBalance(address)).toNumber();
+    },
+    transfer: async (to, amount) => {   
+        const operation = await Tezos.contract.transfer({ 
+            to, 
+            amount, 
+            mutez: true 
+        });
+        await operation.confirmation(1)
+        return operation
     }
 }

@@ -2,11 +2,14 @@
 #include "../../../../errors.religo"
 #include "../../../onOvenWithdrawalRequested/onOvenWithdrawalRequestedInit.religo"
 
+type ovenOwnerContract = contract(unit);
 
-type vaultOwnerContract = contract(unit);
 let withdraw = ((withdrawParameter, storage): (withdrawParameter, ovenStorage)): (list(operation), ovenStorage) => {
     let coreContractAddress: address = storage.coreAddress;
-    let onOvenWithdrawalRequestedParameter: onOvenWithdrawalRequestedParameter = withdrawParameter;
+    let onOvenWithdrawalRequestedParameter: onOvenWithdrawalRequestedParameter = {
+        sender: Tezos.sender,
+        value: withdrawParameter,
+    };
 
     let coreRunEntrypointLambdaParameter: runEntrypointLambdaParameter = {
         lambdaName: "onOvenWithdrawalRequested",
@@ -19,19 +22,19 @@ let withdraw = ((withdrawParameter, storage): (withdrawParameter, ovenStorage)):
         coreContractAddress
     ));
 
-    // we can be certain that the Tezos.sender will be the vault owner
+    // we can be certain that the Tezos.sender will be the oven owner
     // thanks to the hook validations implemented in the core
-    let vaultOwnerContract: option(contract(unit)) = Tezos.get_contract_opt(Tezos.sender);
-    let vaultOwnerContract: vaultOwnerContract = switch (vaultOwnerContract) {
-        | Some(vaultOwnerContract) => vaultOwnerContract
-        | None => failwith(errorOvenOwnerDoesNotAcceptDeposits): vaultOwnerContract
+    let ovenOwnerContract: option(contract(unit)) = Tezos.get_contract_opt(Tezos.sender);
+    let ovenOwnerContract: ovenOwnerContract = switch (ovenOwnerContract) {
+        | Some(ovenOwnerContract) => ovenOwnerContract
+        | None => failwith(errorOvenOwnerDoesNotAcceptDeposits): ovenOwnerContract
     };
 
     let amountOfXTZToWithdraw = withdrawParameter * 1mutez; // cast nat to tez
     let withdrawXTZOperation = Tezos.transaction(
         (),
         amountOfXTZToWithdraw,
-        vaultOwnerContract
+        ovenOwnerContract
     );
 
     ([
