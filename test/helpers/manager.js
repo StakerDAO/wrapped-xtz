@@ -14,6 +14,11 @@ const managerHelpers = (instance) => {
             const operation = await instance.methods.setDelegate(delegate, ovenAddress).send()
             await operation.confirmation(1);
             return operation
+        },
+        deposit: async function(coreAddress, sendParams) {
+            const operation = await instance.methods.deposit(coreAddress).send(sendParams)
+            await operation.confirmation(1);
+            return operation;
         }
     }
 };

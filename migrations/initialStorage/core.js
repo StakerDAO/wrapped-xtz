@@ -1,7 +1,7 @@
 const compileLambda = require('../../scripts/lambdaCompiler/compileLambda');
 const { UnitValue, MichelsonMap } = require('@taquito/taquito');
 const testPackValue = require('../../scripts/lambdaCompiler/testPackValue');
-const { alice } = require('./../../scripts/sandbox/accounts');
+const { alice, carol } = require('./../../scripts/sandbox/accounts');
 const lambdasList = require('./../../lambdas');
 const loadLambdaArtifact = require('./../../scripts/lambdaCompiler/loadLambdaArtifact');
 const generateAddress = require('./../../helpers/generateAddress');
@@ -72,6 +72,18 @@ initialStorage.test.runEntrypointLambda = () => {
 initialStorage.test.createOven = (tzip7Address) => {
     let storage = initialStorage.base(tzip7Address);
     return storage;
-}
+};
+initialStorage.test.onOvenDepositReceived = (ovens) => (tzip7Address) => {
+    let storage = initialStorage.base(tzip7Address);
+
+    // alice's pkh is registred as an oven
+    storage.ovens.set(alice.pkh, carol.pkh);
+
+    ovens.forEach(ovenAndOwner => {
+        storage.ovens.set(ovenAndOwner.oven, ovenAndOwner.owner);
+    });
+
+    return storage;
+};
 
 module.exports = initialStorage;

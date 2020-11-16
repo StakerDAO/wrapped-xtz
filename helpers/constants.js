@@ -29,6 +29,8 @@ module.exports = {
             lambdaNotFound: '0',
             lambdaNotAnEntrypoint: '1',
             lambdaParameterWrongType: '2',
+            ovenNotTrusted: '6',
+            ovenMissingDefaultEntrypoint: '5'
         },
     },
 };

@@ -61,6 +61,14 @@ const coreHelpers = (instance) => {
             });
             await operation.confirmation(1);
             return operation;
+        },
+        onOvenDepositReceived: async (sendParams) => {
+            const operation = await instance.methods.runEntrypointLambda(
+                'onOvenDepositReceived',
+                testPackValue('()')
+            ).send(sendParams)
+            await operation.confirmation(1);
+            return operation;
         }
     };
 }
