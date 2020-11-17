@@ -24,7 +24,7 @@ contract('core', () => {
         });
     };
 
-    describe('onOvenDespositReceived', () => {
+    describe('onOvenDepositReceived', () => {
 
         beforeEach(async () => {
             helpers = {};
