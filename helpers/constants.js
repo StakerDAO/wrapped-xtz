@@ -23,14 +23,14 @@ module.exports = {
             unsafeAllowanceChange: "UnsafeAllowanceChange",
         },
         core: {
-            amountNotZero: '4',
-            notAnOvenOwner: '14',
-            ovenOwnerDoesNotAcceptDeposits: '15',
             lambdaNotFound: '0',
             lambdaNotAnEntrypoint: '1',
             lambdaParameterWrongType: '2',
+            amountNotZero: '4',
+            ovenMissingDefaultEntrypoint: '5',
             ovenNotTrusted: '6',
-            ovenMissingDefaultEntrypoint: '5'
+            notAnOvenOwner: '14',
+            ovenOwnerDoesNotAcceptDeposits: '15',
         },
     },
 };
