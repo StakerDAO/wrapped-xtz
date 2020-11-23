@@ -1,12 +1,12 @@
-#include "../../partials/wxtz/getViews/storage.religo"
-#include "../../partials/wxtz/getViews/parameter.religo"
-#include "../../partials/wxtz/getViews/constants.religo"
+#include "../../../partials/wxtz/getViews/storage.religo"
+#include "../../../partials/wxtz/getViews/parameter.religo"
+#include "../../../partials/wxtz/getViews/constants.religo"
 
-#include "../../partials/wxtz/getViews/requestBalance.religo"
-#include "../../partials/wxtz/getViews/requestAllowance.religo"
-#include "../../partials/wxtz/getViews/requestTotalSupply.religo"
-#include "../../partials/wxtz/getViews/requestOutcome.religo"
-#include "../../partials/wxtz/getViews/requestSwap.religo"
+#include "../../../partials/wxtz/getViews/requestBalance.religo"
+#include "../../../partials/wxtz/getViews/requestAllowance.religo"
+#include "../../../partials/wxtz/getViews/requestTotalSupply.religo"
+#include "../../../partials/wxtz/getViews/requestOutcome.religo"
+#include "../../../partials/wxtz/getViews/requestSwap.religo"
 
 
 

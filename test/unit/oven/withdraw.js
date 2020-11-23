@@ -4,7 +4,7 @@ const { TezosOperationError } = require("@taquito/taquito");
 const { expect } = require('chai').use(require('chai-as-promised'));
 const _managerHelpers = require('../../helpers/manager');
 const _taquitoHelpers = require('../../helpers/taquito');
-const setup = require('./before');
+const before = require('./before');
 
 
 contract('oven', () => {
@@ -17,8 +17,8 @@ contract('oven', () => {
         beforeEach(async () => {
             await _taquitoHelpers.initialize();
             await _taquitoHelpers.setSigner(alice.sk);
-            
-            helpers = await setup(
+
+            helpers = await before(
                 alice.pkh, //owner
                 amountMutez,
                 helpers
@@ -77,7 +77,7 @@ contract('oven', () => {
 
             let { managerHelpers, managerAddress } = await _managerHelpers.originate();
 
-            helpers = await setup(
+            helpers = await before(
                 managerAddress, // owner
                 amountMutez, 
                 helpers
@@ -130,7 +130,7 @@ contract('oven', () => {
 
             const brokenManager = true;
             let { managerHelpers, managerAddress } = await _managerHelpers.originate(brokenManager);
-            helpers = await setup(
+            helpers = await before(
                 managerAddress, 
                 amountMutez,
                 helpers
