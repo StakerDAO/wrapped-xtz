@@ -19,6 +19,16 @@ const managerHelpers = (instance) => {
             const operation = await instance.methods.deposit(coreAddress).send(sendParams)
             await operation.confirmation(1);
             return operation;
+        },
+        transfer: async function(from, to, value, tzip7Address) {
+            const operation = await instance.methods.transfer(
+                tzip7Address,
+                from,
+                to,
+                value
+            ).send();
+            await operation.confirmation(1);
+            return operation;
         }
     }
 };
@@ -31,8 +41,9 @@ module.exports = {
         } else {
             instance = await manager.new(UnitValue);
         };
+        console.log("Originated manager at", instance.address);
         const managerHelpers = await this.at(instance.address);
-    
+        
         return {
             instance,
             managerHelpers,
