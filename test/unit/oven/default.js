@@ -1,7 +1,7 @@
 const _taquitoHelpers = require('../../helpers/taquito');
 const { alice } = require('../../../scripts/sandbox/accounts');
 const { expect } = require('chai').use(require('chai-as-promised'));
-const setup = require('./before');
+const before = require('./before');
 
 contract('oven', () => {
     let helpers = {};
@@ -12,7 +12,7 @@ contract('oven', () => {
         await _taquitoHelpers.initialize();
         await _taquitoHelpers.setSigner(alice.sk);
 
-        helpers = await setup(
+        helpers = await before(
             alice.pkh, //owner
             amountMutez,
             helpers
