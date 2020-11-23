@@ -14,15 +14,26 @@ const tzip7Helpers = (instance) => {
             return await instance.storage();
         },
         getAdministrator: async function() {
-            return (await this.getStorage()).token.admin
+            return (await this.getStorage()).token.admin;
         },
         getBalance: async function(address) {
-            const balance = await (await this.getStorage()).token.ledger.get(address)
+            const balance = await (await this.getStorage()).token.ledger.get(address);
             return balance.toNumber();
         },
         setPause: async function(boolean) {
             const operation = await instance.methods.setPause(boolean).send()
             operation.confirmation(1);
+            return operation
+        },
+        transfer: async function(amount, from, to) {
+            const operation = await instance.methods
+                .transfer(
+                    from,
+                    to,
+                    amount // value
+                )
+                .send()
+            await operation.confirmation(1);
             return operation
         }
     }

@@ -53,6 +53,7 @@
     }
   },
   "dependencies": {
+    "@taquito/signer": "^7.0.1-beta.0",
     "bignumber.js": "^9.0.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",

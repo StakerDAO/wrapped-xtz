@@ -3,6 +3,7 @@ const { Tezos } = require('@taquito/taquito');
 const ovenHelpers = (instance) => {
     return {
         instance: instance,
+        // this helper function only deposits from an implicit account
         default: async (xtzAmount) => {
             const operation = await Tezos.contract.transfer({
                 to: instance.address,

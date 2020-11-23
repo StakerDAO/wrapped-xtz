@@ -13,7 +13,6 @@ const ovenCode = readFileSync(`${process.cwd()}/contracts/partials/wxtz/core/lam
 
 contract('core', () => {
     
-
     describe('createOven', () => {
         let helpers = {};
 
@@ -114,7 +113,7 @@ contract('core', () => {
             expect(wXTZbalanceAlice).to.equal(amountMutez);
         });
 
-        it('should create an oven by Stella for Carline and be topped up by Trent', async () => {
+        it('should create an oven by a 3rd party and be topped up by a 3rd party', async () => {
             // create oven with inital balance
             const amountTez = 1000;
             const amountMutez = amountTez * 1000000;
