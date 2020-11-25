@@ -4,7 +4,7 @@ const { expect } = require('chai').use(require('chai-as-promised'));
 const { Tezos } = require('@taquito/taquito')
 const { InMemorySigner } = require('@taquito/signer')
 
-const { alice, bob } = require('./../../scripts/sandbox/accounts');
+const { alice, bob, chuck } = require('./../../scripts/sandbox/accounts');
 const initialStorage = require('./../../migrations/initialStorage/tzip-7');
 const { contractErrors } = require('./../../helpers/constants');
 
@@ -356,40 +356,64 @@ contract('TZIP-7 token contract', accounts => {
             to: bob.pkh,
             value: 2
         };
+        let balance = {};
+        let thirdParty = chuck; // malicious participant
+        let sender = alice;
+        let recipient = bob;
+
+        beforeEach(async () => {
+            balance.senderBeforeTransfer = await getBalance(sender.pkh);
+            balance.recipientBeforeTransfer = await getBalance(recipient.pkh);
+        });
        
         it("should transfer token to Bob", async () => {
-            const balanceAliceBeforeTransfer = await getBalance(alice.pkh);
-            const balanceBobBeforeTransfer = await getBalance(bob.pkh);
-        
             await tzip7Instance.transfer(
                 transferParam.from, 
                 transferParam.to, 
                 transferParam.value
             );
 
-            const balanceAliceAfterTransfer = await getBalance(alice.pkh);
-            const balanceBobAfterTransfer = await getBalance(bob.pkh);
+            balance.senderAfterTransfer = await getBalance(sender.pkh);
+            balance.recipientAfterTransfer = await getBalance(recipient.pkh);
             
-            expect(balanceAliceAfterTransfer).to.equal(balanceAliceBeforeTransfer - transferParam.value);
-            expect(balanceBobAfterTransfer).to.equal(balanceBobBeforeTransfer + transferParam.value);
+            expect(balance.senderAfterTransfer).to.equal(balance.senderBeforeTransfer - transferParam.value);
+            expect(balance.recipientAfterTransfer).to.equal(balance.recipientBeforeTransfer + transferParam.value);
+        });
+
+        it("should transfer token from sender to sender", async () => {
+            // transferring to herself
+            await tzip7Instance.transfer(
+                transferParam.from, // sender
+                transferParam.from, // sender 
+                transferParam.value
+            );
+            // notice that recipient is sender in this case!
+            balance.recipientAfterTransfer = await getBalance(sender.pkh); 
+            expect(balance.recipientAfterTransfer).to.equal(balance.senderBeforeTransfer);
         });
 
         it("should not allow Alice to transfer more tokens than she owns", async () => {
-            const balanceAliceBeforeTransfer = await getBalance(alice.pkh);
-            const value = balanceAliceBeforeTransfer + transferParam.value;
-            await expect(tzip7Instance.transfer(transferParam.from, transferParam.to, value)).to.be.rejectedWith(contractErrors.tzip7.notEnoughBalance);
+            const value = balance.senderBeforeTransfer + 1;
+            await expect(tzip7Instance.transfer(transferParam.from, transferParam.to, value))
+                .to.be.rejectedWith(contractErrors.tzip7.notEnoughBalance);
         });
 
-        it("should not allow Bob to spend Alice' tokens", async () => {
-            // Bob should not have any allowance
-            const allowance = Number(await storage.token.approvals.get({0: transferParam.from, 1: transferParam.to}));
+        it("should not allow third party to spend tokens", async () => {
+            // recipient should not have any allowance
+            const allowance = Number(await storage.token.approvals.get({0: transferParam.from, 1: transferParam.to})) || 0;
             expect(allowance).to.equal(0);
-            // switching to guardian's (Bob's) secret key
-            Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
+
+            Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(thirdParty.sk)});
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
-            // Bob transfers Alice' tokens
-            await expect(contract.methods.transfer(transferParam.from, transferParam.to, transferParam.value).send()).to.be.rejectedWith(contractErrors.tzip7.notEnoughAllowance);
+            const operationPromise = contract.methods.transfer(
+                transferParam.from, 
+                transferParam.to, 
+                transferParam.value
+            ).send();
+            
+            await expect(operationPromise)
+                .to.be.rejectedWith(contractErrors.tzip7.notEnoughAllowance);
         });
     });
 

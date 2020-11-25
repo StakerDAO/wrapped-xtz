@@ -57,10 +57,10 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 			Some(newSenderBalance),
 			tokenStorage.ledger
 		);
-		let receiverBalance = Big_map.find_opt(transferParameter.to_, tokenStorage.ledger);
+		let receiverBalance = Big_map.find_opt(transferParameter.to_, newTokens);
 		let receiverBalance = switch (receiverBalance) {
-		| Some(value) => value
-		| None => defaultBalance
+			| Some(value) => value
+			| None => defaultBalance
 		};
 		let newReceiverBalance = receiverBalance + transferParameter.value;
 		let newTokens = Big_map.update(
@@ -70,9 +70,9 @@ let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStor
 		);
 		// save new balances and allowances in token ledger and approvals
 		let newStorage = {
-				...tokenStorage,
-				ledger: newTokens,
-				approvals: newAllowances
+			...tokenStorage,
+			ledger: newTokens,
+			approvals: newAllowances
 		};
 		// no operations are returned, only the updated token storage
 		(emptyListOfOperations, newStorage);
