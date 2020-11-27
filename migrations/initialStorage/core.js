@@ -78,7 +78,7 @@ initialStorage.test.createOven = (tzip7Address) => {
 initialStorage.test.onOvenDepositReceived = (ovens) => (tzip7Address) => {
     let storage = initialStorage.base(tzip7Address);
 
-    // alice's pkh is registred as an oven
+    // alice's pkh is registered as an oven
     storage.ovens.set(alice.pkh, carol.pkh);
 
     ovens.forEach(ovenAndOwner => {
@@ -94,6 +94,23 @@ initialStorage.test.onOvenWithdrawalRequested = (tzip7Address) => {
         // alice owns a mock oven with the same pkh as alice
         alice.pkh, alice.pkh
     );
+    return storage;
+};
+
+initialStorage.test.wrongArbitraryValue = () => {
+    let storage = initialStorage.test.base();
+    // overwrite TZIP-7 address
+    storage.arbitraryValues.set('wXTZTokenContractAddress', 
+        testPackValue(
+            `unit`
+        )
+    );
+
+    storage.ovens.set(
+        // alice owns a mock oven with the same pkh as alice
+        alice.pkh, alice.pkh
+    );
+
     return storage;
 };
 
