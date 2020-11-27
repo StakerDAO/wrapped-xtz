@@ -3,7 +3,10 @@ const before = require("../before");
 
 const _coreInitialStorage = require('../../../../migrations/initialStorage/core');
 const _tzip7InitialStorage = require('../../../../migrations/initialStorage/tzip-7');
-const { TezosOperationError, Tezos } = require('@taquito/taquito');
+const _managerHelpers = require('./../../../helpers/manager');
+const _taquitoHelpers = require('./../../../helpers/taquito');
+const _oven = require('./../../../helpers/oven');
+const { TezosOperationError, Tezos, UnitValue } = require('@taquito/taquito');
 const { contractErrors } = require('../../../../helpers/constants');
 const { alice, chuck } = require('../../../../scripts/sandbox/accounts');
 const testPackValue = require("../../../../scripts/lambdaCompiler/testPackValue");
@@ -103,4 +106,71 @@ contract('core', () => {
             });
         });
     });
+
+    describe('onOvenWithdrawalRequested', () => {
+        let helpers = {};
+
+        beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+
+            // manager contract acts as broken TZIP-7 that has no mint entrypoint implemented
+            const { managerAddress } = await _managerHelpers.originate();
+            const brokenTzip7Address = managerAddress;
+            
+            await before({
+                core: _coreInitialStorage.test.onOvenWithdrawalRequested(brokenTzip7Address)     
+            }, helpers);
+        });
+        
+        it('should fail for burning tokens', async () => {
+            const operationPromise = helpers.core.onOvenWithdrawalRequested(10, alice.pkh)
+            
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.core.wXTZTokenContractWrongType);   
+        });
+        
+        it('should fail when an unknown oven requests a withdraw', async () => {
+            // the signer of the operation is the malicious oven
+            await _taquitoHelpers.setSigner(chuck.sk);
+            const operationPromise = helpers.core.onOvenWithdrawalRequested(
+                10, // amount requested
+                alice.pkh // oven owner
+            );
+
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.core.ovenNotFound);   
+        });
+    });
+
+    describe('onOvenWithdrawalRequested with wrong arbitrary value in storage', () => {
+        let helpers = {};
+
+        beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+            
+            await before({
+                core: _coreInitialStorage.test.wrongArbitraryValue()    
+            }, helpers);
+        });
+        
+        it('should fail for burning tokens', async () => {
+            const operationPromise = helpers.core.onOvenWithdrawalRequested(10, alice.pkh)
+            
+            await expect(operationPromise).to.be.eventually.rejected
+            .and.be.instanceOf(TezosOperationError)
+            .and.have.property('message', contractErrors.core.arbitraryValueWrongType); 
+        });
+    });
+
+    describe.only("test", () => {
+        it('test', async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+            await _oven.originate()
+        })
+    })
 });
