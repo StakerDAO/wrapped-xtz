@@ -82,6 +82,10 @@ const tzip7Helpers = (instance) => {
             ).send();
             await operation.confirmation(1);
             return operation
+        },
+        getTotalSupply: async function() {
+            const totalSupply = (await this.getStorage()).token.totalSupply;
+            return totalSupply.toNumber()
         }
     }
 }

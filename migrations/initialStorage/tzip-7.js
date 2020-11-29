@@ -49,4 +49,16 @@ initialStorage.setPause = {
     },
 };
 
+initialStorage.burn = {
+    ...initialStorage.base,
+    token: {
+        ...initialStorage.base.token,
+        ledger: MichelsonMap.fromLiteral({
+            [alice.pkh]: 100000000, 
+            [bob.pkh]: 100000000
+        }),
+        totalSupply: 200000000,
+    },
+};
+
 module.exports = initialStorage;
