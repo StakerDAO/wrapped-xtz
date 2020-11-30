@@ -20,8 +20,8 @@ const tzip7Helpers = (instance) => {
             return (await this.getStorage()).token.pauseGuardian
         },
         getBalance: async function(address) {
-            const balance = await (await this.getStorage()).token.ledger.get(address);
-            return balance.toNumber();
+            const balance = await (await this.getStorage()).token.ledger.get(address) || 0;
+            return Number(balance);
         },
         setPause: async function(boolean) {
             const operation = await instance.methods.setPause(boolean).send();
