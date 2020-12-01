@@ -71,8 +71,8 @@ const tzip7Helpers = (instance) => {
                 1: spender
             };
             const approvals = (await this.getStorage()).token.approvals;
-            const allowanceValue = await approvals.get(key);
-            return allowanceValue.toNumber();
+            const allowanceValue = await approvals.get(key) || 0;
+            return Number(allowanceValue);
         },
         transfer: async function(from, to, value) {
             const operation = await instance.methods.transfer(
@@ -86,6 +86,12 @@ const tzip7Helpers = (instance) => {
         getTotalSupply: async function() {
             const totalSupply = (await this.getStorage()).token.totalSupply;
             return totalSupply.toNumber()
+        },
+        setPauseGuardian: async function(pauseGuardianAddress) {
+            const operation = await instance.methods
+                .setPauseGuardian(pauseGuardianAddress)
+                .send();
+            return await operation.confirmation(1);
         }
     }
 }
