@@ -1,11 +1,12 @@
 const tzip7 = artifacts.require('tzip-7');
 const { expect } = require('chai').use(require('chai-as-promised'));
 
-const { alice, bob, carol, chuck, walter } = require('./../../scripts/sandbox/accounts');
-const _tzip7InitialStorage = require('./../../migrations/initialStorage/tzip-7');
-const _tzip7Helpers = require('./../helpers/tzip-7');
-const _taquitoHelpers = require('./../helpers/taquito');
-const { contractErrors } = require('./../../helpers/constants');
+const { alice, bob, chuck, walter } = require('../../../scripts/sandbox/accounts');
+const _tzip7InitialStorage = require('../../../migrations/initialStorage/tzip-7');
+const _tzip7Helpers = require('../../helpers/tzip-7');
+const _taquitoHelpers = require('../../helpers/taquito');
+const { contractErrors } = require('../../../helpers/constants');
+const { TezosOperationError } = require('@taquito/taquito');
 
 
 contract('TZIP-7 token contract', () => {
@@ -21,7 +22,7 @@ contract('TZIP-7 token contract', () => {
         console.log('Originated token contract at:', tzip7Instance.address);
 
         await _taquitoHelpers.initialize();
-        await _taquitoHelpers.setSigner(alice.sk);
+        await _taquitoHelpers.setSigner(admin.sk);
 
         helpers.tzip7 = await _tzip7Helpers.at(tzip7Instance.address);
     });
@@ -34,13 +35,34 @@ contract('TZIP-7 token contract', () => {
     it('should fail if not called by admin', async () => {
         await _taquitoHelpers.setSigner(thirdParty.sk);
         const operationPromise = helpers.tzip7.mint(admin.pkh, 500000);
-        await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+        
+        await expect(operationPromise).to.be.eventually.rejected
+            .and.be.instanceOf(TezosOperationError)
+            .and.have.property('message', contractErrors.tzip7.noPermission);
     });
 
     it('should fail if called by pause guardian', async () => {
         await _taquitoHelpers.setSigner(pauseGuardian.sk);
         const operationPromise = helpers.tzip7.mint(admin.pkh, 500000);
-        await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+        
+        await expect(operationPromise).to.be.eventually.rejected
+            .and.be.instanceOf(TezosOperationError)
+            .and.have.property('message', contractErrors.tzip7.noPermission);
+    });
+
+    it('should fail if token operations are paused', async () => {
+         // call %setPause with pause guardian
+         await _taquitoHelpers.signAs(pauseGuardian.sk, async () => {
+            await helpers.tzip7.setPause(true);
+        });
+        
+        const operationPromise = helpers.tzip7.mint(
+            bob.pkh, // token owner
+            100 // value
+        );
+        await expect(operationPromise).to.be.eventually.rejected
+            .and.be.instanceOf(TezosOperationError)
+            .and.have.property('message', contractErrors.tzip7.tokenOperationsPaused);
     });
 
     describe('Effects of mint', () => {
