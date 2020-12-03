@@ -1,5 +1,7 @@
 const tzip7 = artifacts.require('tzip-7');
 const { Tezos } = require('@taquito/taquito');
+const crypto = require('crypto');
+const randomBytes = require('random-bytes');
 
 const tzip7Helpers = (instance) => {
     return {
@@ -92,6 +94,58 @@ const tzip7Helpers = (instance) => {
                 .setPauseGuardian(pauseGuardianAddress)
                 .send();
             return await operation.confirmation(1);
+        },
+        // Bridge related helpers
+        toHexString: function(byteArray) {
+            return Array.prototype.map.call(byteArray, function(byte) {
+              return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+            }).join('');
+        },
+        hexToBytes: function(hex) {
+            for (var bytes = [], c = 0; c < hex.length; c += 2)
+            bytes.push(parseInt(hex.substr(c, 2), 16));
+            return bytes;
+        },
+        randomSecret: function() {
+            const maxByteLength = 32;
+            const bytes = randomBytes.sync(maxByteLength);
+            return this.toHexString(bytes)
+        },
+        hash: function(payload) {
+            const data = Buffer.from(this.hexToBytes(payload));
+            const hash = crypto.createHash('sha256');
+            hash.update(data);
+            return `${ hash.digest('hex') }`
+        },
+        randomHash: function() {
+            const secret = this.randomSecret();
+            return this.hash(secret)
+        },
+        getISOTimeWithDelay: function(hours) {
+            const timeNow = new Date();
+            timeNow.setHours( timeNow.getHours() + hours);
+            // Remove milliseconds for Tezos protocol
+            timeNow.setMilliseconds(000);
+            const timeWithDelay = timeNow.toISOString();
+            return timeWithDelay
+        },
+        lock: async function(swap) {
+            const operation = await instance.methods
+                .lock(
+                    swap.confirmed,
+                    swap.fee,
+                    swap.releaseTime,
+                    swap.secretHash,
+                    swap.to,
+                    swap.value)
+                .send();
+            return operation.confirmation(1);
+        },
+        getSwap: async function(secretHash) {
+            const swap = await (await this.getStorage()).bridge.swaps.get(secretHash);
+            swap.fee = swap.fee.toNumber();
+            swap.value = swap.value.toNumber();
+            return swap
         }
     }
 }
