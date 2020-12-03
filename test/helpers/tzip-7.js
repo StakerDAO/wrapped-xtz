@@ -146,6 +146,12 @@ const tzip7Helpers = (instance) => {
             swap.fee = swap.fee.toNumber();
             swap.value = swap.value.toNumber();
             return swap
+        },
+        confirmSwap: async function(secretHash) {
+            const operation = await instance.methods
+                .confirmSwap(secretHash)
+                .send();
+            return operation.confirmation(1);
         }
     }
 }
