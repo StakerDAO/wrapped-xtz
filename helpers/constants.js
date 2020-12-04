@@ -13,9 +13,12 @@ module.exports = {
     },
     contractErrors: {
         tzip7: {
+            allowanceMismatch: "AllowanceMismatch",
+            fundsLock: "FundsLock",
             noPermission: "NoPermission",
             notEnoughAllowance: "NotEnoughAllowance",
             notEnoughBalance: "NotEnoughBalance",
+            swapIsNotConfirmed: "SwapIsNotConfirmed",
             swapLockAlreadyExists: "SwapLockAlreadyExists",
             swapLockDoesNotExist: "SwapLockDoesNotExist",
             tokenOperationsPaused: "TokenOperationsArePaused",
