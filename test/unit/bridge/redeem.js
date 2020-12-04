@@ -34,7 +34,7 @@ contract('TZIP-7 with bridge', () => {
                 await _taquitoHelpers.setSigner(accounts.sender.sk);
                 swapSecret = _cryptoHelpers.randomSecret();
                 swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
-                swapLockParameters.confirmed = false;
+                swapLockParameters.confirmed = true;
                 await helpers.tzip7.lock(swapLockParameters);
             });
 
@@ -50,10 +50,17 @@ contract('TZIP-7 with bridge', () => {
                     .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
             });
 
+            it('should fail for too long secret' , async () => {
+                const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(33));
+                await expect(operationPromise).to.be.eventually.rejected
+                    .and.be.instanceOf(TezosOperationError)
+                    .and.have.property('message', contractErrors.tzip7.tooLongSecret);
+            });
+
             describe('Effects of redeem', () => {
 
                 beforeEach(async () => {
-                    helpers.balances.senderBeforeRedeem = helpers.tzip7.getBalance(accounts.sender.pkh);
+                    helpers.balances.senderBeforeRedeem = await helpers.tzip7.getBalance(accounts.sender.pkh);
                     await helpers.tzip7.redeem(swapSecret);
                 });
                 
@@ -70,7 +77,7 @@ contract('TZIP-7 with bridge', () => {
 
                 it('should not change balance of sender', async () => {
                     const sender = await helpers.tzip7.getBalance(accounts.sender.pkh);
-                    expect(sender).to.equal(helpers.balance.senderBeforeRedeem);
+                    expect(sender).to.equal(helpers.balances.senderBeforeRedeem);
                 });
                 
                 it('should save outcomes to storage', async () => {
@@ -80,9 +87,9 @@ contract('TZIP-7 with bridge', () => {
 
                 it('should remove swap record in contract storage', async () => {
                     // swap record not found
-                    const promise = await helpers.tzip7.getSwap(swapLockParameters.secretHash);
+                    const swap = await helpers.tzip7.getSwap(swapLockParameters.secretHash);
                     // TODO: find better way of catching this storage read error
-                    await expect(promise).to.be.rejected;
+                    expect(swap).to.be.undefined;
                 });
 
                 it('should not change total supply' , async () => {
