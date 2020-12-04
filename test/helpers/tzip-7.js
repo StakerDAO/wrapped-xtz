@@ -1,7 +1,5 @@
 const tzip7 = artifacts.require('tzip-7');
 const { Tezos } = require('@taquito/taquito');
-const crypto = require('crypto');
-const randomBytes = require('random-bytes');
 
 const tzip7Helpers = (instance) => {
     return {
@@ -96,31 +94,6 @@ const tzip7Helpers = (instance) => {
             return await operation.confirmation(1);
         },
         // Bridge related helpers
-        toHexString: function(byteArray) {
-            return Array.prototype.map.call(byteArray, function(byte) {
-              return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-            }).join('');
-        },
-        hexToBytes: function(hex) {
-            for (var bytes = [], c = 0; c < hex.length; c += 2)
-            bytes.push(parseInt(hex.substr(c, 2), 16));
-            return bytes;
-        },
-        randomSecret: function() {
-            const maxByteLength = 32;
-            const bytes = randomBytes.sync(maxByteLength);
-            return this.toHexString(bytes)
-        },
-        hash: function(payload) {
-            const data = Buffer.from(this.hexToBytes(payload));
-            const hash = crypto.createHash('sha256');
-            hash.update(data);
-            return `${ hash.digest('hex') }`
-        },
-        randomHash: function() {
-            const secret = this.randomSecret();
-            return this.hash(secret)
-        },
         getISOTimeWithDelay: function(hours) {
             const timeNow = new Date();
             timeNow.setHours( timeNow.getHours() + hours);
@@ -152,6 +125,16 @@ const tzip7Helpers = (instance) => {
                 .confirmSwap(secretHash)
                 .send();
             return operation.confirmation(1);
+        },
+        redeem: async function(secret) {
+            const operation = await instance.methods
+                .redeem(secret)
+                .send();
+            return operation.confirmation(1);
+        },
+        getOutcomes: async function(secretHash) {
+            const outcome = await (await this.getStorage()).bridge.outcomes.get(secretHash);
+            return outcome
         }
     }
 }
