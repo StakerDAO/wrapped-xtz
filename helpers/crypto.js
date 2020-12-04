@@ -12,19 +12,21 @@ module.exports = {
         bytes.push(parseInt(hex.substr(c, 2), 16));
         return bytes;
     },
-    randomSecret: function() {
-        const maxByteLength = 32;
-        const bytes = randomBytes.sync(maxByteLength);
-        return this.toHexString(bytes)
+    randomSecret: function(byteLength) {
+        if (byteLength == undefined) {
+            byteLength = 32; // max byte length defined in swap/bridge specification
+        };
+        const bytes = randomBytes.sync(byteLength);
+        return this.toHexString(bytes);
     },
     hash: function(payload) {
         const data = Buffer.from(this.hexToBytes(payload));
         const hash = crypto.createHash('sha256');
         hash.update(data);
-        return `${ hash.digest('hex') }`
+        return hash.digest('hex');
     },
     randomHash: function() {
         const secret = this.randomSecret();
-        return this.hash(secret)
+        return this.hash(secret);
     },
 };
