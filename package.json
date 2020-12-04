@@ -4,7 +4,7 @@
   "description": "",
   "devDependencies": {
     "@taquito/taquito": "^6.3.5-beta.0",
-    "commitizen": "^4.1.2",
+    "commitizen": "^4.2.2",
     "cz-conventional-changelog": "^3.2.0",
     "eztz.js": "git+https://github.com/TezTech/eztz.git",
     "fs-extra": "^9.0.0",
@@ -34,7 +34,7 @@
     "tools:restart": "node ./scripts/tools.js restart",
     "wait-for-sandbox": "node ./scripts/sandbox/waitForNetwork.js",
     "sandbox:start": "./scripts/sandbox/start_ganache-cli.sh",
-    "fix-ligo-version": "./scripts/fix-ligo-version.sh", 
+    "fix-ligo-version": "./scripts/fix-ligo-version.sh",
     "env:start": "npm run tools:start bbbox && npm run sandbox:start",
     "env:kill": "npm run tools:kill bbbox",
     "env:restart": "npm run tools:restart bbbox",
