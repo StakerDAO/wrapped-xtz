@@ -25,7 +25,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         value: swap.value,
     };
     // calling the transfer function to redeem the token amount specified in swap
-    let (_, newTokenStorage) = transfer((transferValueParameter, storage.token));
+    let ledger = updateLedgerByTransfer(transferValueParameter, storage.token.ledger);
 
     // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
     let transferFeeParameter: transferParameter = {
@@ -34,7 +34,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         value: swap.fee,
     };
     // please note that the modified newTokenStorage from above is used here
-    let (_, newTokenStorage) = transfer(transferFeeParameter, newTokenStorage);
+    let ledger = updateLedgerByTransfer(transferFeeParameter, ledger);
     
     // remove the swap record from storage
     let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
@@ -42,7 +42,10 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     // update both token ledger storage and swap records in bridge storage
     let newStorage = {
         ...storage,
-        token: newTokenStorage, 
+        token: {
+            ...storage.token,
+            ledger: ledger
+        }, 
         bridge: {
             ...storage.bridge,
             swaps: newSwaps,

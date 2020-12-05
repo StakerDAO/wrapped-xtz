@@ -1,8 +1,8 @@
 #include "types.religo"
 
 type tokenStorage = {
-  ledger: tokens,
-  approvals: allowances,
+  ledger: ledger,
+  approvals: approvals,
   admin: address,
   pauseGuardian: address,
   paused: bool,
