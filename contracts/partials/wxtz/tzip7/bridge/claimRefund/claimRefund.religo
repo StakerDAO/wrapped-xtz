@@ -1,9 +1,6 @@
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
-    // continue only if token operations are not paused
-    let isPaused = switch (storage.token.paused) {
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
+	// continue only if token operations are not paused
+	failIfPaused(storage.token);
     
     // retrieve swap record from storage
     let swap = Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps);

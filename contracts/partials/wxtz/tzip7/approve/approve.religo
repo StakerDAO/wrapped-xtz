@@ -1,9 +1,6 @@
 let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
 	// continue only if token operations are not paused
-	let isPaused = switch (tokenStorage.paused) {
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
+	failIfPaused(tokenStorage);
 	// retrieve existing allowance and set default value if none was found
 	let previousState = Big_map.find_opt(
 		(Tezos.sender, approveParameter.spender),
