@@ -35,7 +35,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		value: totalAmount,
 	};
 	// call the transfer function of TZIP-7
-	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
+	let ledger = updateLedgerByTransfer(transferParameter, storage.token.ledger);
 	
 	// update both bridge and token ledger storage
 	let newBridgeStorage = { 
@@ -45,7 +45,10 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 	let newStorage = {
 		...storage,
 		bridge: newBridgeStorage,
-		token: newTokenStorage,
+		token: {
+			...storage.token,
+			ledger: ledger,
+		},
 	};
 	// no operations are returned, only the updated storage
 	(emptyListOfOperations, newStorage);

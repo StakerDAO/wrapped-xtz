@@ -11,5 +11,5 @@ type swap = {
 type swaps = big_map(secretHash, swap);
 type outcomes = big_map(secretHash, secret);
 
-type tokens = big_map(address, nat);
-type allowances = big_map((address, address), nat);
+type ledger = big_map(address, nat);
+type approvals = big_map((address, address), nat);
