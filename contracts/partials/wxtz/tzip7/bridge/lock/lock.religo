@@ -1,6 +1,6 @@
 let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
-	let isPaused = switch (storage.token.paused) {
+	failIfPaused(storage.token);
 		| true => (failwith(errorTokenOperationsArePaused): bool)
 		| false => false	
 	};
