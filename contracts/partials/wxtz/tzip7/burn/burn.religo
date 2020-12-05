@@ -1,10 +1,7 @@
 let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
-    // continue only if token operations are not paused
-	let isPaused = switch (tokenStorage.paused) {
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
-
+	// continue only if token operations are not paused
+	failIfPaused(tokenStorage);
+    
     // only the admin is allowed to burn tokens
     switch(Tezos.sender == tokenStorage.admin) {
         | true => unit
