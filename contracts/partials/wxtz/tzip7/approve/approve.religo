@@ -1,20 +1,18 @@
 let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
 	// continue only if token operations are not paused
 	failIfPaused(tokenStorage);
-	// retrieve existing allowance and set default value if none was found
-	let previousState = Big_map.find_opt(
-		(Tezos.sender, approveParameter.spender),
+	// retrieve existing allowance
+	let allowance = getTokenAllowance(
+		Tezos.sender, 
+		approveParameter.spender, 
 		tokenStorage.approvals
 	);
-	let previousState = switch (previousState) {
-		| Some(value) => value
-		| None => defaultBalance
-	};
+
 	/**
 	 * Changing allowance value from a non-zero value to a non-zero value is forbidden
 	 * to prevent this attack vector https://docs.google.com/document/d/1YLPtQxZu1UAvO9cZ1O2RPXBbT0mooh4DYKjA_jp-RLM/
 	 */
-	if (previousState > 0n && approveParameter.value > 0n) { 
+	if (allowance > 0n && approveParameter.value > 0n) { 
 		(failwith(errorUnsafeAllowanceChange): (entrypointReturn, tokenStorage));
 	}
 	else {
