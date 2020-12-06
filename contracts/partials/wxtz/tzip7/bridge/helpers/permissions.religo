@@ -13,3 +13,16 @@ let failIfSenderIsNotTheInitiator = ((secretHash, swaps): (secretHash, swaps)): 
         | false => (failwith(errorSenderIsNotTheInitiator): unit)
     };
 };
+
+let isSwapConfirmed = (swap: swap): bool => {
+    swap.confirmed == true;
+};
+
+let failIfSwapIsAlreadyConfirmed = ((secretHash, swaps): (secretHash, swaps)): unit => {
+    let swap = getTokenSwap(secretHash, swaps);
+    let isSwapConfirmed = isSwapConfirmed(swap);
+    switch (isSwapConfirmed) {
+        | true => (failwith(errorSwapIsAlreadyConfirmed): unit)
+        | false => unit
+    };
+};
