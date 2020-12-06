@@ -9,20 +9,20 @@ contract('oven', () => {
     let helpers = {};
     let amountTez = 100;
     let amountMutez = amountTez * 1000000;
-
-    beforeEach(async () => {
-        await _taquitoHelpers.initialize();
-        await _taquitoHelpers.setSigner(alice.sk);
-        
-        helpers = await before(
-            alice.pkh, //owner
-            amountMutez,
-            helpers
-        );
-    });
+    const baker = bob.pkh;
 
     describe('setDelegate with an implicit account', () => {
-        const baker = bob.pkh;   
+        
+        beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+            
+            helpers = await before(
+                alice.pkh, //owner
+                amountMutez,
+                helpers
+            );
+        });
 
         it('should delegate to baker Bob', async () => {     
             // set new delegate        
@@ -92,8 +92,6 @@ contract('oven', () => {
             
             helpers.manager = managerHelpers;
         });
-
-        const baker = bob.pkh;   
 
         it('should delegate to baker Bob', async () => {     
             const ovenAddress = helpers.oven.instance.address;

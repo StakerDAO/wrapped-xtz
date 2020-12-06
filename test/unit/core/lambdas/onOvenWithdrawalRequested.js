@@ -165,12 +165,4 @@ contract('core', () => {
             .and.have.property('message', contractErrors.core.arbitraryValueWrongType); 
         });
     });
-
-    describe.only("test", () => {
-        it('test', async () => {
-            await _taquitoHelpers.initialize();
-            await _taquitoHelpers.setSigner(alice.sk);
-            await _oven.originate()
-        })
-    })
 });

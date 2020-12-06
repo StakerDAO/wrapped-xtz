@@ -91,7 +91,7 @@ const coreHelpers = (instance) => {
             const operation = await instance.methods.runEntrypointLambda(
                 'onOvenSetDelegate', //lambdaName
                 testPackValue(`
-                    ("${address}": address)
+                    ("${ovenOwnerAddress}": address)
                 `)
             ).send({
                 mutez: true,
