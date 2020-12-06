@@ -1,7 +1,7 @@
 let getTotalSupply = ((getTotalSupplyParameter, tokenStorage): (getTotalSupplyParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
-  let total = tokenStorage.totalSupply;
+  let totalSupply = tokenStorage.totalSupply;
   let operation = Tezos.transaction(
-    total, 
+    totalSupply, 
     0mutez,
     getTotalSupplyParameter.callback
   );
