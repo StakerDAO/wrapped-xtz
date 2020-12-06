@@ -11,7 +11,7 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
     // check that sender of transaction has permission to confirm the swap
     switch (Tezos.sender == swap.from_) {
         | true => unit
-        | false => (failwith(errorNoPermission): unit)
+        | false => (failwith(errorSenderIsNotTheInitiator): unit)
     };
 
     // change confirmed value to true in swap record
