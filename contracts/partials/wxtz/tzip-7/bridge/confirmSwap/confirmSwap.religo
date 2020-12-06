@@ -5,6 +5,8 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
     
     // check that sender of transaction has permission to confirm the swap
     failIfSenderIsNotTheInitiator(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    // check if swap was already confirmed
+    failIfSwapIsAlreadyConfirmed(confirmSwapParameter.secretHash, bridgeStorage.swaps);
     // retrieve swap record from storage
     let swap = getTokenSwap(confirmSwapParameter.secretHash, bridgeStorage.swaps);
 

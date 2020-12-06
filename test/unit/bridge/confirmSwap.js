@@ -32,8 +32,8 @@ contract('TZIP-7 with bridge', () => {
             });
 
             it("should be callable by initiator of swap", async () => {
-                const operationPromise = helpers.tzip7.confirmSwap(secretHash);
-                await expect(operationPromise).to.be.eventually.fulfilled;
+                const operationPromise = await helpers.tzip7.confirmSwap(secretHash);
+                //await expect(operationPromise).to.be.eventually.fulfilled;
             });
  
             it('should change the swap property confirmed to true in storage', async () => {
@@ -87,10 +87,11 @@ contract('TZIP-7 with bridge', () => {
                 helpers.tzip7 = await _tzip7Helpers.at(tzip7Instance.address);
             });
         
-            it('should not change the storage for an already confirmed swap', async () => {
-                await helpers.tzip7.confirmSwap(secretHash);
-                const swap = await helpers.tzip7.getSwap(secretHash);
-                expect(swap.confirmed).to.be.true;
+            it('should fail for an already confirmed swap', async () => {
+                const operationPromise = helpers.tzip7.confirmSwap(secretHash);
+                await expect(operationPromise).to.be.eventually.rejected
+                    .and.be.instanceOf(TezosOperationError)
+                    .and.have.property('message', contractErrors.tzip7.swapIsAlreadyConfirmed);
             });
         });
     });
