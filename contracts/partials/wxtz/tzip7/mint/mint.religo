@@ -11,19 +11,19 @@ let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entr
 	// retrieve token balance before minting operation and calculate new token balance
 	let tokenBalance = getTokenBalance(mintParameter.to_, tokenStorage.ledger);
 
-	let newTokenBalance = tokenBalance + mintParameter.value;
-	let newTokens = Big_map.update(
+	let increasedTokenBalance = tokenBalance + mintParameter.value;
+	let ledger = Big_map.update(
 		mintParameter.to_,
-		Some(newTokenBalance),
+		Some(increasedTokenBalance),
 		tokenStorage.ledger
 	);
 	// update total supply accordingly
-	let newTotalSupply = tokenStorage.totalSupply + mintParameter.value;
-	let newStorage = {
+	let totalSupply = tokenStorage.totalSupply + mintParameter.value;
+	let tokenStorage = {
 		...tokenStorage,
-		ledger: newTokens,
-		totalSupply: newTotalSupply
+		ledger: ledger,
+		totalSupply: totalSupply
 	};
 	// no operations are returned, only the updated token storage
-	(emptyListOfOperations, newStorage);
+	(emptyListOfOperations, tokenStorage);
 };

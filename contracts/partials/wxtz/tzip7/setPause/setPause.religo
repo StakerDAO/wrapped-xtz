@@ -19,10 +19,10 @@ let setPause = ((setPauseParameter, tokenStorage): (bool, tokenStorage)): (entry
     };
     
     // update pause state in token storage
-    let newStorage = {
+    let tokenStorage = {
         ...tokenStorage,
         paused: setPauseParameter
     };
     // no operations are returned, only the updated storage
-    (emptyListOfOperations, newStorage);
+    (emptyListOfOperations, tokenStorage);
 };

@@ -11,18 +11,18 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entr
 
     // calculate new balance and update token ledger storage accordingly
     let reducedTokenBalance = safeBalanceSubtraction(tokenBalance, burnParameter.value);
-    let newTokens = Big_map.update(
+    let ledger = Big_map.update(
         burnParameter.from_,
         Some(reducedTokenBalance),
         tokenStorage.ledger
     );
     // update total token supply accordingly
-    let newTotalSupply = abs(tokenStorage.totalSupply - burnParameter.value);
-    let newStorage = {
+    let totalSupply = abs(tokenStorage.totalSupply - burnParameter.value);
+    let tokenStorage = {
         ...tokenStorage,
-        ledger: newTokens,
-        totalSupply: newTotalSupply,
+        ledger: ledger,
+        totalSupply: totalSupply,
     };
     // no operations are returned, only the updated storage
-    (emptyListOfOperations, newStorage);
+    (emptyListOfOperations, tokenStorage);
 };
