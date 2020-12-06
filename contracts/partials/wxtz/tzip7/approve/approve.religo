@@ -17,16 +17,16 @@ let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage
 	}
 	else {
 		// update new allowance from 0 to parameter.value or from previous state value to 0
-		let newAllowances = Big_map.update(
+		let approvals = Big_map.update(
 			(Tezos.sender, approveParameter.spender),
 			Some(approveParameter.value),
 			tokenStorage.approvals
 		);
-		let newStorage = {
+		let tokenStorage = {
 				...tokenStorage,
-				approvals: newAllowances
+				approvals: approvals
 		};
 		// no operations are returned, only the updated storage
-		(emptyListOfOperations, newStorage);
+		(emptyListOfOperations, tokenStorage);
 	};
 };
