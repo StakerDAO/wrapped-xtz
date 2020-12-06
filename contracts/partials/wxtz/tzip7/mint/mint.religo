@@ -9,11 +9,8 @@ let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entr
     };
 
 	// retrieve token balance before minting operation and calculate new token balance
-	let tokenBalance = Big_map.find_opt(mintParameter.to_, tokenStorage.ledger);
-	let tokenBalance = switch (tokenBalance) {
-		| Some(tokenBalance) => tokenBalance
-		| None => defaultBalance
-	};
+	let tokenBalance = getTokenBalance(mintParameter.to_, tokenStorage.ledger);
+
 	let newTokenBalance = tokenBalance + mintParameter.value;
 	let newTokens = Big_map.update(
 		mintParameter.to_,
