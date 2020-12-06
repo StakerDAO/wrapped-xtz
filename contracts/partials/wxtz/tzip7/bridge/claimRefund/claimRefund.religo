@@ -1,7 +1,11 @@
+#include "../helpers/permissions.religo"
+
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
     
+    // check that sender of transaction has permission to confirm the swap
+    failIfSenderIsNotTheInitiator(claimRefundParameter.secretHash, storage.bridge.swaps);
     // retrieve swap record from storage
     let swap = Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps);
     let swap = switch (swap) {
