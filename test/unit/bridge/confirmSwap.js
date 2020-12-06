@@ -49,7 +49,7 @@ contract('TZIP-7 with bridge', () => {
                 
                 await expect(operationPromise).to.be.eventually.rejected
                     .and.be.instanceOf(TezosOperationError)
-                    .and.have.property('message', contractErrors.tzip7.noPermission);
+                    .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
             });
 
             it('should fail for a third party', async () => {
@@ -59,7 +59,7 @@ contract('TZIP-7 with bridge', () => {
                 
                 await expect(operationPromise).to.be.eventually.rejected
                     .and.be.instanceOf(TezosOperationError)
-                    .and.have.property('message', contractErrors.tzip7.noPermission);
+                    .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
             });
             
             it('should fail for a non-existing swap', async () => {

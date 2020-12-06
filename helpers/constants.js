@@ -18,6 +18,7 @@ module.exports = {
             noPermission: "NoPermission",
             notEnoughAllowance: "NotEnoughAllowance",
             notEnoughBalance: "NotEnoughBalance",
+            senderIsNotTheInitiator: "errorSenderIsNotTheInitiator",
             swapIsNotConfirmed: "SwapIsNotConfirmed",
             swapLockAlreadyExists: "SwapLockAlreadyExists",
             swapLockDoesNotExist: "SwapLockDoesNotExist",

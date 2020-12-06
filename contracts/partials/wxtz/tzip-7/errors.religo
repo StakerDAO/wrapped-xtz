@@ -12,6 +12,4 @@ let errorSwapLockAlreadyExists: string = "SwapLockAlreadyExists";
 let errorTooLongSecret: string = "TooLongSecret";
 let errorSwapIsOver: string = "SwapIsOver";
 let errorSwapIsNotConfirmed: string = "SwapIsNotConfirmed";
-
-
-
+let errorSenderIsNotTheInitiator: string = "SenderIsNotTheInitiator"
