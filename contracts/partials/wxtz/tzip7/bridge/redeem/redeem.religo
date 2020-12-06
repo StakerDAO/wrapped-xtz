@@ -1,9 +1,6 @@
 let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
 	
 	// provided secret needs to be below a certain length
 	let secretByteLength = Bytes.length(redeemParameter.secret);

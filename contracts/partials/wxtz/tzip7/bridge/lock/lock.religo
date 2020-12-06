@@ -1,9 +1,6 @@
 let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
 	
 	// create swap record entry from parameters and implicit values
 	let swapEntry: swap = {
