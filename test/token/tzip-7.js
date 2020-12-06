@@ -248,7 +248,7 @@ contract('TZIP-7 token contract', accounts => {
             await expect(contract.methods.setPauseGuardian(chuck.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
         });
     
-        it("should change the (pause) guardian to (trusted) Trent's address", async () => {
+        it.skip("should change the (pause) guardian to (trusted) Trent's address", async () => {
             // only admin has permission 
             // check that Alice is the current admin
             expect(storage.token.admin).to.equal(alice.pkh);
@@ -379,7 +379,7 @@ contract('TZIP-7 token contract', accounts => {
             expect(balance.recipientAfterTransfer).to.equal(balance.recipientBeforeTransfer + transferParam.value);
         });
 
-        it("should transfer token from sender to sender", async () => {
+        it.skip("should transfer token from sender to sender", async () => {
             // transferring to herself
             await tzip7Instance.transfer(
                 transferParam.from, // sender

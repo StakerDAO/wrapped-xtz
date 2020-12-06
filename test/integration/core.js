@@ -7,13 +7,9 @@ const tzip7InitialStorage = require('../../migrations/initialStorage/tzip-7');
 const { expect } = require('chai').use(require('chai-as-promised'));;;
 const { rpcErrors } = require('./../../helpers/constants');
 
-const ovenCode = readFileSync(`${process.cwd()}/contracts/partials/wxtz/core/lambdas/createOven/oven/oven.tz`, {
-    encoding: 'utf8'
-});
-
 contract('core', () => {
     
-    describe('createOven', () => {
+    describe.skip('createOven', () => {
         let helpers = {};
 
         beforeEach(async () => {
