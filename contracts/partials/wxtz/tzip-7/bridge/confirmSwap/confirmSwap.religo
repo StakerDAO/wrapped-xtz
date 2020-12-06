@@ -1,18 +1,12 @@
+#include "../helpers/permissions.religo"
+
 let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
     // confirm swap transaction ignores paused token operations
-
-    // retrieve swap record from storage
-    let swap = Big_map.find_opt(confirmSwapParameter.secretHash, bridgeStorage.swaps);
-	let swap = switch (swap) {
-		| Some(swap) => swap
-		| None => (failwith(errorSwapLockDoesNotExist): swap)
-	};
-
+    
     // check that sender of transaction has permission to confirm the swap
-    switch (Tezos.sender == swap.from_) {
-        | true => unit
-        | false => (failwith(errorSenderIsNotTheInitiator): unit)
-    };
+    failIfSenderIsNotTheInitiator(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    // retrieve swap record from storage
+    let swap = getTokenSwap(confirmSwapParameter.secretHash, bridgeStorage.swaps);
 
     // change confirmed value to true in swap record
     let newSwapEntry = {
