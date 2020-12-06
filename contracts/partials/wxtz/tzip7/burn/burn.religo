@@ -7,12 +7,7 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entr
         | true => unit
         | false => (failwith(errorNoPermission): unit)
     };
-
-    let tokenBalance = Big_map.find_opt(burnParameter.from_, tokenStorage.ledger);
-    let tokenBalance = switch (tokenBalance) {
-        | Some(tokenBalance) => tokenBalance
-        | None => defaultBalance
-    };
+    let tokenBalance = getTokenBalance(burnParameter.from_, tokenStorage.ledger);
 
     // continue only if amount to burn does not exceed available balance
     if (tokenBalance < burnParameter.value) { 
