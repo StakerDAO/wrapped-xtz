@@ -137,6 +137,12 @@ const tzip7Helpers = (instance) => {
         getOutcomes: async function(secretHash) {
             const outcome = await (await this.getStorage()).bridge.outcomes.get(secretHash);
             return outcome;
+        },
+        claimRefund: async function(secretHash) {
+            const operation = await instance.methods
+                .claimRefund(secretHash)
+                .send();
+            return operation.confirmation(1);
         }
     }
 }

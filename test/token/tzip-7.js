@@ -42,7 +42,8 @@ contract('TZIP-7 token contract', accounts => {
         await updateStorage();
     });
     
-    describe("Mint and Burn", () => {
+    // please use tests in /unit/tzip-7
+    describe.skip("Mint and Burn", () => {
         it("should mint 10 tokens for Alice", async () => {
             
             const initialBalance = await getBalance(alice.pkh);
@@ -80,7 +81,7 @@ contract('TZIP-7 token contract', accounts => {
             expect(totalSupplyAfterOperation).to.equal((initialTotalSupply - tokensToBurn));
         });
         
-        it("should fail for burning more tokens than Alice has", async () => {
+        it.skip("should fail for burning more tokens than Alice has", async () => {
             // calling the token contract %burn entrypoint
             await expect(tzip7Instance.burn(alice.pkh, 100)).to.be.rejectedWith(contractErrors.tzip7.notEnoughBalance);
         });
@@ -95,7 +96,8 @@ contract('TZIP-7 token contract', accounts => {
         });
     });
 
-    describe("Approving allowances", () => {
+    // please use tests in /unit/tzip-7
+    describe.skip("Approving allowances", () => {
         const allowanceValue = 5;
         const owner = alice.pkh;
         const spender = bob.pkh;
@@ -229,7 +231,8 @@ contract('TZIP-7 token contract', accounts => {
 
     });
     
-    describe("Changing Permissions", () => {
+    // please use tests in /unit/tzip-7
+    describe.skip("Changing Permissions", () => {
         it("should not change the admin's address by Chuck", async () => {
             // switching to Bob's secret key
             Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(chuck.sk)});
@@ -262,7 +265,8 @@ contract('TZIP-7 token contract', accounts => {
         });
     });
    
-    describe("Pause", () => {
+    // please use tests in /unit/tzip-7
+    describe.skip("Pause", () => {
       
         it("should not allow the admin to pause all transfer, approve, mint and burn operations", async () => {
             // check that Alice is the admin
@@ -270,7 +274,7 @@ contract('TZIP-7 token contract', accounts => {
             // check that Alice is not the pause guardian
             expect(storage.token.pauseGuardian).not.to.equal(alice.pkh)
             // call the token contract at the %setPause entrypoint to pause all operations
-            await expect(tzip7Instance.setPause(true)).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
+            await expect(tzip7Instance.setPause(true)).to.be.rejectedWith(contractErrors.tzip7.senderIsNotPauseGuardian);
             // read contract's storage after the operation
             storage = await tzip7Instance.storage();
             expect(storage.token.paused).to.be.false;
@@ -379,7 +383,7 @@ contract('TZIP-7 token contract', accounts => {
             expect(balance.recipientAfterTransfer).to.equal(balance.recipientBeforeTransfer + transferParam.value);
         });
 
-        it.skip("should transfer token from sender to sender", async () => {
+        it("should transfer token from sender to sender", async () => {
             // transferring to herself
             await tzip7Instance.transfer(
                 transferParam.from, // sender
@@ -416,7 +420,8 @@ contract('TZIP-7 token contract', accounts => {
         });
     });
 
-    describe("Get Contract Views", () => {
+    // please use tests in /unit/tzip-7
+    describe.skip("Get Contract Views", () => {
         it("should view allowance given by Alice to Bob", async () => {
             const contractAddress = tzip7Instance.address;
             const owner = alice.pkh;
