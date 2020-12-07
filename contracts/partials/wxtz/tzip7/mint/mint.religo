@@ -1,4 +1,4 @@
-let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): tokenEntrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(tokenStorage);
 

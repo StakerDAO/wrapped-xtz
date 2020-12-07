@@ -1,4 +1,4 @@
-let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (address, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (address, tokenStorage)): tokenEntrypointReturn => {
     if (Tezos.sender == tokenStorage.admin) {
         let newStorage = {
             ...tokenStorage,
@@ -6,6 +6,6 @@ let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (address, tok
         };
         (emptyListOfOperations, newStorage);
     } else {
-        (failwith (errorNoPermission): (entrypointReturn, tokenStorage));
+        (failwith (errorNoPermission): tokenEntrypointReturn);
     };
 };

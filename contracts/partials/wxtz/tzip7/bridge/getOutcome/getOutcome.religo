@@ -1,4 +1,4 @@
-let getOutcome = ((getOutcomeParameter, bridgeStorage): (getOutcomeParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
+let getOutcome = ((getOutcomeParameter, bridgeStorage): (getOutcomeParameter, bridgeStorage)): bridgeEntrypointReturn => {
 	// retrieve secret from outcomes in bridge storage
 	let secret = Big_map.find_opt(
 		getOutcomeParameter.secretHash,

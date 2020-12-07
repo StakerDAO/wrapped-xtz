@@ -15,7 +15,7 @@ let setSwap = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
 	);
 };
 
-let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
+let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
 	// check for existing swap lock

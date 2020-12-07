@@ -1,4 +1,4 @@
-let getSwap = ((getSwapParameter, bridgeStorage): (getSwapParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
+let getSwap = ((getSwapParameter, bridgeStorage): (getSwapParameter, bridgeStorage)): bridgeEntrypointReturn => {
 	// retrieve swap record from bridge storage
 	let swap = getSwapLock(getSwapParameter.secretHash, bridgeStorage.swaps);
 

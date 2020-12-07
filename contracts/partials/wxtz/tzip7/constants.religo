@@ -1,5 +1,7 @@
 let defaultBalance: nat = 0n;
 // do not change defaultAllowanceValue constant
 let defaultAllowanceValue: nat = 0n;
-type entrypointReturn = list(operation);
-let emptyListOfOperations: entrypointReturn = [];
+let emptyListOfOperations: list(operation) = [];
+type entrypointReturn = (list(operation), storage);
+type bridgeEntrypointReturn = (list(operation), bridgeStorage);
+type tokenEntrypointReturn = (list(operation), tokenStorage);

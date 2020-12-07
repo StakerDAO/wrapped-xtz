@@ -1,7 +1,7 @@
 #include "../helpers/permissions.religo"
 #include "../helpers/validators.religo"
 
-let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
+let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);   
     // check that sender of transaction has permission to confirm the swap
@@ -34,7 +34,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let swaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
 
     // update both token ledger storage and swap records in bridge storage
-    let newStorage = {
+    let storage = {
         ...storage,
         token: {
             ...storage.token,
@@ -46,5 +46,5 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         },
     };
     // no operations are returned, only the updated storage
-    (emptyListOfOperations, newStorage);
+    (emptyListOfOperations, storage);
 };

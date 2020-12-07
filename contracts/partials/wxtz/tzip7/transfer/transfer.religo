@@ -40,7 +40,7 @@ let updateLedgerByTransfer = ((transferParameter, ledger): (transferParameter, l
 	);
 };
 
-[@inline] let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+[@inline] let transfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): tokenEntrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(tokenStorage);
 	// check for enough balance or allowance

@@ -1,4 +1,4 @@
-let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tokenStorage)): tokenEntrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(tokenStorage);
 	// retrieve existing allowance
@@ -13,7 +13,7 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
      * but it does not prohibit changing allowance from non-zero to non-zero
      */
 	if (allowance != approveCASParameter.expected) { 
-        (failwith(errorAllowanceMismatch): (entrypointReturn, tokenStorage)) 
+        (failwith(errorAllowanceMismatch): tokenEntrypointReturn) 
     }
 	else {
 		let approvals = Big_map.update(

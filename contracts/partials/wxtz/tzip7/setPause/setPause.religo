@@ -1,4 +1,4 @@
-let setPause = ((setPauseParameter, tokenStorage): (bool, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let setPause = ((setPauseParameter, tokenStorage): (bool, tokenStorage)): tokenEntrypointReturn => {
     /**
      * Only the pause guardian is allowed to pause token operations, not the administrator.
      * However, only the administrator is allowed to unpause, not the pause-guardian.

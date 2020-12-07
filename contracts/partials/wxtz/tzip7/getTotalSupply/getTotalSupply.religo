@@ -1,4 +1,4 @@
-let getTotalSupply = ((getTotalSupplyParameter, tokenStorage): (getTotalSupplyParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let getTotalSupply = ((getTotalSupplyParameter, tokenStorage): (getTotalSupplyParameter, tokenStorage)): tokenEntrypointReturn => {
   let totalSupply = tokenStorage.totalSupply;
   let operation = Tezos.transaction(
     totalSupply, 
