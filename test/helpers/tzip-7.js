@@ -146,6 +146,12 @@ const tzip7Helpers = (instance) => {
             };
             const allowance = await storage.token.approvals.get(key) || 0;
             return Number(allowance);
+        },
+        claimRefund: async function(secretHash) {
+            const operation = await instance.methods
+                .claimRefund(secretHash)
+                .send();
+            return operation.confirmation(1);
         }
     }
 }
