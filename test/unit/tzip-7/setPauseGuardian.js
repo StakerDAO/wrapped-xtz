@@ -40,7 +40,7 @@ contract('TZIP-7 token contract %setPauseGuardian entrypoint', () => {
             const operationPromise = helpers.tzip7.setPauseGuardian(thirdParty.pkh);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.noPermission);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotAdmin);
             // unchanged storage
             expect(await helpers.tzip7.getPauseGuardian()).to.equal(_tzip7InitialStorage.base.token.pauseGuardian);
         });
@@ -51,7 +51,7 @@ contract('TZIP-7 token contract %setPauseGuardian entrypoint', () => {
             const operationPromise = helpers.tzip7.setPauseGuardian(newPauseGuardian.pkh);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.noPermission);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotAdmin);
             // unchanged storage
             expect(await helpers.tzip7.getPauseGuardian()).to.equal(_tzip7InitialStorage.base.token.pauseGuardian);
         });

@@ -15,7 +15,8 @@ module.exports = {
         tzip7: {
             allowanceMismatch: "AllowanceMismatch",
             fundsLock: "FundsLock",
-            noPermission: "NoPermission",
+            senderIsNotAdmin: "SenderIsNotAdmin",
+            senderIsNotPauseGuardian: "SenderIsNotPauseGuardian",
             notEnoughAllowance: "NotEnoughAllowance",
             notEnoughBalance: "NotEnoughBalance",
             senderIsNotTheInitiator: "SenderIsNotTheInitiator",
