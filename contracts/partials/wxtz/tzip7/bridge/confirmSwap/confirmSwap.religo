@@ -1,6 +1,6 @@
 #include "../helpers/permissions.religo"
 
-let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
+let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): bridgeEntrypointReturn => {
     // confirm swap transaction ignores paused token operations
     
     // check that sender of transaction has permission to confirm the swap
@@ -16,15 +16,16 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
         confirmed: true,
     };
     // update swap record in bridge storage
-    let swaps = Big_map.update(
+    let swaps = updateSwapLock(
         confirmSwapParameter.secretHash,
-        Some(swap),
+        swap,
         bridgeStorage.swaps
     );
-    let newBridgeStorage = {
+
+    let bridgeStorage = {
         ...bridgeStorage,
         swaps: swaps,
     };
     // no operations are returned, only the updated storage
-    (emptyListOfOperations, newBridgeStorage);
+    (emptyListOfOperations, bridgeStorage);
 };

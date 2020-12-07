@@ -31,7 +31,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let ledger = updateLedgerByTransfer(transferFeeParameter, ledger);
     
     // remove the swap record from storage
-    let swaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
+    let swaps = removeSwapLock(claimRefundParameter.secretHash, storage.bridge.swaps);
 
     // update both token ledger storage and swap records in bridge storage
     let newStorage = {
