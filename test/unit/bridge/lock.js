@@ -28,9 +28,9 @@ contract('TZIP-7 with bridge', () => {
         await _taquitoHelpers.setSigner(accounts.sender.sk);
     });
 
-    describe("%lock", () => {
+    describe("Invoke %lock on bridge", () => {
 
-        describe('Effects of lock', () => {
+        describe('Effects of %lock', () => {
             
             beforeEach(async () => {
                 // call the token contract at the %lock entrypoint
