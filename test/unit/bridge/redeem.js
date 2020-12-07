@@ -151,8 +151,8 @@ contract('TZIP-7 with bridge', () => {
             await helpers.tzip7.lock(swapLockParameters);
         });
 
-        it('should fail for an unconfirmed swap', async () => {
-            const operationPromise = await helpers.tzip7.redeem(swapSecret);
+        it('should fail for swap past release time', async () => {
+            const operationPromise = helpers.tzip7.redeem(swapSecret);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.swapIsOver);
