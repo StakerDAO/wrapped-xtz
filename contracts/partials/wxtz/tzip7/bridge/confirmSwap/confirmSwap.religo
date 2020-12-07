@@ -8,22 +8,22 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
     // check if swap was already confirmed
     failIfSwapIsAlreadyConfirmed(confirmSwapParameter.secretHash, bridgeStorage.swaps);
     // retrieve swap record from storage
-    let swap = getTokenSwap(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    let swap = getSwapLock(confirmSwapParameter.secretHash, bridgeStorage.swaps);
 
     // change confirmed value to true in swap record
-    let newSwapEntry = {
+    let swap = {
         ...swap,
         confirmed: true,
     };
     // update swap record in bridge storage
-    let newSwaps = Big_map.update(
+    let swaps = Big_map.update(
         confirmSwapParameter.secretHash,
-        Some(newSwapEntry),
+        Some(swap),
         bridgeStorage.swaps
     );
     let newBridgeStorage = {
         ...bridgeStorage,
-        swaps: newSwaps,
+        swaps: swaps,
     };
     // no operations are returned, only the updated storage
     (emptyListOfOperations, newBridgeStorage);

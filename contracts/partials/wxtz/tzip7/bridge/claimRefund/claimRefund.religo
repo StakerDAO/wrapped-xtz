@@ -1,29 +1,22 @@
 #include "../helpers/permissions.religo"
+#include "../helpers/validators.religo"
 
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
-	failIfPaused(storage.token);
-    
+	failIfPaused(storage.token);   
     // check that sender of transaction has permission to confirm the swap
     failIfSenderIsNotTheInitiator(claimRefundParameter.secretHash, storage.bridge.swaps);
+    
     // retrieve swap record from storage
-    let swap = Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps);
-    let swap = switch (swap) {
-        | Some(swap) => swap
-        | None => (failwith(errorSwapLockDoesNotExist): swap)
-    };
-
+    let swap = getSwapLock(claimRefundParameter.secretHash, storage.bridge.swaps);
 	// check for swap protocol time condition
-	switch (swap.releaseTime <= Tezos.now) {
-		| true => unit
-		| false => (failwith(errorFundsLock): unit)
-	};
+    failIfSwapIsNotOver(swap);
 
     // constructing the transfer parameter to redeem locked-up tokens
     let transferValueParameter: transferParameter = {
         to_: swap.from_,
-        from_: Tezos.self_address,
         value: swap.value,
+        from_: Tezos.self_address,
     };
     // calling the transfer function to redeem the token amount specified in swap
     let ledger = updateLedgerByTransfer(transferValueParameter, storage.token.ledger);
@@ -31,14 +24,14 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
     let transferFeeParameter: transferParameter = {
         to_: swap.to_,
-        from_: Tezos.self_address,
         value: swap.fee,
+        from_: Tezos.self_address,
     };
-    // please note that the modified newTokenStorage from above is used here
+    // please note that the modified ledger storage from above is used here
     let ledger = updateLedgerByTransfer(transferFeeParameter, ledger);
     
     // remove the swap record from storage
-    let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
+    let swaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
 
     // update both token ledger storage and swap records in bridge storage
     let newStorage = {
@@ -49,7 +42,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         }, 
         bridge: {
             ...storage.bridge,
-            swaps: newSwaps,
+            swaps: swaps,
         },
     };
     // no operations are returned, only the updated storage
