@@ -1,9 +1,10 @@
-const { alice, bob, carol, walter, chuck } = require('./../../../scripts/sandbox/accounts');
+const { alice, bob, carol, chuck, trent, walter } = require('./../../../scripts/sandbox/accounts');
 
 module.exports = {
     admin: alice,
     sender: bob,
     recipient: carol,
     thirdParty: chuck, // has malicious intent
-    pauseGuardian: walter
+    pauseGuardian: walter, // warden
+    lockSaver: trent, // trusted arbitrator
 };

@@ -19,7 +19,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	let totalValue = swap.value + swap.fee;
 	let transferParameter: transferParameter = {
 		to_: swap.to_,
-		from_: Tezos.self_address,
+		from_: storage.bridge.lockSaver,
 		value: totalValue,
 	};
 	// calling the transfer function to redeem the total token amount specified in swap

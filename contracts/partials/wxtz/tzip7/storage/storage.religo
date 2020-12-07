@@ -12,6 +12,7 @@ type tokenStorage = {
 type bridgeStorage = {
   swaps: swaps,
   outcomes: outcomes,
+  lockSaver: address,
 };
 
 type storage = {

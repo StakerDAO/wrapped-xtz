@@ -16,7 +16,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let transferValueParameter: transferParameter = {
         to_: swap.from_,
         value: swap.value,
-        from_: Tezos.self_address,
+        from_: storage.bridge.lockSaver,
     };
     // calling the transfer function to redeem the token amount specified in swap
     let ledger = updateLedgerByTransfer(transferValueParameter, storage.token.ledger);
@@ -25,7 +25,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let transferFeeParameter: transferParameter = {
         to_: swap.to_,
         value: swap.fee,
-        from_: Tezos.self_address,
+        from_: storage.bridge.lockSaver,
     };
     // please note that the modified ledger storage from above is used here
     let ledger = updateLedgerByTransfer(transferFeeParameter, ledger);
