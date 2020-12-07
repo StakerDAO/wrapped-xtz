@@ -37,7 +37,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 	let lockValue = lockParameter.value + lockParameter.fee;
 	let transferParameter: transferParameter = {
 		from_: Tezos.sender,
-		to_:  Tezos.self_address,
+		to_:  storage.bridge.lockSaver,
 		value: lockValue,
 	};
 	// call the transfer function of TZIP-7

@@ -13,7 +13,7 @@ module.exports = async (initialStorage, accounts, helpers) => {
     helpers.balances = {};
     helpers.balances.senderBefore = await helpers.tzip7.getBalance(accounts.sender.pkh);
     helpers.balances.recipientBefore = await helpers.tzip7.getBalance(accounts.recipient.pkh);
-    helpers.balances.contractBefore = await helpers.tzip7.getBalance(tzip7Instance.address);
+    helpers.balances.lockSaverBefore = await helpers.tzip7.getBalance(accounts.lockSaver.pkh);
     helpers.balances.totalSupplyBefore = initialStorage.token.totalSupply;
     return helpers;
 };

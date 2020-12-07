@@ -64,9 +64,9 @@ contract('TZIP-7 with bridge', () => {
                     await helpers.tzip7.redeem(swapSecret);
                 });
                 
-                it("should reduce token balance for contract", async () => {
-                    const contractBalance = await helpers.tzip7.getBalance(helpers.tzip7.instance.address);
-                    expect(contractBalance).to.equal(0);
+                it("should reduce token balance for lockSaver", async () => {
+                    const lockSaverBalance = await helpers.tzip7.getBalance(accounts.lockSaver.pkh);
+                    expect(lockSaverBalance).to.equal(0);
                 });
 
                 it("should increase token balance for recipient", async () => {
