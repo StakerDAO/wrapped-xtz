@@ -16,11 +16,12 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
         confirmed: true,
     };
     // update swap record in bridge storage
-    let swaps = Big_map.update(
+    let swaps = updateSwapLock(
         confirmSwapParameter.secretHash,
-        Some(swap),
+        swap,
         bridgeStorage.swaps
     );
+
     let bridgeStorage = {
         ...bridgeStorage,
         swaps: swaps,

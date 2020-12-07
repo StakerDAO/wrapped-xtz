@@ -1,20 +1,3 @@
-let failIfSwapLockExists = ((secretHash, swaps): (secretHash, swaps)): unit => {
-	let existingSwap = Big_map.find_opt(secretHash, swaps);
-	switch(existingSwap) {
-		| Some(swap) => (failwith(errorSwapLockAlreadyExists): unit)
-		| None => unit
-	};
-};
-
-let setSwap = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
-	failIfSwapLockExists(secretHash, swaps);
-	Big_map.add(
-		secretHash,
-		swap,
-		swaps
-	);
-};
-
 let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
@@ -31,7 +14,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointRetur
 		from_: Tezos.sender,
 	};
 	// save new swap record with secretHash as key
-	let swaps = setSwap(lockParameter.secretHash, swap, storage.bridge.swaps);
+	let swaps = setNewSwapLock(lockParameter.secretHash, swap, storage.bridge.swaps);
 	
 	// lock up total swap amount, by transferring it to the smart contracts own address
 	let lockValue = lockParameter.value + lockParameter.fee;

@@ -1,4 +1,4 @@
-#include "../../storage/getSwapLock.religo"
+#include "../../storage/swapLockRepository.religo"
 
 let isSenderInitiator = (swap: swap): bool => {
     Tezos.sender == swap.from_;

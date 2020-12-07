@@ -1,4 +1,5 @@
 #include "types.religo"
+#include "swapLockRepository.religo"
 
 type tokenStorage = {
   ledger: ledger,

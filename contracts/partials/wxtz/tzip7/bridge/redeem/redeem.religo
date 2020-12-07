@@ -26,10 +26,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): entrypoin
 	let ledger = updateLedgerByTransfer(transferParameter, storage.token.ledger);
 
 	// remove swap record from bridge storage
-	let swaps = Big_map.remove(
-		secretHash,
-		storage.bridge.swaps
-	);
+	let swaps = removeSwapLock(secretHash, storage.bridge.swaps);
 	// save secret and secretHash to outcomes in bridge storage
 	let outcomes = Big_map.add(
 		secretHash,
