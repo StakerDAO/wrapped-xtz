@@ -46,7 +46,7 @@ contract('TZIP-7 token contract', () => {
         const operationPromise = helpers.tzip7.burn(admin.pkh, 1000000);
         await expect(operationPromise).to.be.eventually.rejected
             .and.be.instanceOf(TezosOperationError)
-            .and.have.property('message', contractErrors.tzip7.noPermission);
+            .and.have.property('message', contractErrors.tzip7.senderIsNotAdmin);
     });
 
     it('should fail if called by pause guardian', async () => {
@@ -54,7 +54,7 @@ contract('TZIP-7 token contract', () => {
         const operationPromise = helpers.tzip7.burn(admin.pkh, 1000000);
         await expect(operationPromise).to.be.eventually.rejected
             .and.be.instanceOf(TezosOperationError)
-            .and.have.property('message', contractErrors.tzip7.noPermission);
+            .and.have.property('message', contractErrors.tzip7.senderIsNotAdmin);
     });
 
     it('should fail if token operations are paused', async () => {

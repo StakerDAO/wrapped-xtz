@@ -40,7 +40,7 @@ contract('TZIP-7 token contract', () => {
             const operationPromise = helpers.tzip7.setAdministrator(newAdmin.pkh);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.noPermission);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotAdmin);
             // unchanged storage
             expect(await helpers.tzip7.getAdministrator()).to.equal(_tzip7InitialStorage.base.token.admin);
         });
@@ -51,7 +51,7 @@ contract('TZIP-7 token contract', () => {
             const operationPromise = helpers.tzip7.setAdministrator(newAdmin.pkh);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.noPermission);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotAdmin);
             // unchanged storage
             expect(await helpers.tzip7.getAdministrator()).to.equal(_tzip7InitialStorage.base.token.admin);
         });

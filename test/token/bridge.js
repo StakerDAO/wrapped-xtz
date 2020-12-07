@@ -157,7 +157,7 @@ contract('TZIP-7 extended with hashed time-lock swap', accounts => {
             Tezos.setProvider({rpc: rpc, signer: await InMemorySigner.fromSecretKey(bob.sk)});
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
-            await expect(contract.methods.confirmSwap(secretHash).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+            await expect(contract.methods.confirmSwap(secretHash).send()).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
         });
     
         it("should allow Alice to confirm swap", async () => {

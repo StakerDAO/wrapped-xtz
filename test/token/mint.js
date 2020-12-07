@@ -34,13 +34,13 @@ contract('TZIP-7 token contract', () => {
     it('should fail if not called by admin', async () => {
         await _taquitoHelpers.setSigner(thirdParty.sk);
         const operationPromise = helpers.tzip7.mint(admin.pkh, 500000);
-        await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+        await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
     });
 
     it('should fail if called by pause guardian', async () => {
         await _taquitoHelpers.setSigner(pauseGuardian.sk);
         const operationPromise = helpers.tzip7.mint(admin.pkh, 500000);
-        await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+        await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
     });
 
     describe('Effects of mint', () => {

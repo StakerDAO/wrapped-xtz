@@ -5,7 +5,7 @@ let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): token
 	// only the admin is allowed to mint tokens
     switch(Tezos.sender == tokenStorage.admin) {
         | true => unit
-        | false => (failwith(errorNoPermission): unit)
+        | false => (failwith(errorSenderIsNotAdmin): unit)
     };
 
 	// retrieve token balance before minting operation and calculate new token balance

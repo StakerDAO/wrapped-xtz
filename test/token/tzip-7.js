@@ -91,7 +91,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %burn entrypoint
-            await expect(contract.methods.burn(alice.pkh, 5).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+            await expect(contract.methods.burn(alice.pkh, 5).send()).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
         });
     });
 
@@ -236,7 +236,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %setAdministrator entrypoint and passing Bob's address
-            await expect(contract.methods.setAdministrator(chuck.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+            await expect(contract.methods.setAdministrator(chuck.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
         });
     
         it("should fail to change guardian address by Chuck", async () => {
@@ -245,7 +245,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %burn entrypoint
-            await expect(contract.methods.setPauseGuardian(chuck.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+            await expect(contract.methods.setPauseGuardian(chuck.pkh).send()).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
         });
     
         it.skip("should change the (pause) guardian to (trusted) Trent's address", async () => {
@@ -270,7 +270,7 @@ contract('TZIP-7 token contract', accounts => {
             // check that Alice is not the pause guardian
             expect(storage.token.pauseGuardian).not.to.equal(alice.pkh)
             // call the token contract at the %setPause entrypoint to pause all operations
-            await expect(tzip7Instance.setPause(true)).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+            await expect(tzip7Instance.setPause(true)).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
             // read contract's storage after the operation
             storage = await tzip7Instance.storage();
             expect(storage.token.paused).to.be.false;
@@ -306,7 +306,7 @@ contract('TZIP-7 token contract', accounts => {
             // load the contract for the Tezos Taquito instance
             const contract = await Tezos.contract.at(tzip7Instance.address);
             // call the token contract at the %setPause entrypoint to pause all operations
-            await expect(contract.methods.setPause(false).send()).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+            await expect(contract.methods.setPause(false).send()).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
             // read contract's storage
             await updateStorage();
             expect(storage.token.paused).to.be.true;

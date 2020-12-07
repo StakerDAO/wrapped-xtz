@@ -5,7 +5,7 @@ let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): token
     // only the admin is allowed to burn tokens
     switch(Tezos.sender == tokenStorage.admin) {
         | true => unit
-        | false => (failwith(errorNoPermission): unit)
+        | false => (failwith(errorSenderIsNotAdmin): unit)
     };
     let tokenBalance = getTokenBalance(burnParameter.from_, tokenStorage.ledger);
 

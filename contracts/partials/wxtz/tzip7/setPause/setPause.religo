@@ -6,13 +6,13 @@ let setPause = ((setPauseParameter, tokenStorage): (bool, tokenStorage)): tokenE
     switch (setPauseParameter) {
         | true => {
             switch (Tezos.sender == tokenStorage.pauseGuardian) {
-                    | false => (failwith(errorNoPermission): unit)
+                    | false => (failwith(errorSenderIsNotPauseGuardian): unit)
                     | true => unit
                 }
             }
         | false => {
             switch (Tezos.sender == tokenStorage.admin) {
-                    | false => (failwith(errorNoPermission): unit)
+                    | false => (failwith(errorSenderIsNotAdmin): unit)
                     | true => unit
                 };
             }

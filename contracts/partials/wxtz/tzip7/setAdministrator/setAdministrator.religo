@@ -8,6 +8,6 @@ let setAdministrator = ((setAdministratorParameter, tokenStorage): (address, tok
         // no operations are returned, only the updated token storage
         (emptyListOfOperations, tokenStorage);
     } else {
-        (failwith (errorNoPermission): tokenEntrypointReturn);
+        (failwith (errorSenderIsNotAdmin): tokenEntrypointReturn);
     };
 };

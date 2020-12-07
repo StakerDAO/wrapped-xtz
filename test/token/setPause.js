@@ -105,7 +105,7 @@ contract('TZIP-7 token contract', () => {
 
             it("should fail for the admin to pause operations", async () => {
                 const operationPromise = helpers.tzip7.setPause(true);
-                await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+                await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
                 // storage did not change
                 expect(await helpers.tzip7.getPauseState()).to.be.false;
             });
@@ -115,7 +115,7 @@ contract('TZIP-7 token contract', () => {
                     await helpers.tzip7.setPause(true);
                 });
 
-                await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+                await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
                 // storage did not change
                 expect(await helpers.tzip7.getPauseState()).to.be.false;
             });
@@ -165,7 +165,7 @@ contract('TZIP-7 token contract', () => {
                     const operationPromise = _taquitoHelpers.signAs(pauseGuardian.sk, async () => {
                         await helpers.tzip7.setPause(false)
                     });
-                    await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+                    await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
                     // storage unchanged
                     expect(await helpers.tzip7.getPauseState()).to.be.true;
                 });
@@ -184,7 +184,7 @@ contract('TZIP-7 token contract', () => {
                     const operationPromise = _taquitoHelpers.signAs(pauseGuardian.sk, async () => {
                         await helpers.tzip7.setPause(false);
                     });
-                    await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.noPermission);
+                    await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.senderIsNotAdmin);
                     expect(await helpers.tzip7.getPauseState()).to.be.true;
 
                     await _taquitoHelpers.signAs(admin.sk, async () => {

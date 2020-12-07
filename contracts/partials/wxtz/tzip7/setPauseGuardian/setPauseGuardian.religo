@@ -6,6 +6,6 @@ let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (address, tok
         };
         (emptyListOfOperations, newStorage);
     } else {
-        (failwith (errorNoPermission): tokenEntrypointReturn);
+        (failwith (errorSenderIsNotAdmin): tokenEntrypointReturn);
     };
 };
