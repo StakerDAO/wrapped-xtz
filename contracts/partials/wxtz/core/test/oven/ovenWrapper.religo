@@ -1,2 +1,1 @@
-// raw michelson pasted here comes from `oven.tz`, it needs to be updated each time `oven.tz` is recompiled
 ((ovenParameter, ovenStorage): (ovenParameter, ovenStorage)) => ovenWrapper((ovenParameter, ovenStorage))

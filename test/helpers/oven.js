@@ -1,4 +1,5 @@
 const { Tezos } = require('@taquito/taquito');
+const compileContract = require('../../scripts/lambdaCompiler/compileContract');
 
 const ovenHelpers = (instance) => {
     return {
@@ -37,6 +38,23 @@ const ovenHelpers = (instance) => {
 };
 
 module.exports = {
+    originate: async function(initialStorage) {
+        const code = compileContract(
+            'contracts/partials/wxtz/core/test/oven/ovenWrapperMockContract.religo',
+        );
+        const originationOperation = await Tezos.contract.originate({
+            code: code,
+            storage: initialStorage
+        });
+        await originationOperation.confirmation(1);
+        console.log('Originated oven at', originationOperation.contractAddress);
+
+        const ovenHelpers = await this.at(originationOperation.contractAddress);
+        return {    
+            ovenHelpers,
+            ovenAddress: originationOperation.contractAddress
+        };
+    },
     at: async (address) => {
         const instance = await Tezos.contract.at(address);
         return ovenHelpers(instance);
