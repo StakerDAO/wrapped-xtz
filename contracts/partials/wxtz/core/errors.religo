@@ -20,3 +20,5 @@ let errorSenderIsNotAdmin: string = "12"
 let errorOvenNotFound: string = "13"
 let errorNotAnOvenOwner: string = "14"
 let errorOvenOwnerDoesNotAcceptDeposits: string = "15";
+
+let errorInvalidOvenOwner: string = "16"
