@@ -100,9 +100,33 @@ const coreHelpers = (instance) => {
 
             await operation.confirmation(1);
             return operation
+        },
+        updateLambdas: async function(lambdasList, sendParams) {
+            let religoMapLiteral = [];
+            lambdasList.forEach(lambda => {
+                religoMapLiteral.push(`("${lambda.lambdaName}", Some("${lambda.bytes}": bytes))`);
+            });
+            const ligoExpression = religoMapLiteral.join(',');
+            const operation = await instance.methods.runEntrypointLambda(
+                'updateLambdas', //lambdaName
+                testPackValue(`
+                    Map.literal([${ligoExpression}])
+                `)
+            ).send({
+                mutez: true,
+                ...sendParams
+            });
+
+            return operation.confirmation(1);
+        },
+        getLambda: async function(lambdaName) {
+            const storage = await instance.storage()
+            const lambdaBytes = await storage.lambdas.get(lambdaName);
+            return lambdaBytes;
         }
     };
-}
+};
+
 module.exports = {
     originate: async function(initialStorage) {
         const instance = await core.new(initialStorage);

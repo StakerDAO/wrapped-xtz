@@ -123,4 +123,38 @@ initialStorage.test.onOvenSetDelegate = () => {
     return storage;
 };
 
+initialStorage.test.updateLambdasBrokenAdminAddress = () => {
+    let storage = initialStorage.test.base();
+    storage.arbitraryValues.set('admin',
+        testPackValue(
+            `"stringNotAddress": string` // invalid address
+        )
+    );
+
+    return storage;
+};
+
+initialStorage.test.updateLambdasMissingAdminAddress = () => {
+    let storage = initialStorage.test.base();
+    storage.arbitraryValues.delete('admin');
+    return storage;
+};
+
+initialStorage.test.updateLambdasBrokenArbitraryLambda = () => {
+    let storage = initialStorage.test.base();
+    storage.lambdas.set(
+        'arbitrary/permissions/isAdmin',
+        testPackValue(
+            `unit`
+        )
+    );
+    return storage;
+}
+
+initialStorage.test.default = () => {
+    let storage = initialStorage.test.base();
+    console.log(storage)
+    return storage;
+};
+
 module.exports = initialStorage;
