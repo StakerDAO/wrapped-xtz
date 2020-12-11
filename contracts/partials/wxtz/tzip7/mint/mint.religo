@@ -8,9 +8,9 @@ let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entr
 	let tokenBalance = getTokenBalance(mintParameter.to_, tokenStorage.ledger);
 
 	let increasedTokenBalance = tokenBalance + mintParameter.value;
-	let ledger = Big_map.update(
+	let ledger = setTokenBalance(
 		mintParameter.to_,
-		Some(increasedTokenBalance),
+		increasedTokenBalance,
 		tokenStorage.ledger
 	);
 	// update total supply accordingly

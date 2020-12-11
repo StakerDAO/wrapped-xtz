@@ -25,16 +25,16 @@ let updateApprovalsByTransfer = ((owner, spender, value, approvals): (address, a
 let updateLedgerByTransfer = ((transferParameter, ledger): (transferParameter, ledger)): ledger => {
 	let senderBalance = getTokenBalance(transferParameter.from_, ledger);
 	let reducedSenderBalance = safeBalanceSubtraction(senderBalance, transferParameter.value);
-	let ledger = Big_map.update(
+	let ledger = setTokenBalance(
 		transferParameter.from_,
-		Some(reducedSenderBalance),
+		reducedSenderBalance,
 		ledger
 	);
 	let receiverBalance = getTokenBalance(transferParameter.to_, ledger);
 	let increasedReceiverBalance = receiverBalance + transferParameter.value;
-	Big_map.update(
+	setTokenBalance(
 		transferParameter.to_,
-		Some(increasedReceiverBalance),
+		increasedReceiverBalance,
 		ledger
 	);
 };
