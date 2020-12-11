@@ -1,16 +1,12 @@
 /*
  * This manager is an originated account
  * that owns an oven for testing purposes.
+ * It has no default entrypoint and therefore
+ * considered as broken/unfit to own an oven.
  */
 
-#include "../../partials/wxtz/core/lambdas/onOvenDepositReceived/onOvenDepositReceivedInit.religo"
-#include "../../partials/wxtz/core/runEntrypointLambda/composeRunEntrypointLambdaOperation.religo"
-
-
-type setDelegateParameter = {
-    ovenAddress: address,
-    delegate: option(key_hash),
-};
+#include "../../../partials/wxtz/core/lambdas/onOvenDepositReceived/onOvenDepositReceivedInit.religo"
+#include "../../../partials/wxtz/core/runEntrypointLambda/composeRunEntrypointLambdaOperation.religo"
 
 type withdrawParameter = {
     ovenAddress: address,
@@ -22,8 +18,7 @@ type depositParameter = {
 };
 
 type parameter = 
-| Default(unit)
-| SetDelegate(setDelegateParameter)
+| Placeholder(unit)
 | Withdraw(withdrawParameter)
 | Deposit(depositParameter);
 
@@ -31,23 +26,8 @@ type storage = unit;
 
 let main = ((parameter, storage): (parameter, storage)) => {
     switch(parameter) {
-        | Default => {
-            ([]: list(operation), storage)
-        }
-        | SetDelegate(setDelegateParameter) => {
-            let ovenContract: option(contract(option(key_hash))) = Tezos.get_entrypoint_opt("%setDelegate", setDelegateParameter.ovenAddress);
-            let ovenContract: contract(option(key_hash)) = switch (ovenContract) {
-                | Some(contract) => contract
-                | None => (failwith("noSetDelegateEntrypointFound"): contract(option(key_hash)))
-            };
-        
-            let operation = Tezos.transaction(
-                setDelegateParameter.delegate,
-                0mutez,
-                ovenContract
-            );
-
-            ([operation]: list(operation), storage)
+        | Placeholder => {
+            ([]: list(operation), storage);
         }
         | Withdraw(withdrawParameter) => { 
             let ovenContract: option(contract(nat)) = Tezos.get_entrypoint_opt("%withdraw", withdrawParameter.ovenAddress);
@@ -62,7 +42,7 @@ let main = ((parameter, storage): (parameter, storage)) => {
                 ovenContract
             );
 
-            ([operation]: list(operation), storage)
+            ([operation]: list(operation), storage);
         }
         | Deposit(depositParameter) => {
             let coreContract: option(contract(runEntrypointLambdaParameter)) = Tezos.get_entrypoint_opt("%runEntrypointLambda", depositParameter.coreAddress);

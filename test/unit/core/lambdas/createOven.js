@@ -1,7 +1,7 @@
 const { expect } = require('chai').use(require('chai-as-promised'));
 const before = require("../before");
 
-const { alice, bob, carol, chuck } = require('../../../../scripts/sandbox/accounts');
+const { alice, bob, carol } = require('../../../../scripts/sandbox/accounts');
 const _coreInitialStorage = require('../../../../migrations/initialStorage/core');
 const _tzip7InitialStorage = require('../../../../migrations/initialStorage/tzip-7');
 const { TezosOperationError, Tezos } = require('@taquito/taquito');
@@ -12,8 +12,8 @@ const testPackValue = require('../../../../scripts/lambdaCompiler/testPackValue'
 const loadLambdaArtifact = require('../../../../scripts/lambdaCompiler/loadLambdaArtifact');
 
 contract('core', () => {
-    describe('createOven', () => {
 
+    describe('createOven', () => {
         let helpers = {};
 
         beforeEach(async () => {
@@ -74,6 +74,7 @@ contract('core', () => {
                 const operationPromise = createOven(notADelegate);
 
                 await expect(operationPromise).to.be.eventually.rejected
+                    .and.be.instanceOf(TezosOperationError)
                     .and.have.property('message', rpcErrors.proto.unregistredDelegate);
             });
 
@@ -95,6 +96,7 @@ contract('core', () => {
                 ).send();
 
                 await expect(operationPromise).to.be.eventually.rejected
+                    .and.be.instanceOf(TezosOperationError)
                     .and.have.property('message', contractErrors.core.lambdaParameterWrongType)
             });
         });
@@ -162,7 +164,6 @@ contract('core', () => {
             });
         });
 
-
         describe('storage updates', () => {
 
             it('should add the default oven owner and originated address to the storage', async () => {
@@ -177,7 +178,6 @@ contract('core', () => {
                 const realOvenOwner = await helpers.core.getOvenOwner(ovenHelpers.instance.address);
                 expect(realOvenOwner).to.be.equal(ovenOwner);
             });
-
         });
     }); 
 });

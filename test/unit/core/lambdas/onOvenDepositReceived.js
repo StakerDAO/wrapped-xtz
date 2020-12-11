@@ -24,7 +24,7 @@ contract('core', () => {
         });
     };
 
-    describe('onOvenDespositReceived', () => {
+    describe('onOvenDepositReceived', () => {
 
         beforeEach(async () => {
             helpers = {};
@@ -89,7 +89,7 @@ contract('core', () => {
     describe('onOvenDepositReceived', () => {
 
         beforeEach(async () => {
-            // taquito initialization here is duplicit
+            // taquito initialization here is duplicate
             await _taquitoHelpers.initialize();
             await _taquitoHelpers.setSigner(alice.sk);
             helpers = {};
@@ -150,6 +150,60 @@ contract('core', () => {
                 await expect(operation).to.be.eventually.fulfilled;
             });
 
+        });
+    });
+
+    describe('onOvenDepositReceived with broken TZIP-7', () => {
+        
+        beforeEach(async () => {
+            helpers = {};
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+            
+            // manager contract will also act as oven and needs to have a %default entrypoint
+            const { managerAddress, managerHelpers } = await _managerHelpers.originate();
+            helpers.manager = managerHelpers;
+            
+            // manager contract acts as broken TZIP-7 that has no mint entrypoint implemented
+            const brokenTzip7Address = managerAddress;
+            await before({
+                core: _coreInitialStorage.test.onOvenDepositReceived([
+                    {
+                        oven: helpers.manager.instance.address,
+                        owner: alice.pkh
+                    }
+                ]) (brokenTzip7Address)     
+            }, helpers);
+        });
+        
+        it('should fail for minting tokens', async () => {
+            const operationPromise = helpers.manager.deposit(
+                helpers.core.instance.address, // core address
+                {
+                    amount: 100,
+                    mutez: true
+                }
+            );
+
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.core.wXTZTokenContractWrongType);   
+        });
+    });
+
+    describe('onOvenDepositReceived with wrong arbitrary value in storage', () => {
+        helpers = {};
+
+        beforeEach(async () => await before({
+            core: _coreInitialStorage.test.wrongArbitraryValue()    
+        }, helpers));
+        
+        it('should fail for burning tokens', async () => {       
+            const operationPromise = onOvenDepositReceived(); 
+
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.core.arbitraryValueWrongType); 
         });
     });
 });

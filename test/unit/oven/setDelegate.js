@@ -1,28 +1,31 @@
 const { rpcErrors } = require("../../../helpers/constants");
 const _taquitoHelpers = require('../../helpers/taquito');
-const { alice, bob } = require('../../../scripts/sandbox/accounts');
+const { alice, bob, chuck } = require('../../../scripts/sandbox/accounts');
 const { expect } = require('chai').use(require('chai-as-promised'));
 const _managerHelpers = require('../../helpers/manager');
-const setup = require('./before');
+const { TezosOperationError } = require("@taquito/taquito");
+const { contractErrors } = require("../../../helpers/constants");
+const _ovenHelpers = require('../../helpers/oven');
+const before = require('./before');
 
-contract('oven', () => {
+contract('oven %setDelegate entrypoint', () => {
     let helpers = {};
     let amountTez = 100;
     let amountMutez = amountTez * 1000000;
-
-    beforeEach(async () => {
-        await _taquitoHelpers.initialize();
-        await _taquitoHelpers.setSigner(alice.sk);
-        
-        helpers = await setup(
-            alice.pkh, //owner
-            amountMutez,
-            helpers
-        );
-    });
+    const baker = bob.pkh;
 
     describe('setDelegate with an implicit account', () => {
-        const baker = bob.pkh;   
+        
+        beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+            
+            helpers = await before(
+                alice.pkh, //owner
+                amountMutez,
+                helpers
+            );
+        });
 
         it('should delegate to baker Bob', async () => {     
             // set new delegate        
@@ -84,7 +87,7 @@ contract('oven', () => {
 
             let { managerHelpers, managerAddress } = await _managerHelpers.originate();
 
-            helpers = await setup(
+            helpers = await before(
                 managerAddress, // owner
                 amountMutez, 
                 helpers
@@ -92,8 +95,6 @@ contract('oven', () => {
             
             helpers.manager = managerHelpers;
         });
-
-        const baker = bob.pkh;   
 
         it('should delegate to baker Bob', async () => {     
             const ovenAddress = helpers.oven.instance.address;
@@ -147,6 +148,26 @@ contract('oven', () => {
                     delegate: `${baker}`
                 });
             });
+        });
+    });
+
+    describe('scenario where the core is broken', () => {
+
+        beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(alice.sk);
+
+            const initalStorage = alice.pkh; // alice mocks the core contract
+            const { ovenHelpers } = await _ovenHelpers.originate(initalStorage);
+            helpers.oven = ovenHelpers;
+        });
+
+        it('should fail for an oven linked to a core without a %runEntrypointLambda', async () => {
+            const operationPromise = helpers.oven.setDelegate(chuck.pkh);
+
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.core.coreContractEntrypointTypeMissmatch);    
         });
     });
 });
