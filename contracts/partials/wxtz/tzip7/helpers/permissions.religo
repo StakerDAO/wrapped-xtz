@@ -33,3 +33,27 @@ let canTransfer = ((transferSpender, transferParameter, tokenStorage): (address,
 		failForNegativeAllowanceDifference(allowance, transferParameter.value);
 	};
 };
+
+let isAdmin = (tokenStorage: tokenStorage): bool => {
+	Tezos.sender == tokenStorage.admin;
+};
+
+let failIfNotAdmin = (tokenStorage: tokenStorage): unit => {
+	let isAdmin = isAdmin(tokenStorage);
+	switch(isAdmin) {
+		| true => unit
+		| false => (failwith(errorNoPermission): unit)
+	};
+};
+
+let isPauseGuardian = (tokenStorage: tokenStorage): bool => {
+	Tezos.sender == tokenStorage.pauseGuardian;
+};
+
+let failIfNotPauseGuardian = (tokenStorage: tokenStorage): unit => {
+	let isPauseGuardian = isPauseGuardian(tokenStorage);
+	switch(isPauseGuardian) {
+		| true => unit
+		| false => (failwith(errorNoPermission): unit)
+	};
+};

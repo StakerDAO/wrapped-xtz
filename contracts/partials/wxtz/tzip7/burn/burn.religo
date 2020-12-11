@@ -1,12 +1,9 @@
 let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
 	// continue only if token operations are not paused
 	failIfPaused(tokenStorage);
-    
     // only the admin is allowed to burn tokens
-    switch(Tezos.sender == tokenStorage.admin) {
-        | true => unit
-        | false => (failwith(errorNoPermission): unit)
-    };
+    failIfNotAdmin(tokenStorage);
+
     let tokenBalance = getTokenBalance(burnParameter.from_, tokenStorage.ledger);
 
     // calculate new balance and update token ledger storage accordingly

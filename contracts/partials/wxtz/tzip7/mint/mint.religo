@@ -1,12 +1,8 @@
 let mint = ((mintParameter, tokenStorage): (mintParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
 	// continue only if token operations are not paused
 	failIfPaused(tokenStorage);
-
 	// only the admin is allowed to mint tokens
-    switch(Tezos.sender == tokenStorage.admin) {
-        | true => unit
-        | false => (failwith(errorNoPermission): unit)
-    };
+    failIfNotAdmin(tokenStorage);
 
 	// retrieve token balance before minting operation and calculate new token balance
 	let tokenBalance = getTokenBalance(mintParameter.to_, tokenStorage.ledger);
