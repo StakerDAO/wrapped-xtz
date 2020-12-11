@@ -208,7 +208,7 @@ contract('core, oven, TZIP-7', () => {
         });
     });
 
-    describe.skip('token operations are paused in TZIP-7', () => {
+    describe('token operations are paused in TZIP-7', () => {
         let helpers = {};
         const ovenOwner = alice;
         const pauseGuardian = walter;
