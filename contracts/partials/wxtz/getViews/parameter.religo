@@ -1,8 +1,8 @@
-#include "../tzip7/getBalance/parameter.religo"
-#include "../tzip7/getAllowance/parameter.religo"
-#include "../tzip7/getTotalSupply/parameter.religo"
-#include "../tzip7/bridge/getOutcome/parameter.religo"
-#include "../tzip7/bridge/getSwap/parameter.religo"
+#include "../tzip-7/getBalance/parameter.religo"
+#include "../tzip-7/getAllowance/parameter.religo"
+#include "../tzip-7/getTotalSupply/parameter.religo"
+#include "../tzip-7/bridge/getOutcome/parameter.religo"
+#include "../tzip-7/bridge/getSwap/parameter.religo"
 
 
 type requestBalanceParameter = {

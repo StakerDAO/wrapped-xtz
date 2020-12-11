@@ -1,0 +1,1 @@
+type setPauseGuardianParameter = address;

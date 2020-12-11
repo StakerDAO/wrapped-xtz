@@ -20,6 +20,24 @@ const coreHelpers = (instance) => {
         getArbitraryValue: async function(key) {
             return await (await instance.storage()).arbitraryValues.get(key);
         },
+        setArbitraryValue: async function(key, value) {
+            let packedArbitraryValue;
+            if (value) {
+                packedArbitraryValue = `Some("${testPackValue(value)}": bytes): option(bytes)`
+            } else {
+                packedArbitraryValue = `None: option(bytes)`
+            }
+            
+            const operation = await this.runEntrypointLambda(
+                'setArbitraryValue',
+                `
+                    {
+                        arbitraryValueKey: "${key}",
+                        arbitraryValue: ${packedArbitraryValue}
+                    }
+                `
+            )
+        },
         createOven: async function(delegateKeyHash, ownerAddress, sendParams) {
             let delegate;
             if (delegateKeyHash === null) {
@@ -123,6 +141,24 @@ const coreHelpers = (instance) => {
             const storage = await instance.storage()
             const lambdaBytes = await storage.lambdas.get(lambdaName);
             return lambdaBytes;
+        },
+        setAdministrator: async function(administrator) {
+            return await this.runEntrypointLambda(
+                "tzip-7/setAdministrator",
+                `"${administrator}": address`
+            );
+        },
+        setPauseGuardian: async function(pauseGuardian) {
+            return await this.runEntrypointLambda(
+                "tzip-7/setPauseGuardian",
+                `"${pauseGuardian}": address`
+            );
+        },
+        setPause: async function(pause) {
+            return await this.runEntrypointLambda(
+                "tzip-7/setPause",
+                pause
+            );
         }
     };
 };

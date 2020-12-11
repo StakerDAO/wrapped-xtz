@@ -1,4 +1,4 @@
-#include "../tzip7/storage/types.religo"
+#include "../tzip-7/storage/types.religo"
 
 type owner = address;
 type contractAddress = address;
