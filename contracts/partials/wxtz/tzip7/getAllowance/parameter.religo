@@ -1,7 +1,7 @@
 type getAllowanceParameter = 
 [@layout:comb]
 {
-	owner: address,
-	spender: address,
-	callback: contract(nat),
+    owner: address,
+    spender: address,
+    callback: contract(nat),
 };

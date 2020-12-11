@@ -6,18 +6,18 @@
  * following the TZIP-7 specification.
  */
 let failForNegativeBalanceDifference = ((a, b): (nat, nat)): unit => {
-	let positiveDifference = a >= b;
-	switch (positiveDifference) {
-		| true => unit
-		| false => (failwith(errorNotEnoughBalance): unit)
-	}
+    let positiveDifference = a >= b;
+    switch (positiveDifference) {
+        | true => unit
+        | false => (failwith(errorNotEnoughBalance): unit)
+    }
 };
 let failForNegativeAllowanceDifference = ((a, b): (nat, nat)): unit => {
-	let positiveDifference = a >= b;
-	switch (positiveDifference) {
-		| true => unit
-		| false => (failwith(errorNotEnoughAllowance): unit)
-	}
+    let positiveDifference = a >= b;
+    switch (positiveDifference) {
+        | true => unit
+        | false => (failwith(errorNotEnoughAllowance): unit)
+    }
 };
 
 /**
@@ -26,10 +26,10 @@ let failForNegativeAllowanceDifference = ((a, b): (nat, nat)): unit => {
  * hence these helper functions.
  */
 let safeAllowanceSubtraction = ((a, b): (nat, nat)): nat => {
-	failForNegativeAllowanceDifference(a, b);
-	abs(a - b);
+    failForNegativeAllowanceDifference(a, b);
+    abs(a - b);
 };
 let safeBalanceSubtraction = ((a, b): (nat, nat)): nat => {
-	failForNegativeBalanceDifference(a, b);
-	abs(a - b);
+    failForNegativeBalanceDifference(a, b);
+    abs(a - b);
 };

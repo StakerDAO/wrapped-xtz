@@ -6,6 +6,6 @@
 #include "updateTokenStorageRepository.religo"
 
 type storage = {
-  token: tokenStorage,
-  bridge: bridgeStorage,
+    token: tokenStorage,
+    bridge: bridgeStorage,
 };

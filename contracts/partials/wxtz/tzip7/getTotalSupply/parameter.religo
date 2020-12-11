@@ -1,3 +1,3 @@
 type getTotalSupplyParameter = {
-	callback: contract(nat),
+    callback: contract(nat),
 };

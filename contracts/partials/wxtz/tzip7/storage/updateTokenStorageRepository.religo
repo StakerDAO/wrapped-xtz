@@ -60,13 +60,13 @@ let updateTokenStorageByMint = ((mintParameter, tokenStorage): (mintParameter, t
 let updateApprovalsByTransfer = ((transferParameter, spender, tokenStorage): (transferParameter, address, tokenStorage)): tokenStorage => {
     let owner = transferParameter.from_;
     let allowance = getTokenAllowance(owner, spender, tokenStorage.approvals);
-	let reducedAllowance = safeAllowanceSubtraction(allowance, transferParameter.value);
-	let approvals = setTokenAllowance(
-		owner,
-		spender,
-		reducedAllowance,
-		tokenStorage.approvals
-	);
+    let reducedAllowance = safeAllowanceSubtraction(allowance, transferParameter.value);
+    let approvals = setTokenAllowance(
+        owner,
+        spender,
+        reducedAllowance,
+        tokenStorage.approvals
+    );
     let tokenStorage = {
         ...tokenStorage,
         approvals: approvals
@@ -80,20 +80,20 @@ let updateApprovalsByTransfer = ((transferParameter, spender, tokenStorage): (tr
  * Performs an extra check on the sender for enough balance.
  */
 let updateLedgerByTransfer = ((transferParameter, tokenStorage): (transferParameter, tokenStorage)): tokenStorage => {
-	let senderBalance = getTokenBalance(transferParameter.from_, tokenStorage.ledger);
-	let reducedSenderBalance = safeBalanceSubtraction(senderBalance, transferParameter.value);
-	let ledger = setTokenBalance(
-		transferParameter.from_,
-		reducedSenderBalance,
-		tokenStorage.ledger
-	);
-	let receiverBalance = getTokenBalance(transferParameter.to_, ledger);
-	let increasedReceiverBalance = receiverBalance + transferParameter.value;
-	let ledger = setTokenBalance(
-		transferParameter.to_,
-		increasedReceiverBalance,
-		ledger
-	);
+    let senderBalance = getTokenBalance(transferParameter.from_, tokenStorage.ledger);
+    let reducedSenderBalance = safeBalanceSubtraction(senderBalance, transferParameter.value);
+    let ledger = setTokenBalance(
+        transferParameter.from_,
+        reducedSenderBalance,
+        tokenStorage.ledger
+    );
+    let receiverBalance = getTokenBalance(transferParameter.to_, ledger);
+    let increasedReceiverBalance = receiverBalance + transferParameter.value;
+    let ledger = setTokenBalance(
+        transferParameter.to_,
+        increasedReceiverBalance,
+        ledger
+    );
     let tokenStorage = {
         ...tokenStorage,
         ledger: ledger

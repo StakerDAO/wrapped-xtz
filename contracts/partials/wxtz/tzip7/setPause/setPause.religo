@@ -7,7 +7,7 @@ let setPause = ((setPauseParameter, tokenStorage): (bool, tokenStorage)): (entry
         | true => failIfNotPauseGuardian(tokenStorage)
         | false => failIfNotAdmin(tokenStorage)
     };
-    
+
     // update pause state in token storage
     let tokenStorage = {
         ...tokenStorage,
