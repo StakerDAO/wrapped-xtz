@@ -16,9 +16,10 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
         (failwith(errorAllowanceMismatch): (entrypointReturn, tokenStorage)) 
     }
 	else {
-		let approvals = Big_map.update(
-			(Tezos.sender, approveCASParameter.spender),
-			Some(approveCASParameter.value),
+		let approvals = setTokenAllowance(
+			Tezos.sender, // token owner
+			approveCASParameter.spender,
+			approveCASParameter.value,
 			tokenStorage.approvals
 		);
 		let tokenStorage = {

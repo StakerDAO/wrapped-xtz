@@ -1,4 +1,7 @@
 #include "types.religo"
+#include "getTokenAllowance.religo"
+#include "getTokenBalance.religo"
+#include "setTokenAllowance.religo"
 
 type tokenStorage = {
   ledger: ledger,
