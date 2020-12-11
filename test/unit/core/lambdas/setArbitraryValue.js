@@ -19,7 +19,7 @@ contract('core', () => {
         }, helpers)
     });
 
-    describe.only('setArbitraryValue', () => {
+    describe('setArbitraryValue', () => {
         // by default alice is the signer, and she is also the default admin
         it('should not be callable by a non-admin address', async () => {
             const arbitraryValue = `("${bob.pkh}": address)`
@@ -34,7 +34,7 @@ contract('core', () => {
         });
 
         // explicitly test the entrypoint call as the defined admin
-        it.only('should be callable by the admin', async () => {
+        it('should be callable by the admin', async () => {
             const arbitraryValueKey = "admin";
             const arbitraryValue = `("${bob.pkh}": address)`
             const operationPromise = _taquitoHelpers.signAs(alice.sk, async () => {
