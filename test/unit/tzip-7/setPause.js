@@ -88,11 +88,11 @@ contract('TZIP-7 token contract', () => {
                     // read contract's storage after the operation
                     expect(await helpers.tzip7.getPauseState()).to.be.false;
     
-                    const transferPromise = helpers.tzip7.transfer(
-                        alice.pkh, // from
-                        bob.pkh, // to
-                        1000000 // 1 wXTZ
-                    );
+                    const transferPromise = helpers.tzip7.transfer({
+                        from: alice.pkh,
+                        to: bob.pkh,
+                        value: 1000000 // 1 wXTZ
+                    });
                     await expect(transferPromise).to.be.fulfilled;
     
                     const approvePromise = helpers.tzip7.approve(
