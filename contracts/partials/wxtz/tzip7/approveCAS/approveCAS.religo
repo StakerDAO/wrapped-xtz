@@ -3,7 +3,7 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
 	failIfPaused(tokenStorage);
 	// retrieve existing allowance
 	let allowance = getTokenAllowance(
-		Tezos.sender, 
+		Tezos.sender, // token owner
 		approveCASParameter.spender, 
 		tokenStorage.approvals
 	);
@@ -22,8 +22,8 @@ let approveCAS = ((approveCASParameter, tokenStorage): (approveCASParameter, tok
 			tokenStorage.approvals
 		);
 		let tokenStorage = {
-				...tokenStorage,
-				approvals: approvals
+			...tokenStorage,
+			approvals: approvals
 		};
 		// no operations are returned, only the updated storage
 		(emptyListOfOperations, tokenStorage);
