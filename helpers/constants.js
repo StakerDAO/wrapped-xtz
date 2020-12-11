@@ -42,11 +42,7 @@ module.exports = {
             ovenNotFound: '13',
             notAnOvenOwner: '14',
             ovenOwnerDoesNotAcceptDeposits: '15',
-<<<<<<< HEAD
             invalidOvenOwner: '16'
-=======
-            senderNotAdmin: '12'
->>>>>>> feat(setarbitraryvalue): implemented a lambda to update any arbitrary values as admin
         },
     },
 };
