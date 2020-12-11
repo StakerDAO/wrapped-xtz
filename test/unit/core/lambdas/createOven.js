@@ -56,7 +56,7 @@ contract('core', () => {
         });
 
         describe('delegate selection', () => {
-            it('should be possible to delegate to the vault owner him/herself', async () => {
+            it('should be possible to delegate to the oven owner him/herself', async () => {
                 const operationPromiseBob = _taquitoHelpers.signAs(bob.sk, async () => {
                     return await createOven(bob.pkh, bob.pkh);
                 });
