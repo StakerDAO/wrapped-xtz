@@ -41,7 +41,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	};
 
 	// calling the transfer function to redeem the total token amount specified in swap
-	let ledger = updateLedgerByTransfer(transferParameter, storage.token.ledger);
+	let tokenStorage = updateLedgerByTransfer(transferParameter, storage.token);
 
 	// save secret and secretHash to outcomes in bridge storage
 	let newOutcome = Big_map.add(
@@ -59,10 +59,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	// update token ledger storage and bridge storage
 	let newStorage = {
 		...storage,
-		token: {
-			...storage.token,
-			ledger: ledger,
-		}, 
+		token: tokenStorage, 
 		bridge: {
 			...storage.bridge,
 			swaps: newSwap,

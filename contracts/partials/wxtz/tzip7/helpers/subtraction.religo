@@ -1,3 +1,5 @@
+#include "../errors.religo"
+
 /*
  * These helper functions check, whether the result of a substraction
  * is negative or positive and fails with the associated error message
