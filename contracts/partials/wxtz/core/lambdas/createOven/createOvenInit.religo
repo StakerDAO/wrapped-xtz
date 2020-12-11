@@ -41,3 +41,32 @@ let originateOven = ((xtzAmount, delegate, ovenOwner, coreContractAddress): orig
         ovenInitialStorage
     );
 }
+
+/**
+ * Some known addresses can't be ovenOwners by design,
+ * this validation exists to prevent obscure edge cases.
+ * 
+ * // TODO: should the admin address also be included in this validation?
+ */
+let failIfInvalidOvenOwner = (ovenOwner: ovenOwner, storage: storage, lambdaExtras: lambdaExtras): unit => {
+    let existingOvenOwner: option(address) = Big_map.find_opt(ovenOwner, storage.ovens);
+    let isOvenOwnerTrustedOven: bool = switch (existingOvenOwner) {
+        | Some(existingOvenOwner) => true // oven with address `ovenOwner` has been found
+        | None => false
+    };
+    
+    let wXTZTokenContractAddress: address = getWXTZTokenContractAddress((storage));
+    let isOvenOwnerWXTZTokenContract: bool = ovenOwner == wXTZTokenContractAddress;
+
+    let isOvenOwnerCurrentContract: bool = ovenOwner == lambdaExtras.selfAddress;
+    
+    let isInvalidOvenOwner: bool = 
+        isOvenOwnerCurrentContract 
+        || isOvenOwnerTrustedOven
+        || isOvenOwnerWXTZTokenContract;
+    
+    switch (isInvalidOvenOwner) {
+        | true => failwith(errorInvalidOvenOwner)
+        | false => ()
+    };
+};

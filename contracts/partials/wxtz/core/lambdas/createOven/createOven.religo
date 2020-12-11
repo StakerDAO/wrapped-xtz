@@ -15,6 +15,9 @@
      */
     let ovenOwner: ovenOwner = createOvenParameter.ovenOwner;
 
+    // validate the proposed ovenOwner address
+    failIfInvalidOvenOwner(ovenOwner, storage, lambdaExtras);
+
     // Compose the origination operation and get the newly orignated wXTZ Oven address
     let (ovenOriginationOperation, newOvenAddress): (operation, address) = originateOven((
         // Send all the XTZ received to the newly created wXTZ Oven

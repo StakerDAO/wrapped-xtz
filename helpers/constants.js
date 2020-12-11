@@ -42,6 +42,7 @@ module.exports = {
             ovenNotFound: '13',
             notAnOvenOwner: '14',
             ovenOwnerDoesNotAcceptDeposits: '15',
+            invalidOvenOwner: '16'
         },
     },
 };

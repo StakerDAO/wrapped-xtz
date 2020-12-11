@@ -99,6 +99,39 @@ contract('core', () => {
                     .and.be.instanceOf(TezosOperationError)
                     .and.have.property('message', contractErrors.core.lambdaParameterWrongType)
             });
+
+            describe('ovenOwner validation', () => {
+                
+                const expectToBeRejectedWithInvalidOvenOwner = async (operationPromise) => {
+                    await expect(operationPromise).to.be.eventually.rejected
+                        .and.have.property('message', contractErrors.core.invalidOvenOwner);
+                }
+
+                it('should not be possible to createOven with wXTZ Core as the ovenOwner', async () => {
+                    const operationPromise = createOven(
+                        null, 
+                        helpers.core.instance.address
+                    );
+                    await expectToBeRejectedWithInvalidOvenOwner(operationPromise);
+                });
+
+                it('should not be possible to createOven with wXTZ Token contract as the ovenOwner', async () => {
+                    const operationPromise = createOven(
+                        null,
+                        helpers.tzip7.instance.address
+                    );
+                    await expectToBeRejectedWithInvalidOvenOwner(operationPromise);
+                });
+
+                it('should not be possible to createOven with an existing wXTZ Oven as the ovenOwner', async () => {
+                    const { ovenAddress } = await createOven();
+                    const operationPromise = createOven(
+                        null,
+                        ovenAddress
+                    );
+                    await expectToBeRejectedWithInvalidOvenOwner(operationPromise);
+                });
+            })
         });
 
 
