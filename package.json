@@ -3,14 +3,21 @@
   "version": "1.0.0",
   "description": "",
   "devDependencies": {
+    "@taquito/signer": "^7.0.1-beta.0",
     "@taquito/taquito": "^6.3.5-beta.0",
+    "bignumber.js": "^9.0.1",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "commitizen": "^4.2.2",
     "cz-conventional-changelog": "^3.2.0",
     "eztz.js": "git+https://github.com/TezTech/eztz.git",
     "fs-extra": "^9.0.0",
+    "ganache-cli": "^6.11.0-tezos.0",
+    "husky": "^4.3.5",
     "lodash": "^4.17.20",
     "onchange": "^7.0.2",
     "promise-retry": "^1.1.1",
+    "random-bytes": "^1.0.0",
     "rimraf": "^3.0.2",
     "truffle": "^5.5.0-tezos.4"
   },
@@ -51,13 +58,5 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "dependencies": {
-    "@taquito/signer": "^7.0.1-beta.0",
-    "bignumber.js": "^9.0.1",
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "ganache-cli": "^6.10.0-tezos.1",
-    "random-bytes": "^1.0.0"
   }
 }
