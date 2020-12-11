@@ -9,7 +9,7 @@ const { contractErrors } = require('../../../helpers/constants');
 const { TezosOperationError } = require('@taquito/taquito');
 
 
-contract('TZIP-7 token contract', () => {
+contract('TZIP-7 token contract %mint entrypoint', () => {
     let helpers = {};
     const pauseGuardian = walter;
     const admin = alice;

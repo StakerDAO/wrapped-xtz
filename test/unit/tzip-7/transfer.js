@@ -10,7 +10,7 @@ const { contractErrors } = require('../../../helpers/constants');
 const { TezosOperationError } = require('@taquito/taquito');
 
 
-contract('TZIP-7 token contract', () => {
+contract('TZIP-7 token contract %transfer entrypoint', () => {
     let helpers = {};
     const pauseGuardian = walter;
     let balances;
@@ -53,7 +53,7 @@ contract('TZIP-7 token contract', () => {
             });
             transferParameter.to = carol.pkh;
             transferParameter.value = 100;
-            
+
             const operationPromise = helpers.tzip7.transfer(transferParameter);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
