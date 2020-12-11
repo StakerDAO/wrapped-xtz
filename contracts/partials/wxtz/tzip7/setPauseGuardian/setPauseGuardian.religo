@@ -1,4 +1,4 @@
-let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (address, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let setPauseGuardian = ((setPauseGuardianParameter, tokenStorage): (setPauseGuardianParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
     // only the current administrator is allowed to change the pause guardian's address
     failIfNotAdmin(tokenStorage);
 

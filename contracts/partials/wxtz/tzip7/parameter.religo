@@ -6,6 +6,9 @@
 #include "./getTotalSupply/parameter.religo"
 #include "./mint/parameter.religo"
 #include "./burn/parameter.religo"
+#include "./setAdministrator/parameter.religo"
+#include "./setPause/parameter.religo"
+#include "./setPauseGuardian/parameter.religo"
 
 #include "./bridge/lock/parameter.religo"
 #include "./bridge/redeem/parameter.religo"
@@ -20,9 +23,9 @@ type parameter =
     | ApproveCAS(approveCASParameter)
     | Mint(mintParameter)
     | Burn(burnParameter)
-    | SetAdministrator(address)
-    | SetPauseGuardian(address)
-    | SetPause(bool)
+    | SetAdministrator(setAdministratorParameter)
+    | SetPauseGuardian(setPauseGuardianParameter)
+    | SetPause(setPauseParameter)
     | GetAllowance(getAllowanceParameter)
     | GetBalance(getBalanceParameter)
     | GetTotalSupply(getTotalSupplyParameter)
