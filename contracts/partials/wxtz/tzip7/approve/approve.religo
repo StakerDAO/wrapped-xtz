@@ -3,7 +3,7 @@ let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage
 	failIfPaused(tokenStorage);
 	// retrieve existing allowance
 	let allowance = getTokenAllowance(
-		Tezos.sender, 
+		Tezos.sender, // token owner
 		approveParameter.spender, 
 		tokenStorage.approvals
 	);
@@ -23,8 +23,8 @@ let approve = ((approveParameter, tokenStorage): (approveParameter, tokenStorage
 			tokenStorage.approvals
 		);
 		let tokenStorage = {
-				...tokenStorage,
-				approvals: approvals
+			...tokenStorage,
+			approvals: approvals
 		};
 		// no operations are returned, only the updated storage
 		(emptyListOfOperations, tokenStorage);
