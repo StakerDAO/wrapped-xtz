@@ -20,6 +20,24 @@ const coreHelpers = (instance) => {
         getArbitraryValue: async function(key) {
             return await (await instance.storage()).arbitraryValues.get(key);
         },
+        setArbitraryValue: async function(key, value) {
+            let packedArbitraryValue;
+            if (value) {
+                packedArbitraryValue = `Some("${testPackValue(value)}": bytes): option(bytes)`
+            } else {
+                packedArbitraryValue = `None: option(bytes)`
+            }
+            
+            const operation = await this.runEntrypointLambda(
+                'setArbitraryValue',
+                `
+                    {
+                        arbitraryValueKey: "${key}",
+                        arbitraryValue: ${packedArbitraryValue}
+                    }
+                `
+            )
+        },
         createOven: async function(delegateKeyHash, ownerAddress, sendParams) {
             let delegate;
             if (delegateKeyHash === null) {

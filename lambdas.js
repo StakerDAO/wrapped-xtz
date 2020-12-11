@@ -48,5 +48,9 @@ module.exports = [
     {
         lambdaName: 'contracts/partials/wxtz/core/lambdas/createOven/createOven.religo',
         lambdaAlias: 'entrypoint/createOven',
+    },
+    {
+        lambdaName: 'contracts/partials/wxtz/core/lambdas/setArbitraryValue/setArbitraryValue.religo',
+        lambdaAlias: 'entrypoint/setArbitraryValue'
     }
 ]
