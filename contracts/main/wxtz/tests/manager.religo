@@ -5,7 +5,7 @@
 
 #include "../../../partials/wxtz/core/lambdas/onOvenDepositReceived/onOvenDepositReceivedInit.religo"
 #include "../../../partials/wxtz/core/runEntrypointLambda/composeRunEntrypointLambdaOperation.religo"
-#include "../../../partials/wxtz/tzip7/transfer/parameter.religo"
+#include "../../../partials/wxtz/tzip-7/transfer/parameter.religo"
 
 
 type setDelegateParameter = {
