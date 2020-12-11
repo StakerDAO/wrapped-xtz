@@ -8,7 +8,7 @@ const _taquitoHelpers = require('../../helpers/taquito');
 const { contractErrors } = require('../../../helpers/constants');
 const { TezosOperationError } = require('@taquito/taquito');
 
-contract('TZIP-7 token contract', () => {
+contract('TZIP-7 token contract %approve entrypoint', () => {
     let helpers = {};
     const pauseGuardian = walter;
     const admin = alice;

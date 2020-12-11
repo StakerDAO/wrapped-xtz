@@ -7,7 +7,7 @@ const _tzip7InitialStorage = require('../../../migrations/initialStorage/tzip-7'
 const _tzip7Helpers = require('../../helpers/tzip-7');
 const _taquitoHelpers = require('../../helpers/taquito');
 
-contract('TZIP-7 token contract', () => {
+contract('TZIP-7 token contract %getAllowance entrypoint', () => {
     let helpers = {};
     const admin = alice;
     let getViewsInstance;
