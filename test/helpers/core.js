@@ -141,6 +141,24 @@ const coreHelpers = (instance) => {
             const storage = await instance.storage()
             const lambdaBytes = await storage.lambdas.get(lambdaName);
             return lambdaBytes;
+        },
+        setAdministrator: async function(administrator) {
+            return await this.runEntrypointLambda(
+                "tzip-7/setAdministrator",
+                `"${administrator}": address`
+            );
+        },
+        setPauseGuardian: async function(pauseGuardian) {
+            return await this.runEntrypointLambda(
+                "tzip-7/setPauseGuardian",
+                `"${pauseGuardian}": address`
+            );
+        },
+        setPause: async function(pause) {
+            return await this.runEntrypointLambda(
+                "tzip-7/setPause",
+                pause
+            );
         }
     };
 };

@@ -18,6 +18,7 @@ initialStorage.base = {
     },
 };
 
+
 initialStorage.withBalances = {
     ...initialStorage.base,
     token: {
@@ -109,5 +110,10 @@ initialStorage.test.confirmSwap = (secretHash, confirmed) => {
     });
     return storage;
 };
+
+initialStorage.test.paused = {
+    ...initialStorage.base,
+    paused: true
+}
 
 module.exports = initialStorage;

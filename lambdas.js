@@ -52,5 +52,17 @@ module.exports = [
     {
         lambdaName: 'contracts/partials/wxtz/core/lambdas/setArbitraryValue/setArbitraryValue.religo',
         lambdaAlias: 'entrypoint/setArbitraryValue'
+    },
+    {
+        lambdaName: 'contracts/partials/wxtz/core/lambdas/tzip-7/setAdministrator/setAdministrator.religo',
+        lambdaAlias: 'entrypoint/tzip-7/setAdministrator'
+    },
+    {
+        lambdaName: 'contracts/partials/wxtz/core/lambdas/tzip-7/setPauseGuardian/setPauseGuardian.religo',
+        lambdaAlias: 'entrypoint/tzip-7/setPauseGuardian'
+    },
+    {
+        lambdaName: 'contracts/partials/wxtz/core/lambdas/tzip-7/setPause/setPause.religo',
+        lambdaAlias: 'entrypoint/tzip-7/setPause'
     }
 ]
