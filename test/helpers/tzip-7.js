@@ -74,11 +74,11 @@ const tzip7Helpers = (instance) => {
             const allowanceValue = await approvals.get(key) || 0;
             return Number(allowanceValue);
         },
-        transfer: async function(from, to, value) {
+        transfer: async function(transferParameters) {
             const operation = await instance.methods.transfer(
-                from,
-                to,
-                value
+                transferParameters.from,
+                transferParameters.to,
+                transferParameters.value
             ).send();
             await operation.confirmation(1);
             return operation
@@ -137,6 +137,15 @@ const tzip7Helpers = (instance) => {
         getOutcomes: async function(secretHash) {
             const outcome = await (await this.getStorage()).bridge.outcomes.get(secretHash);
             return outcome;
+        },
+        getAllowanceFromStorage: async function(storage, owner, spender) {
+            // michelson pair
+            const key = {
+                0: owner,
+                1: spender
+            };
+            const allowance = await storage.token.approvals.get(key) || 0;
+            return Number(allowance);
         }
     }
 }

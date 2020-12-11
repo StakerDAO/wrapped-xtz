@@ -79,7 +79,11 @@ contract('core, oven, TZIP-7', () => {
             const totalOvenBalance = balance.xtzOvenBefore;
             // oven owner reduces wXTZ
             const someAliceWxtz = balance.wXtzOvenOwnerBefore / 2;
-            await helpers.tzip7.transfer(someAliceWxtz, ovenOwner.pkh, carol.pkh);
+            await helpers.tzip7.transfer({ 
+                from: ovenOwner.pkh, 
+                to: carol.pkh,
+                value: someAliceWxtz
+            });
             
             // Alice attempts to withdraw all XTZ in the oven, but does not have enough wXTZ
             const operationPromise = helpers.oven.withdraw(totalOvenBalance);

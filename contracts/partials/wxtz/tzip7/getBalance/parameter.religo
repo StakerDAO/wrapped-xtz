@@ -1,6 +1,6 @@
 type getBalanceParameter = 
 [@layout:comb]
 {
-	owner: address,
-	callback: contract(nat),
+    owner: address,
+    callback: contract(nat),
 };

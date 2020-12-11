@@ -1,6 +1,6 @@
 type approveParameter = 
 [@layout:comb]
 {
-	spender: address,
-	value: nat,
+    spender: address,
+    value: nat,
 };

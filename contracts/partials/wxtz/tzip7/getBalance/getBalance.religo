@@ -1,13 +1,11 @@
+#include "../storage/getTokenBalance.religo"
+
 let getBalance = ((getBalanceParameter, tokenStorage): (getBalanceParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
-	let optionalBalanceValue = Big_map.find_opt(getBalanceParameter.owner, tokenStorage.ledger);
-	let balanceValue = switch (optionalBalanceValue) {
-		| Some value => value
-		| None => defaultBalance
-	};
-	let operation = Tezos.transaction(
-		balanceValue,
-		0mutez,
-		getBalanceParameter.callback
-	);
-	([operation], tokenStorage)
+    let tokenBalance = getTokenBalance(getBalanceParameter.owner, tokenStorage.ledger);
+    let operation = Tezos.transaction(
+        tokenBalance,
+        0mutez,
+        getBalanceParameter.callback
+    );
+    ([operation], tokenStorage);
 };

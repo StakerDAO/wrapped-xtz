@@ -1,9 +1,6 @@
 let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
-	let isPaused = switch (storage.token.paused) {
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
+	failIfPaused(storage.token);
 	
 	// create swap record entry from parameters and implicit values
 	let swapEntry: swap = {
@@ -35,7 +32,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		value: totalAmount,
 	};
 	// call the transfer function of TZIP-7
-	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
+	let tokenStorage = updateLedgerByTransfer(transferParameter, storage.token);
 	
 	// update both bridge and token ledger storage
 	let newBridgeStorage = { 
@@ -45,7 +42,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 	let newStorage = {
 		...storage,
 		bridge: newBridgeStorage,
-		token: newTokenStorage,
+		token: tokenStorage,
 	};
 	// no operations are returned, only the updated storage
 	(emptyListOfOperations, newStorage);

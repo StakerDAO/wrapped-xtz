@@ -1,9 +1,6 @@
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
-    // continue only if token operations are not paused
-    let isPaused = switch (storage.token.paused) {
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
+	// continue only if token operations are not paused
+	failIfPaused(storage.token);
     
     // retrieve swap record from storage
     let swap = Big_map.find_opt(claimRefundParameter.secretHash, storage.bridge.swaps);
@@ -25,7 +22,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         value: swap.value,
     };
     // calling the transfer function to redeem the token amount specified in swap
-    let (_, newTokenStorage) = transfer((transferValueParameter, storage.token));
+    let tokenStorage = updateLedgerByTransfer(transferValueParameter, storage.token);
 
     // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
     let transferFeeParameter: transferParameter = {
@@ -33,8 +30,8 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         from_: Tezos.self_address,
         value: swap.fee,
     };
-    // please note that the modified newTokenStorage from above is used here
-    let (_, newTokenStorage) = transfer(transferFeeParameter, newTokenStorage);
+    // please note that the modified tokenStorage from above is used here
+    let tokenStorage = updateLedgerByTransfer(transferFeeParameter, tokenStorage);
     
     // remove the swap record from storage
     let newSwaps = Big_map.remove(claimRefundParameter.secretHash, storage.bridge.swaps);
@@ -42,7 +39,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     // update both token ledger storage and swap records in bridge storage
     let newStorage = {
         ...storage,
-        token: newTokenStorage, 
+        token: tokenStorage, 
         bridge: {
             ...storage.bridge,
             swaps: newSwaps,

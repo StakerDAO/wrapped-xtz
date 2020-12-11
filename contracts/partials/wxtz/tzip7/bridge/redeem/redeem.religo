@@ -1,9 +1,6 @@
 let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypointReturn, storage) => {
 	// continue only if token operations are not paused
-	let isPaused = switch (storage.token.paused) {
-		| true => (failwith(errorTokenOperationsArePaused): bool)
-		| false => false	
-	};
+	failIfPaused(storage.token);
 	
 	// provided secret needs to be below a certain length
 	let secretByteLength = Bytes.length(redeemParameter.secret);
@@ -44,7 +41,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	};
 
 	// calling the transfer function to redeem the total token amount specified in swap
-	let (_, newTokenStorage) = transfer((transferParameter, storage.token));
+	let tokenStorage = updateLedgerByTransfer(transferParameter, storage.token);
 
 	// save secret and secretHash to outcomes in bridge storage
 	let newOutcome = Big_map.add(
@@ -62,7 +59,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): (entrypoi
 	// update token ledger storage and bridge storage
 	let newStorage = {
 		...storage,
-		token: newTokenStorage, 
+		token: tokenStorage, 
 		bridge: {
 			...storage.bridge,
 			swaps: newSwap,
