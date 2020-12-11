@@ -1,5 +1,3 @@
-#include "../storage/getTokenAllowance.religo"
-#include "../storage/getTokenBalance.religo"
 #include "subtraction.religo"
 
 /**
