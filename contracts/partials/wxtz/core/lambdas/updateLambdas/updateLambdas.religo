@@ -28,7 +28,7 @@
         ((updateLambdasAccumulator, lambdaUpdate): updateLambdasIteratorParameter): updateLambdasAccumulator => {
             let (lambdaName, optionalPackedLambda) = lambdaUpdate;
             // optionalPackedLambda can be Some/None to upsert/remove the entry
-            Map.update(lambdaName, optionalPackedLambda, updateLambdasAccumulator)
+            Big_map.update(lambdaName, optionalPackedLambda, updateLambdasAccumulator)
         };
 
     let lambdas: lambdas = Map.fold(updateLambdasIterator, updateLambdasParameter, updateLambdasAccumulator);
