@@ -1,7 +1,5 @@
 #include "../helpers/permissions.religo"
 #include "../helpers/subtraction.religo"
-#include "../storage/getTokenBalance.religo"
-#include "../storage/getTokenAllowance.religo"
 
 /**
  * Reduces the allowance according to how many tokens are transferred.
@@ -11,9 +9,10 @@
 let updateApprovalsByTransfer = ((owner, spender, value, approvals): (address, address, nat, approvals)): approvals => {
 	let allowance = getTokenAllowance(owner, spender, approvals);
 	let reducedAllowance = safeAllowanceSubtraction(allowance, value);
-	Big_map.update(
-		(owner, spender),
-		Some(reducedAllowance),
+	setTokenAllowance(
+		owner,
+		spender,
+		reducedAllowance,
 		approvals
 	);
 };
