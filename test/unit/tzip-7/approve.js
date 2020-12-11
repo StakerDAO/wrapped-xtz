@@ -8,16 +8,6 @@ const _taquitoHelpers = require('../../helpers/taquito');
 const { contractErrors } = require('../../../helpers/constants');
 const { TezosOperationError } = require('@taquito/taquito');
 
-async function getAllowanceFromStorage(storage, owner, spender) {
-    // michelson pair
-    const key = {
-        0: owner,
-        1: spender
-    };
-    const allowance = await storage.token.approvals.get(key) || 0;
-    return Number(allowance);
-};
-
 contract('TZIP-7 token contract', () => {
     let helpers = {};
     const pauseGuardian = walter;
@@ -43,7 +33,11 @@ contract('TZIP-7 token contract', () => {
             allowance
         );
 
-        const beforeApproveOperation = await getAllowanceFromStorage(_tzip7InitialStorage.withApprovals, carol.pkh, bob.pkh);
+        const beforeApproveOperation = await helpers.tzip7.getAllowanceFromStorage(
+            _tzip7InitialStorage.withApprovals, // storage
+            carol.pkh, // owner
+            bob.pkh // spender
+        );
         const afterApproveOperation = await helpers.tzip7.getAllowance(carol.pkh, bob.pkh);
         expect(beforeApproveOperation).to.equal(0);
         expect(afterApproveOperation).to.equal(allowance);
@@ -56,7 +50,11 @@ contract('TZIP-7 token contract', () => {
             0
         );
 
-        const beforeApproveOperation = await getAllowanceFromStorage(_tzip7InitialStorage.withApprovals, bob.pkh, carol.pkh);
+        const beforeApproveOperation = await helpers.tzip7.getAllowanceFromStorage(
+            _tzip7InitialStorage.withApprovals, 
+            bob.pkh, 
+            carol.pkh
+        );
         const afterApproveOperation = await helpers.tzip7.getAllowance(bob.pkh, carol.pkh);
         expect(beforeApproveOperation).to.not.equal(0);
         expect(afterApproveOperation).to.equal(0);

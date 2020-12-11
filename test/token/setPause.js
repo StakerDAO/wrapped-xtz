@@ -50,11 +50,11 @@ contract('TZIP-7 token contract', () => {
             });
 
             it('should fail for transfer operations', async () => {
-                const operationPromise = helpers.tzip7.transfer(
-                    bob.pkh, // from
-                    carol.pkh, // to
-                    1000000 // 1 wXTZ
-                );
+                const operationPromise = helpers.tzip7.transfer({
+                    from: bob.pkh,
+                    to: carol.pkh,
+                    value: 1000000 // 1 wXTZ
+                });
                 await expect(operationPromise).to.be.rejectedWith(contractErrors.tzip7.tokenOperationsPaused);
             });
 
