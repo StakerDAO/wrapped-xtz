@@ -95,7 +95,7 @@ contract('core', () => {
             helpers = {};
 
             /**
-             * Manager will act as a mock vault, without %default
+             * Manager will act as a mock oven, without %default
              */
             helpers.brokenManagerHelpers = await (async () => {
                 let { managerHelpers } = await _managerHelpers.originate(true);
