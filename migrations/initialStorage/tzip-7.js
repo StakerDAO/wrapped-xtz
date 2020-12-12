@@ -1,5 +1,5 @@
-const { MichelsonMap, UnitValue } = require('@taquito/taquito');
-const { alice, bob, carol, walter } = require('../../scripts/sandbox/accounts');
+const { MichelsonMap } = require('@taquito/taquito');
+const { alice, bob, carol, trent, walter } = require('../../scripts/sandbox/accounts');
 const initialStorage = {};
 const getDelayedISOTime = require('../../helpers/getDelayedISOTime');
 
@@ -8,13 +8,14 @@ initialStorage.base = {
         ledger: new MichelsonMap,
         approvals: new MichelsonMap,
         admin: alice.pkh,
-        pauseGuardian: walter.pkh,
+        pauseGuardian: walter.pkh, // warden
         paused: false,
         totalSupply: 0,
     },
     bridge: {
         swaps: new MichelsonMap,
-        outcomes: new MichelsonMap
+        outcomes: new MichelsonMap,
+        lockSaver: trent.pkh, // trusted arbitrator
     },
 };
 
@@ -84,6 +85,7 @@ initialStorage.test = {};
 initialStorage.test.lock = {
     ...initialStorage.withApprovals,
     bridge: {
+        ...initialStorage.withApprovals.bridge,
         swaps: MichelsonMap.fromLiteral({
             'b7c1fcab1eac98de7a021c73906e2c930cb46d9cf1c90aef6bd549f0ba00f25a': {
                 confirmed: false,
@@ -115,5 +117,11 @@ initialStorage.test.paused = {
     ...initialStorage.base,
     paused: true
 }
+
+initialStorage.test.getOutcome = (secretHash, secret) => {
+    let storage = initialStorage.withApprovals;
+    storage.bridge.outcomes.set(secretHash, secret);
+    return storage;
+};
 
 module.exports = initialStorage;

@@ -1,34 +1,31 @@
-let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): (entrypointReturn, bridgeStorage) => {
+#include "../helpers/permissions.religo"
+
+let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): bridgeEntrypointReturn => {
     // confirm swap transaction ignores paused token operations
-
-    // retrieve swap record from storage
-    let swap = Big_map.find_opt(confirmSwapParameter.secretHash, bridgeStorage.swaps);
-	let swap = switch (swap) {
-		| Some(swap) => swap
-		| None => (failwith(errorSwapLockDoesNotExist): swap)
-	};
-
+    
     // check that sender of transaction has permission to confirm the swap
-    switch (Tezos.sender == swap.from_) {
-        | true => unit
-        | false => (failwith(errorNoPermission): unit)
-    };
+    failIfSenderIsNotTheInitiator(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    // check if swap was already confirmed
+    failIfSwapIsAlreadyConfirmed(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    // retrieve swap record from storage
+    let swap = getSwapLock(confirmSwapParameter.secretHash, bridgeStorage.swaps);
 
     // change confirmed value to true in swap record
-    let newSwapEntry = {
+    let swap = {
         ...swap,
         confirmed: true,
     };
     // update swap record in bridge storage
-    let newSwaps = Big_map.update(
+    let swaps = updateSwapLock(
         confirmSwapParameter.secretHash,
-        Some(newSwapEntry),
+        swap,
         bridgeStorage.swaps
     );
-    let newBridgeStorage = {
+
+    let bridgeStorage = {
         ...bridgeStorage,
-        swaps: newSwaps,
+        swaps: swaps,
     };
     // no operations are returned, only the updated storage
-    (emptyListOfOperations, newBridgeStorage);
+    (emptyListOfOperations, bridgeStorage);
 };

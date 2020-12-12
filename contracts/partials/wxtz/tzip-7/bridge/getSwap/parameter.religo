@@ -1,6 +1,6 @@
 type getSwapParameter = 
 [@layout:comb]
 {
-	secretHash: secretHash,
-	callback: contract(swap),
+    secretHash: secretHash,
+    callback: contract(swap),
 };

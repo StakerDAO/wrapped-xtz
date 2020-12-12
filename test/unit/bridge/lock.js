@@ -1,4 +1,3 @@
-const tzip7 = artifacts.require('tzip-7');
 const { contractErrors } = require('./../../../helpers/constants');
 const { TezosOperationError } = require('@taquito/taquito');
 const getDelayedISOTime = require('../../../helpers/getDelayedISOTime');
@@ -29,9 +28,9 @@ contract('TZIP-7 with bridge', () => {
         await _taquitoHelpers.setSigner(accounts.sender.sk);
     });
 
-    describe("%lock", () => {
+    describe("Invoke %lock on bridge", () => {
 
-        describe('Effects of lock', () => {
+        describe('Effects of %lock', () => {
             
             beforeEach(async () => {
                 // call the token contract at the %lock entrypoint
@@ -45,11 +44,10 @@ contract('TZIP-7 with bridge', () => {
                 expect(helpers.balances.senderAfter).to.equal(helpers.balances.senderBefore - totalSwapValue);
             });
 
-            it("should lock tokens by accrediting to contract's address", async () => {
-                // locked amount was accredited to contract's address
-                helpers.balances.contractAfter = await helpers.tzip7.getBalance(tzip7Instance.address);
+            it("should lock tokens by accrediting to lockSaver's address", async () => {
+                helpers.balances.lockSaverAfter = await helpers.tzip7.getBalance(accounts.lockSaver.pkh);
                 const totalSwapValue = swapLockParameters.value + swapLockParameters.fee;
-                expect(helpers.balances.contractAfter).to.equal(helpers.balances.contractBefore + totalSwapValue);
+                expect(helpers.balances.lockSaverAfter).to.equal(helpers.balances.lockSaverBefore + totalSwapValue);
             });
 
             it('should create swap record in contract storage', async () => {

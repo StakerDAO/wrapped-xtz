@@ -2,7 +2,8 @@
 let errorTokenOperationsArePaused: string = "TokenOperationsArePaused";
 let errorUnsafeAllowanceChange: string = "UnsafeAllowanceChange";
 let errorAllowanceMismatch: string = "AllowanceMismatch";
-let errorNoPermission: string = "NoPermission";
+let errorSenderIsNotAdmin: string = "SenderIsNotAdmin";
+let errorSenderIsNotPauseGuardian: string = "SenderIsNotPauseGuardian";
 let errorNotEnoughAllowance: string = "NotEnoughAllowance";
 let errorNotEnoughBalance: string = "NotEnoughBalance";
 // bridge related errors
@@ -12,6 +13,5 @@ let errorSwapLockAlreadyExists: string = "SwapLockAlreadyExists";
 let errorTooLongSecret: string = "TooLongSecret";
 let errorSwapIsOver: string = "SwapIsOver";
 let errorSwapIsNotConfirmed: string = "SwapIsNotConfirmed";
-
-
-
+let errorSenderIsNotTheInitiator: string = "SenderIsNotTheInitiator";
+let errorSwapIsAlreadyConfirmed: string = "SwapIsAlreadyConfirmed";

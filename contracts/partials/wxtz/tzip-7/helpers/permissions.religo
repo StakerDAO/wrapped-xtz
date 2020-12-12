@@ -42,7 +42,7 @@ let failIfNotAdmin = (tokenStorage: tokenStorage): unit => {
     let isAdmin = isAdmin(tokenStorage);
     switch(isAdmin) {
         | true => unit
-        | false => (failwith(errorNoPermission): unit)
+        | false => (failwith(errorSenderIsNotAdmin): unit)
     };
 };
 
@@ -54,6 +54,6 @@ let failIfNotPauseGuardian = (tokenStorage: tokenStorage): unit => {
     let isPauseGuardian = isPauseGuardian(tokenStorage);
     switch(isPauseGuardian) {
         | true => unit
-        | false => (failwith(errorNoPermission): unit)
+        | false => (failwith(errorSenderIsNotPauseGuardian): unit)
     };
 };

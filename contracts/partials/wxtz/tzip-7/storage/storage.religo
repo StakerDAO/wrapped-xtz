@@ -4,6 +4,7 @@
 #include "setTokenAllowance.religo"
 #include "setTokenBalance.religo"
 #include "updateTokenStorageRepository.religo"
+#include "swapLockRepository.religo"
 
 type storage = {
     token: tokenStorage,
