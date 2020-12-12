@@ -26,7 +26,7 @@ type parameter =
     | SetAdministrator(setAdministratorParameter)
     | SetPauseGuardian(setPauseGuardianParameter)
     | SetPause(setPauseParameter)
-    | GetAllowance(getAllowanceParameter)
+    | GetAllowance(getAllowanceParameterMichelson)
     | GetBalance(getBalanceParameter)
     | GetTotalSupply(getTotalSupplyParameter)
     | Lock(lockParameter)
