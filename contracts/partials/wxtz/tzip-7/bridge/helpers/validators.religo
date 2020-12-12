@@ -1,14 +1,14 @@
 let isSecretLengthBelowThreshold = (secret: secret): bool => {
-	let secretByteLength = Bytes.length(secret);
-	secretByteLength <= 32n;
+    let secretByteLength = Bytes.length(secret);
+    secretByteLength <= 32n;
 };
 
 let failIfSecretTooLong = (secret: secret): unit => {
-	let validSecretLength = isSecretLengthBelowThreshold(secret);
-	switch (validSecretLength) {
-		| true => unit
-		| false => (failwith(errorTooLongSecret): unit)
-	};
+    let validSecretLength = isSecretLengthBelowThreshold(secret);
+    switch (validSecretLength) {
+        | true => unit
+        | false => (failwith(errorTooLongSecret): unit)
+    };
 };
 
 let isValidSwapTime = (swap: swap): bool => {

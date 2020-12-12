@@ -2,6 +2,7 @@
 #include "../../partials/wxtz/tzip-7/parameter.religo"
 #include "../../partials/wxtz/tzip-7/errors.religo"
 #include "../../partials/wxtz/tzip-7/constants.religo"
+#include "../../partials/wxtz/tzip-7/returnTypes.religo"
 
 #include "../../partials/wxtz/tzip-7/transfer/transfer.religo"
 #include "../../partials/wxtz/tzip-7/getAllowance/getAllowance.religo"

@@ -1,4 +1,4 @@
-let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let burn = ((burnParameter, tokenStorage): (burnParameter, tokenStorage)): tokenEntrypointReturn => {
     // continue only if token operations are not paused
     failIfPaused(tokenStorage);
     // only the admin is allowed to burn tokens

@@ -1,3 +1,3 @@
 type redeemParameter = {
-	secret: secret,
+    secret: secret,
 };

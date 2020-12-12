@@ -1,7 +1,7 @@
 #include "../helpers/permissions.religo"
 #include "../helpers/validators.religo"
 
-let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): (entrypointReturn, storage) => {
+let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);   
     // check that sender of transaction has permission to confirm the swap
@@ -19,7 +19,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         from_: storage.bridge.lockSaver,
     };
     // calling the transfer function to redeem the token amount specified in swap
-    let ledger = updateLedgerByTransfer(transferValueParameter, storage.token.ledger);
+    let tokenStorage = updateLedgerByTransfer(transferValueParameter, storage.token);
 
     // constructing the transfer parameter to send the fee regardless of failed swap to the recipient
     let transferFeeParameter: transferParameter = {
@@ -27,24 +27,21 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
         value: swap.fee,
         from_: storage.bridge.lockSaver,
     };
-    // please note that the modified ledger storage from above is used here
-    let ledger = updateLedgerByTransfer(transferFeeParameter, ledger);
+    // please note that the modified token storage from above is used here
+    let tokenStorage = updateLedgerByTransfer(transferFeeParameter, tokenStorage);
     
     // remove the swap record from storage
     let swaps = removeSwapLock(claimRefundParameter.secretHash, storage.bridge.swaps);
 
     // update both token ledger storage and swap records in bridge storage
-    let newStorage = {
+    let storage = {
         ...storage,
-        token: {
-            ...storage.token,
-            ledger: ledger
-        }, 
+        token: tokenStorage, 
         bridge: {
             ...storage.bridge,
             swaps: swaps,
         },
     };
     // no operations are returned, only the updated storage
-    (emptyListOfOperations, newStorage);
+    (emptyListOfOperations, storage);
 };

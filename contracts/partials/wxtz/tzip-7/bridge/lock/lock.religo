@@ -1,21 +1,4 @@
-let failIfSwapLockExists = ((secretHash, swaps): (secretHash, swaps)): unit => {
-	let existingSwap = Big_map.find_opt(secretHash, swaps);
-	switch(existingSwap) {
-		| Some(swap) => (failwith(errorSwapLockAlreadyExists): unit)
-		| None => unit
-	};
-};
-
-let setSwap = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
-	failIfSwapLockExists(secretHash, swaps);
-	Big_map.add(
-		secretHash,
-		swap,
-		swaps
-	);
-};
-
-let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointReturn, storage) => {
+let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
 	// check for existing swap lock
@@ -31,7 +14,11 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		from_: Tezos.sender,
 	};
 	// save new swap record with secretHash as key
-	let swaps = setNewSwapLock(lockParameter.secretHash, swap, storage.bridge.swaps);
+	let swaps = setNewSwapLock(
+        lockParameter.secretHash,
+        swap,
+        storage.bridge.swaps
+    );
 	
 	// lock up total swap amount, by transferring it to the smart contracts own address
 	let lockValue = lockParameter.value + lockParameter.fee;
@@ -41,7 +28,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 		value: lockValue,
 	};
 	// call the transfer function of TZIP-7
-	let ledger = updateLedgerByTransfer(transferParameter, storage.token.ledger);
+	let tokenStorage = updateLedgerByTransfer(transferParameter, storage.token);
 	
 	// update  and token storage
 	let storage = {
@@ -50,10 +37,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): (entrypointRetu
 			...storage.bridge,
 			swaps: swaps,
 		},
-		token: {
-			...storage.token,
-			ledger: ledger,
-		},
+		token: tokenStorage,
 	};
 	// no operations are returned, only the updated storage
 	(emptyListOfOperations, storage);

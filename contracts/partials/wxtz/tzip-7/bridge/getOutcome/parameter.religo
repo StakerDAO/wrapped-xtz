@@ -1,6 +1,6 @@
 type getOutcomeParameter = 
 [@layout:comb]
 {
-	secretHash: secretHash,
-	callback: contract(secret),
+    secretHash: secretHash,
+    callback: contract(secret),
 };

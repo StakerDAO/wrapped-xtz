@@ -1,4 +1,4 @@
-let setAdministrator = ((setAdministratorParameter, tokenStorage): (setAdministratorParameter, tokenStorage)): (entrypointReturn, tokenStorage) => {
+let setAdministrator = ((setAdministratorParameter, tokenStorage): (setAdministratorParameter, tokenStorage)): tokenEntrypointReturn => {
     // only the current administrator is allowed to change admin's address
     failIfNotAdmin(tokenStorage);
 
