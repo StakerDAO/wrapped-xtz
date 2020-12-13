@@ -1,4 +1,5 @@
-let getAllowance = ((getAllowanceParameter, tokenStorage): (getAllowanceParameter, tokenStorage)): tokenEntrypointReturn => {
+let getAllowance = ((getAllowanceParameterMichelson, tokenStorage): (getAllowanceParameterMichelson, tokenStorage)): tokenEntrypointReturn => {
+    let getAllowanceParameter: getAllowanceParameter = toGetAllowanceParameter(getAllowanceParameterMichelson);
     let allowance = getTokenAllowance(
         getAllowanceParameter.owner,
         getAllowanceParameter.spender,

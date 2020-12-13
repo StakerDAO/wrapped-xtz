@@ -11,6 +11,7 @@ let requestTotalSupply = ((requestTotalSupplyParameter, storage): (requestTotalS
     };
 
     let request: getTotalSupplyParameter = {
+        u: (),
         callback: callbackEntrypoint
     };
     

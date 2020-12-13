@@ -1,8 +1,8 @@
 let requestAllowance = ((requestAllowanceParameter, storage): (requestAllowanceParameter, storage)) => {
-    let tzip7Contract: option(contract(getAllowanceParameter)) = Tezos.get_entrypoint_opt("%getAllowance", requestAllowanceParameter.at);
-    let tzip7Contract: contract(getAllowanceParameter) = switch (tzip7Contract) {
+    let tzip7Contract: option(contract(getAllowanceParameterMichelson)) = Tezos.get_entrypoint_opt("%getAllowance", requestAllowanceParameter.at);
+    let tzip7Contract: contract(getAllowanceParameterMichelson) = switch (tzip7Contract) {
         | Some(contract) => contract
-        | None => (failwith(errorNoContract): contract(getAllowanceParameter))
+        | None => (failwith(errorNoContract): contract(getAllowanceParameterMichelson))
     };
     let callbackEntrypoint: option(contract(getAllowanceResponse)) = Tezos.get_entrypoint_opt("%getAllowanceResponse", Tezos.self_address);
     let callbackEntrypoint: contract(getAllowanceResponse) = switch (callbackEntrypoint) {
@@ -14,8 +14,11 @@ let requestAllowance = ((requestAllowanceParameter, storage): (requestAllowanceP
         spender: requestAllowanceParameter.request.spender,
         callback: callbackEntrypoint,
     };
+
+    let requestMichelson: getAllowanceParameterMichelson = Layout.convert_to_left_comb(request);
+
     let operation = Tezos.transaction(
-        request,
+        requestMichelson,
         0mutez,
         tzip7Contract
     );
