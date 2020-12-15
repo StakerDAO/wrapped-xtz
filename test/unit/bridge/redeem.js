@@ -133,29 +133,4 @@ contract('TZIP-7 with bridge', () => {
                 .and.have.property('message', contractErrors.tzip7.swapIsNotConfirmed);
         });
     });
-
-    describe('Invoke %redeem on bridge for a confirmed swap when release time is passed', () => {
-
-        beforeEach(async () => {
-            await before(
-                _tzip7InitialStorage.withApprovals,
-                accounts,
-                helpers,
-            );
-            // locking through contract call is leaner than migrating swap
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
-            swapSecret = _cryptoHelpers.randomSecret();
-            swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
-            swapLockParameters.confirmed = true;
-            swapLockParameters.releaseTime = getDelayedISOTime(-1); // 1h in the past
-            await helpers.tzip7.lock(swapLockParameters);
-        });
-
-        it('should fail for swap past release time', async () => {
-            const operationPromise = helpers.tzip7.redeem(swapSecret);
-            await expect(operationPromise).to.be.eventually.rejected
-                .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapIsOver);
-        });
-    });
 });

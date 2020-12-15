@@ -22,7 +22,6 @@ module.exports = {
             senderIsNotTheInitiator: "SenderIsNotTheInitiator",
             swapIsAlreadyConfirmed: "SwapIsAlreadyConfirmed",
             swapIsNotConfirmed: "SwapIsNotConfirmed",
-            swapIsOver: "SwapIsOver",
             swapLockAlreadyExists: "SwapLockAlreadyExists",
             swapLockDoesNotExist: "SwapLockDoesNotExist",
             tokenOperationsPaused: "TokenOperationsArePaused",

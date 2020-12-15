@@ -15,14 +15,6 @@ let isValidSwapTime = (swap: swap): bool => {
     swap.releaseTime >= Tezos.now;
 };
 
-let failIfSwapIsOver = (swap: swap): unit => {
-    let isValidSwapTime = isValidSwapTime(swap);
-    switch(isValidSwapTime) {
-        | true => unit
-        | false => (failwith(errorSwapIsOver): unit)
-    };
-};
-
 let failIfSwapIsNotOver = (swap: swap): unit => {
     let isValidSwapTime = isValidSwapTime(swap);
     switch(isValidSwapTime) {
