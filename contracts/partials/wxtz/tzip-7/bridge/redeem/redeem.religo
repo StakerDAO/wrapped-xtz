@@ -4,8 +4,8 @@
 let redeem = ((redeemParameter, storage): (redeemParameter, storage)): entrypointReturn => {
     // continue only if token operations are not paused
     failIfPaused(storage.token);	
-    // provided secret needs to be below a certain length
-    failIfSecretTooLong(redeemParameter.secret);
+    // provided secret needs to be 32 bytes long
+    failIfInvalidSecretLength(redeemParameter.secret);
     // calculate SHA-256 hash of provided secret
     let secretHash = Crypto.sha256(redeemParameter.secret);
     // continue only if swap was confirmed

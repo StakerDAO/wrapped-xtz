@@ -26,7 +26,7 @@ module.exports = {
             swapLockAlreadyExists: "SwapLockAlreadyExists",
             swapLockDoesNotExist: "SwapLockDoesNotExist",
             tokenOperationsPaused: "TokenOperationsArePaused",
-            tooLongSecret: "TooLongSecret",
+            invalidSecretLength: "InvalidSecretLength",
             unsafeAllowanceChange: "UnsafeAllowanceChange",
         },
         core: {

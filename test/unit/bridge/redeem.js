@@ -48,11 +48,18 @@ contract('TZIP-7 with bridge', () => {
                 .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
         });
 
+        it('should fail for too short secret' , async () => {
+            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(31));
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.tzip7.invalidSecretLength);
+        });
+
         it('should fail for too long secret' , async () => {
             const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(33));
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.tooLongSecret);
+                .and.have.property('message', contractErrors.tzip7.invalidSecretLength);
         });
 
         describe('Effects of redeem', () => {

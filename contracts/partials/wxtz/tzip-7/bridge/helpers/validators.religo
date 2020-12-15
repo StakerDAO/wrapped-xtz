@@ -1,13 +1,13 @@
-let isSecretLengthBelowThreshold = (secret: secret): bool => {
+let isValidSecretLength = (secret: secret): bool => {
     let secretByteLength = Bytes.length(secret);
-    secretByteLength <= 32n;
+    secretByteLength == 32n;
 };
 
-let failIfSecretTooLong = (secret: secret): unit => {
-    let validSecretLength = isSecretLengthBelowThreshold(secret);
+let failIfInvalidSecretLength = (secret: secret): unit => {
+    let validSecretLength = isValidSecretLength(secret);
     switch (validSecretLength) {
         | true => unit
-        | false => (failwith(errorTooLongSecret): unit)
+        | false => (failwith(errorInvalidSecretLength): unit)
     };
 };
 
