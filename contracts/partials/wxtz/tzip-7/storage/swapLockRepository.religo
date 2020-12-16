@@ -30,8 +30,13 @@ let setNewSwapLock = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swa
 	setSwapLock(secretHash, swap, swaps);
 };
 
-let removeSwapLock = ((secretHash, swaps): (secretHash, swaps)): swaps => {
-	Big_map.remove(secretHash, swaps);
+let removeSwapLock = ((secretHash, bridgeStorage): (secretHash, bridgeStorage)): bridgeStorage => {
+	let swaps = Big_map.remove(secretHash, bridgeStorage.swaps);
+    let bridgeStorage = {
+        ...bridgeStorage,
+        swaps: swaps,
+    };
+    bridgeStorage;
 };
 
 let updateSwapLock = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
