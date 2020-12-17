@@ -24,15 +24,18 @@ let failIfPaused = (tokenStorage: tokenStorage): unit => {
  * spender is not token owner, but was approved with enough allowance.
  */
 let canTransfer = ((transferSpender, transferParameter, tokenStorage): (address, transferParameter, tokenStorage)): unit  => {
-	let transferSpenderIsOwner = transferSpender == transferParameter.from_;
-	if (transferSpenderIsOwner) {
-		let senderBalance = getTokenBalance(transferParameter.from_, tokenStorage.ledger);
-		failForNegativeBalanceDifference(senderBalance, transferParameter.value);
-	} else {
-		let allowance = getTokenAllowance(transferParameter.from_, transferSpender, tokenStorage.approvals);
-		failForNegativeAllowanceDifference(allowance, transferParameter.value);
-	};
+    let transferSpenderIsNotOwner = transferSpender != transferParameter.from_;
+    let senderBalance = getTokenBalance(transferParameter.from_, tokenStorage.ledger);
+    // Ligo compiler does not allow to have 2x fails in the same if/else statement.
+    if (transferSpenderIsNotOwner) {
+        let allowance = getTokenAllowance(transferParameter.from_, transferSpender, tokenStorage.approvals);
+        failForNegativeAllowanceDifference(allowance, transferParameter.value);
+    } else {
+        ();
+    };
+    failForNegativeBalanceDifference(senderBalance, transferParameter.value);
 };
+
 
 let isAdmin = (tokenStorage: tokenStorage): bool => {
     Tezos.sender == tokenStorage.admin;
