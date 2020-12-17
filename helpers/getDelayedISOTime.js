@@ -1,8 +1,9 @@
-module.exports = (hours) => {
-    const timeNow = new Date();
-    timeNow.setHours( timeNow.getHours() + hours);
+module.exports = (minutes) => {
+    let unixEpoch = Date.now();
+    const delayInMilliseconds = minutes * 60 * 1000;
+    unixEpoch += delayInMilliseconds;
+    const timeWithDelay = new Date(unixEpoch);
     // Remove milliseconds for Tezos protocol
-    timeNow.setMilliseconds(000);
-    const timeWithDelay = timeNow.toISOString();
-    return timeWithDelay
+    timeWithDelay.setMilliseconds(000);
+    return timeWithDelay.toISOString()
 };

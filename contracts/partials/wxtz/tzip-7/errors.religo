@@ -14,3 +14,4 @@ let errorInvalidSecretLength: string = "InvalidSecretLength";
 let errorSwapIsNotConfirmed: string = "SwapIsNotConfirmed";
 let errorSenderIsNotTheInitiator: string = "SenderIsNotTheInitiator";
 let errorSwapIsAlreadyConfirmed: string = "SwapIsAlreadyConfirmed";
+let errorSwapTimeBelowThreshold: string = "SwapTimeBelowThreshold";

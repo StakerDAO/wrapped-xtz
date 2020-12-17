@@ -1,8 +1,13 @@
+#include "../helpers/permissions.religo"
+#include "../helpers/validators.religo"
+
 let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
 	// check for existing swap lock
 	failIfSwapLockExists(lockParameter.secretHash, storage.bridge.swaps);
+    // check that swap time input is in the future
+    failIfInvalidSwapTimeInput(lockParameter.releaseTime);
 	
 	// create swap record entry from parameters and implicit values
 	let swap: swap = {

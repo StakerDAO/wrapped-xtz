@@ -1,6 +1,3 @@
-#include "../helpers/permissions.religo"
-#include "../helpers/validators.religo"
-
 let redeem = ((redeemParameter, storage): (redeemParameter, storage)): entrypointReturn => {
     // continue only if token operations are not paused
     failIfPaused(storage.token);	

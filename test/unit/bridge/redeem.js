@@ -14,7 +14,7 @@ contract('TZIP-7 with bridge', () => {
     let swapLockParameters = {
         confirmed: undefined,
         fee: 10,
-        releaseTime: getDelayedISOTime(2),
+        releaseTime: getDelayedISOTime(120),
         secretHash: undefined,
         to: accounts.recipient.pkh,
         value: 5000
@@ -23,17 +23,16 @@ contract('TZIP-7 with bridge', () => {
     describe('Invoke %redeem on bridge for a confirmed swap', () => {
 
         beforeEach(async () => {
-            await before(
-                _tzip7InitialStorage.withApprovals,
-                accounts,
-                helpers
-            );
-            // locking swap through contract call is leaner than migrating
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
             swapSecret = _cryptoHelpers.randomSecret();
             swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
             swapLockParameters.confirmed = true;
-            await helpers.tzip7.lock(swapLockParameters);
+
+            await before(
+                _tzip7InitialStorage.test.redeem(swapLockParameters),
+                accounts,
+                helpers
+            );
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
         });
 
         it('should work with correct secret', async () => {

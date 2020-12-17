@@ -13,22 +13,23 @@ contract('TZIP-7 with bridge', () => {
     let swapLockParameters = {
         confirmed: false,
         fee: 1,
-        releaseTime: getDelayedISOTime(2),
+        releaseTime: undefined,
         secretHash: '',
         to: accounts.recipient.pkh,
         value: 5
     };
 
-    beforeEach(async () => {
-        await before(
-            _tzip7InitialStorage.test.lock, 
-            accounts,
-            helpers
-        );
-        await _taquitoHelpers.setSigner(accounts.sender.sk);
-    });
-
-    describe("Invoke %lock on bridge", () => {
+    describe('Invoke %lock on bridge with releaseTime far enough in the future', () => {
+        
+        beforeEach(async () => {
+            await before(
+                _tzip7InitialStorage.test.lock, 
+                accounts,
+                helpers
+            );
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
+            swapLockParameters.releaseTime = getDelayedISOTime(120); // 2 hours in the future
+        });
 
         describe('Effects of %lock', () => {
             
@@ -70,7 +71,7 @@ contract('TZIP-7 with bridge', () => {
             })
         });
         
-        it("should not allow to reuse a secret-hash", async () => {
+        it('should not allow to reuse a secret-hash', async () => {
             // call the token contract at the %lock entrypoint with an already used secretHash from initialStorage
             swapLockParameters.secretHash = _tzip7InitialStorage.test.lock.bridge.swaps.keys().next().value
             
@@ -90,6 +91,30 @@ contract('TZIP-7 with bridge', () => {
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.tokenOperationsPaused);
+        });
+    });
+
+    describe('Invoke %lock on bridge with releaseTime not far enough in the future', () => {
+        
+        beforeEach(async () => {
+            await before(
+                _tzip7InitialStorage.test.lock, 
+                accounts,
+                helpers
+            );
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
+            // time threshold is current time + minimum time constant of 10 minutes
+            // not using 9 minutes for this test, because sandbox network does not update 
+            // network time after initialization (ganache-core)
+            swapLockParameters.releaseTime = getDelayedISOTime(5); 
+            swapLockParameters.secretHash = _cryptoHelpers.randomHash();
+        });
+
+        it('should fail if release time is earlier than time threshold', async () => {
+            const operationPromise = helpers.tzip7.lock(swapLockParameters);
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.be.instanceOf(TezosOperationError)
+                .and.have.property('message', contractErrors.tzip7.swapTimeBelowThreshold);
         });
     });
 });

@@ -91,7 +91,7 @@ initialStorage.test.lock = {
                 confirmed: false,
                 fee: 100,
                 from: bob.pkh,
-                releaseTime: getDelayedISOTime(1),
+                releaseTime: getDelayedISOTime(60),
                 to: carol.pkh,
                 value: 5000
             },
@@ -106,16 +106,36 @@ initialStorage.test.confirmSwap = (secretHash, confirmed) => {
         confirmed: confirmed,
         fee: 100,
         from: bob.pkh,
-        releaseTime: getDelayedISOTime(1),
+        releaseTime: getDelayedISOTime(60),
         to: carol.pkh,
         value: 5000
     });
     return storage;
 };
 
+initialStorage.test.redeem = (swapLockParameters) => {
+    let storage = initialStorage.withApprovals;
+    storage.bridge.swaps.set(swapLockParameters.secretHash, {
+        confirmed: swapLockParameters.confirmed,
+        fee: swapLockParameters.fee,
+        from: bob.pkh,
+        releaseTime: swapLockParameters.releaseTime,
+        to: carol.pkh,
+        value: swapLockParameters.value
+    });
+    // set enough balance for lockSaver account
+    const totalValue = swapLockParameters.fee + swapLockParameters.value;
+    storage.token.ledger.set(trent.pkh, totalValue);
+    return storage;
+};
+
+initialStorage.test.claimRefund = (swapLockParameters) => {
+    return initialStorage.test.redeem(swapLockParameters);
+};
+
 initialStorage.test.paused = {
     ...initialStorage.base,
     paused: true
-}
+};
 
 module.exports = initialStorage;
