@@ -12,8 +12,6 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): entrypoin
     failIfSwapIsNotConfirmed(secretHash, storage.bridge.swaps);
     // use the calculated hash to retrieve swap record from bridge storage
     let swap = getSwapLock(secretHash, storage.bridge.swaps);
-    // check whether swap time period has expired
-    failIfSwapIsOver(swap);
 
     // construct the transfer parameter to redeem locked-up tokens
     let totalValue = swap.value + swap.fee;
