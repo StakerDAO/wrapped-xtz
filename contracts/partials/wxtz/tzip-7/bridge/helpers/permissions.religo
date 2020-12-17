@@ -1,16 +1,13 @@
 #include "../../storage/swapLockRepository.religo"
 
-let isSenderInitiator = (swap: swap): bool => {
-    Tezos.sender == swap.from_;
-};
-
+/**
+ * This is basically getSwapLock() with a different error message.
+ */
 let failIfSenderIsNotTheInitiator = ((swapId, swaps): (swapId, swaps)): unit => {
-    let swap = getSwapLock(swapId, swaps);
-    // check that sender of the transaction has permission
-    let isSenderInitiator = isSenderInitiator(swap);
-    switch (isSenderInitiator) {
-        | true => unit
-        | false => (failwith(errorSenderIsNotTheInitiator): unit)
+    let swap = Big_map.find_opt(swapId, swaps);
+    switch (swap) {
+        | Some(swap) => unit
+        | None => (failwith(errorSenderIsNotTheInitiator): unit)
     };
 };
 

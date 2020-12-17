@@ -53,7 +53,7 @@ contract('TZIP-7 with bridge', () => {
             
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
         });
 
         it('should fail for a third party', async () => {
@@ -63,15 +63,7 @@ contract('TZIP-7 with bridge', () => {
             
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
-        });
-        
-        it('should fail for a non-existing swap', async () => {
-            const operationPromise = helpers.tzip7.confirmSwap(_cryptoHelpers.randomHash());
-
-            await expect(operationPromise).to.be.eventually.rejected
-                .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
         });
     });
 
@@ -92,8 +84,6 @@ contract('TZIP-7 with bridge', () => {
             tzip7Instance = await tzip7.new(initialstorage);
             // display the current contract address for debugging purposes
             console.log('Originated token contract at:', tzip7Instance.address);
-
- 
 
             helpers.tzip7 = await _tzip7Helpers.at(tzip7Instance.address);
         });

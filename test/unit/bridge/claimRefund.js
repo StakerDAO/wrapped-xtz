@@ -39,7 +39,6 @@ contract('TZIP-7 with bridge', () => {
             );            
         });
 
-
         it('should fail if token operations are paused', async () => {
             // call %setPause with pause guardian
             await _taquitoHelpers.signAs(accounts.pauseGuardian.sk, async () => {
@@ -53,21 +52,14 @@ contract('TZIP-7 with bridge', () => {
                 .and.have.property('message', contractErrors.tzip7.tokenOperationsPaused);
         });
 
+        // this is basically the same as a swap lock that does not exist
         it('should fail if sender is not initiator of the swap', async () => {
             await _taquitoHelpers.setSigner(accounts.thirdParty.sk);
             const operationPromise = helpers.tzip7.claimRefund(swapLockParameters.secretHash);            
 
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
-        });
-
-        it('should fail for a swap lock that does not exist', async () => {
-            const operationPromise = helpers.tzip7.claimRefund(_cryptoHelpers.randomHash());
-            
-            await expect(operationPromise).to.be.eventually.rejected
-                .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
+                .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
         });
 
         describe('effects of invoking %claimRefund', () => {
