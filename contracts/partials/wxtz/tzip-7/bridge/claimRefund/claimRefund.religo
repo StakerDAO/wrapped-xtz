@@ -31,16 +31,13 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let tokenStorage = updateLedgerByTransfer(transferFeeParameter, tokenStorage);
     
     // remove the swap record from storage
-    let swaps = removeSwapLock(claimRefundParameter.secretHash, storage.bridge.swaps);
+    let bridgeStorage = removeSwapLock(claimRefundParameter.secretHash, storage.bridge);
 
     // update both token ledger storage and swap records in bridge storage
     let storage = {
         ...storage,
         token: tokenStorage, 
-        bridge: {
-            ...storage.bridge,
-            swaps: swaps,
-        },
+        bridge: bridgeStorage,
     };
     // no operations are returned, only the updated storage
     (emptyListOfOperations, storage);

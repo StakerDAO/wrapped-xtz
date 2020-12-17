@@ -11,7 +11,6 @@ let errorSwapLockDoesNotExist: string = "SwapLockDoesNotExist";
 let errorFundsLock: string = "FundsLock";
 let errorSwapLockAlreadyExists: string = "SwapLockAlreadyExists";
 let errorInvalidSecretLength: string = "InvalidSecretLength";
-let errorSwapIsOver: string = "SwapIsOver";
 let errorSwapIsNotConfirmed: string = "SwapIsNotConfirmed";
 let errorSenderIsNotTheInitiator: string = "SenderIsNotTheInitiator";
 let errorSwapIsAlreadyConfirmed: string = "SwapIsAlreadyConfirmed";

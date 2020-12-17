@@ -25,12 +25,15 @@ let failIfPaused = (tokenStorage: tokenStorage): unit => {
  */
 let canTransfer = ((transferSpender, transferParameter, tokenStorage): (address, transferParameter, tokenStorage)): unit  => {
 	let transferSpenderIsOwner = transferSpender == transferParameter.from_;
-	if (transferSpenderIsOwner) {
-		let senderBalance = getTokenBalance(transferParameter.from_, tokenStorage.ledger);
+	let senderBalance = getTokenBalance(transferParameter.from_, tokenStorage.ledger);
+    if (transferSpenderIsOwner) {
 		failForNegativeBalanceDifference(senderBalance, transferParameter.value);
 	} else {
-		let allowance = getTokenAllowance(transferParameter.from_, transferSpender, tokenStorage.approvals);
+		// first check for enough allowance
+        let allowance = getTokenAllowance(transferParameter.from_, transferSpender, tokenStorage.approvals);
 		failForNegativeAllowanceDifference(allowance, transferParameter.value);
+        // then check for enough balance
+		failForNegativeBalanceDifference(senderBalance, transferParameter.value);
 	};
 };
 
