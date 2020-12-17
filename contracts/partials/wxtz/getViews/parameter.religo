@@ -1,7 +1,6 @@
 #include "../tzip-7/getBalance/parameter.religo"
 #include "../tzip-7/getAllowance/parameter.religo"
 #include "../tzip-7/getTotalSupply/parameter.religo"
-#include "../tzip-7/bridge/getOutcome/parameter.religo"
 #include "../tzip-7/bridge/getSwap/parameter.religo"
 
 
@@ -17,10 +16,6 @@ type requestAllowanceParameter = {
 
 type requestTotalSupplyParameter = contractAddress;
 
-type requestOutcomeParameter = {
-    at: contractAddress,
-    request: secretHash,
-};
 type requestSwapParameter = {
     at: contractAddress,
     request: secretHash,
@@ -29,7 +24,6 @@ type requestSwapParameter = {
 type parameter = 
 | RequestAllowance(requestAllowanceParameter)
 | RequestBalance(requestBalanceParameter)
-| RequestOutcome(requestOutcomeParameter)
 | RequestSwap(requestSwapParameter)
 | RequestTotalSupply(requestTotalSupplyParameter)
 | Receive(response);

@@ -1,26 +1,18 @@
-let isSecretLengthBelowThreshold = (secret: secret): bool => {
+let isValidSecretLength = (secret: secret): bool => {
     let secretByteLength = Bytes.length(secret);
-    secretByteLength <= 32n;
+    secretByteLength == fixedSecretByteLength;
 };
 
-let failIfSecretTooLong = (secret: secret): unit => {
-    let validSecretLength = isSecretLengthBelowThreshold(secret);
+let failIfInvalidSecretLength = (secret: secret): unit => {
+    let validSecretLength = isValidSecretLength(secret);
     switch (validSecretLength) {
         | true => unit
-        | false => (failwith(errorTooLongSecret): unit)
+        | false => (failwith(errorInvalidSecretLength): unit)
     };
 };
 
 let isValidSwapTime = (swap: swap): bool => {
     swap.releaseTime >= Tezos.now;
-};
-
-let failIfSwapIsOver = (swap: swap): unit => {
-    let isValidSwapTime = isValidSwapTime(swap);
-    switch(isValidSwapTime) {
-        | true => unit
-        | false => (failwith(errorSwapIsOver): unit)
-    };
 };
 
 let failIfSwapIsNotOver = (swap: swap): unit => {
