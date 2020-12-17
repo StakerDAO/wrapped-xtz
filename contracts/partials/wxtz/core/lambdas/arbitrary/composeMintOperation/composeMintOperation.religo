@@ -1,4 +1,4 @@
-((arbitraryValueLambdaParameter, storage): (arbitraryValueLambdaParameter, storage)): arbitraryValueLambdaReturnValue => {    
+((arbitraryValueLambdaParameter, storage, lambdaExtras): (arbitraryValueLambdaParameter, storage, lambdaExtras)): arbitraryValueLambdaReturnValue => {    
     let wXTZTokenContractAddress: address = getWXTZTokenContractAddress((storage));
     let wXTZTokenContract: option(contract(mintParameter)) = Tezos.get_entrypoint_opt("%mint", wXTZTokenContractAddress);
     let wXTZTokenContract: contract(mintParameter) = switch (wXTZTokenContract) {

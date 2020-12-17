@@ -1,4 +1,5 @@
 #include "./types.religo"
+#include "./../runArbitraryValueLambda/runArbitraryValueLambda.religo"
 
 /**
  * runEntrypointLambda must be inlined because it uses the `SELF` instruction
@@ -13,10 +14,7 @@ let runEntrypointLambda = ((runEntrypointLambdaParameter, storage): (runEntrypoi
         | None => (failwith(errorLambdaNotFound): packedLambda)
         | Some(packedLambda) => packedLambda
     };
-    
-    /**
-     * Used to pass data that is by design not accessible to lambdas
-     */
+
     let lambdaExtras: lambdaExtras = {
         selfAddress: Tezos.self_address
     };
@@ -25,6 +23,10 @@ let runEntrypointLambda = ((runEntrypointLambdaParameter, storage): (runEntrypoi
     let entrypointLambda: option(entrypointLambda) = Bytes.unpack(packedLambda);
     switch (entrypointLambda) {
         | None => (failwith(errorLambdaNotAnEntrypoint): entrypointReturn)
-        | Some(entrypointLambda) => entrypointLambda((runEntrypointLambdaParameter.lambdaParameter, storage, lambdaExtras))
+        | Some(entrypointLambda) => entrypointLambda((
+            runEntrypointLambdaParameter.lambdaParameter, 
+            storage, 
+            lambdaExtras
+        ))
     };
 }

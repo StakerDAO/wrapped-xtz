@@ -61,7 +61,8 @@
             lambdaName: "arbitrary/composeMintOperation",
             lambdaParameter: composeMintOperationParameter,
         },
-        storage
+        storage,
+        lambdaExtras
     ));
 
     (

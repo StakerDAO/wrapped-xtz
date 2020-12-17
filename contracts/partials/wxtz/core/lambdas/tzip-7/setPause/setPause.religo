@@ -1,8 +1,12 @@
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
-    let (_, _, _) = runArbitraryValueLambda(({
-        lambdaName: "arbitrary/permissions/isAdmin",
-        lambdaParameter: Bytes.pack(Tezos.sender)
-    }, storage));
+    let (_, _, _) = runArbitraryValueLambda((
+        {
+            lambdaName: "arbitrary/permissions/isAdmin",
+            lambdaParameter: Bytes.pack(Tezos.sender)
+        }, 
+        storage,
+        lambdaExtras
+    ));
 
     let setPauseParameter: option(setPauseParameter) = Bytes.unpack(lambdaParameter);
     let setPauseParameter: setPauseParameter = switch (setPauseParameter) {

@@ -1,7 +1,7 @@
 /**
  * Check if the provided address owns the provided oven address
  */
-((arbitraryValueLambdaParameter, storage): (arbitraryValueLambdaParameter, storage)): arbitraryValueLambdaReturnValue => {
+((arbitraryValueLambdaParameter, storage, lambdaExtras): (arbitraryValueLambdaParameter, storage, lambdaExtras)): arbitraryValueLambdaReturnValue => {
     // unpack the lambda parameter
     let isOvenOwnerParameter: option(isOvenOwnerParameter) = Bytes.unpack(arbitraryValueLambdaParameter);
     let isOvenOwnerParameter: isOvenOwnerParameter = switch (isOvenOwnerParameter) {
