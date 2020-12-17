@@ -108,9 +108,9 @@ contract('TZIP-7 with bridge', () => {
             );
             await _taquitoHelpers.setSigner(accounts.sender.sk);
             // time threshold is current time + minimum time constant of 10 minutes
-            // not using 9 minutes for this test, because sandbox network does not update 
-            // network time after initialization (ganache-core)
-            swapLockParameters.releaseTime = getDelayedISOTime(5); 
+            // this test will fail when running many tests at once, because the
+            // sandbox does not update network time after initialization (ganache-core)
+            swapLockParameters.releaseTime = getDelayedISOTime(0); 
             swapLockParameters.secretHash = _cryptoHelpers.randomHash();
         });
 
