@@ -138,10 +138,4 @@ initialStorage.test.paused = {
     paused: true
 };
 
-initialStorage.test.getOutcome = (secretHash, secret) => {
-    let storage = initialStorage.withApprovals;
-    storage.bridge.outcomes.set(secretHash, secret);
-    return storage;
-};
-
 module.exports = initialStorage;

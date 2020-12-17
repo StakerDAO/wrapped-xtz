@@ -5,7 +5,6 @@
 #include "../../../partials/wxtz/getViews/requestBalance.religo"
 #include "../../../partials/wxtz/getViews/requestAllowance.religo"
 #include "../../../partials/wxtz/getViews/requestTotalSupply.religo"
-#include "../../../partials/wxtz/getViews/requestOutcome.religo"
 #include "../../../partials/wxtz/getViews/requestSwap.religo"
 
 
@@ -14,7 +13,6 @@ let main = ((parameter, storage): (parameter, storage)) => {
     switch(parameter) {
         | RequestBalance(requestParameter) => requestBalance(requestParameter, storage)
         | RequestAllowance(requestAllowanceParameter) => requestAllowance(requestAllowanceParameter, storage)
-        | RequestOutcome(requestOutcomeParameter) => requestOutcome(requestOutcomeParameter, storage)
         | RequestSwap(requestSwapParameter) => requestSwap(requestSwapParameter, storage)
         | RequestTotalSupply(requestTotalSupplyParameter) => requestTotalSupply(requestTotalSupplyParameter, storage)
         | Receive(response) => {
@@ -35,12 +33,6 @@ let main = ((parameter, storage): (parameter, storage)) => {
                     (emptyListOfOperations, {
                         ...storage,
                         totalSupply: value,
-                    })
-                }
-                | GetOutcomeResponse(value) => {
-                    (emptyListOfOperations, {
-                        ...storage,
-                        outcome: value
                     })
                 }
                 | GetSwapResponse(value) => {
