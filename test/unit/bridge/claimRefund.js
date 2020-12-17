@@ -14,7 +14,7 @@ contract('TZIP-7 with bridge', () => {
     let swapLockParameters = {
         confirmed: true,
         fee: 10,
-        releaseTime: getDelayedISOTime(-1), // time in the past
+        releaseTime: getDelayedISOTime(-60), // time in the past
         secretHash: undefined,
         to: accounts.recipient.pkh,
         value: 5000
@@ -23,16 +23,14 @@ contract('TZIP-7 with bridge', () => {
     describe('Invoke %claimRefund on bridge for a swap lock past the release time', () => {
 
         beforeEach(async () => {
+            swapSecret = _cryptoHelpers.randomSecret();
+            swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
             await before(
-                _tzip7InitialStorage.withApprovals,
+                _tzip7InitialStorage.test.claimRefund(swapLockParameters),
                 accounts,
                 helpers
             );
-            // locking swap through contract call is leaner than migrating
             await _taquitoHelpers.setSigner(accounts.sender.sk);
-            swapSecret = _cryptoHelpers.randomSecret();
-            swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
-            await helpers.tzip7.lock(swapLockParameters);
         });
 
 
@@ -117,17 +115,16 @@ contract('TZIP-7 with bridge', () => {
     describe('Invoke %claimRefund on bridge for a swap lock before the release time', () => {
 
         beforeEach(async () => {
+            swapSecret = _cryptoHelpers.randomSecret();
+            swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
+            swapLockParameters.releaseTime = getDelayedISOTime(60); // time in the future, release time not reached
+
             await before(
-                _tzip7InitialStorage.withApprovals,
+                _tzip7InitialStorage.test.claimRefund(swapLockParameters),
                 accounts,
                 helpers
             );
-            // locking swap through contract call is leaner than migrating
             await _taquitoHelpers.setSigner(accounts.sender.sk);
-            swapSecret = _cryptoHelpers.randomSecret();
-            swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
-            swapLockParameters.releaseTime = getDelayedISOTime(1); // time in the future, release time not reached
-            await helpers.tzip7.lock(swapLockParameters);
         });
 
         it('should fail for a swap lock that did not reach release time', async () => {

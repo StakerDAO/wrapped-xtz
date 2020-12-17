@@ -14,7 +14,7 @@ contract('TZIP-7 with bridge', () => {
     let swapLockParameters = {
         confirmed: true,
         fee: 10,
-        releaseTime: getDelayedISOTime(1), 
+        releaseTime: getDelayedISOTime(60), 
         secretHash: undefined,
         to: accounts.recipient.pkh,
         value: 5000

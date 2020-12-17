@@ -25,6 +25,7 @@ module.exports = {
             swapIsOver: "SwapIsOver",
             swapLockAlreadyExists: "SwapLockAlreadyExists",
             swapLockDoesNotExist: "SwapLockDoesNotExist",
+            swapTimeBelowThreshold: "SwapTimeBelowThreshold",
             tokenOperationsPaused: "TokenOperationsArePaused",
             tooLongSecret: "TooLongSecret",
             unsafeAllowanceChange: "UnsafeAllowanceChange",
