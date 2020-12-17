@@ -18,7 +18,7 @@ type requestTotalSupplyParameter = contractAddress;
 
 type requestSwapParameter = {
     at: contractAddress,
-    request: secretHash,
+    request: getSwapRequest,
 };
 
 type parameter = 

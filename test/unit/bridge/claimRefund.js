@@ -19,20 +19,25 @@ contract('TZIP-7 with bridge', () => {
         to: accounts.recipient.pkh,
         value: 5000
     };
+    let swapId;
 
     describe('Invoke %claimRefund on bridge for a swap lock past the release time', () => {
 
         beforeEach(async () => {
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
+            const swapInitiator = accounts.sender.pkh;
             swapSecret = _cryptoHelpers.randomSecret();
             swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
+            swapId = {
+                0: swapLockParameters.secretHash,
+                1: swapInitiator
+            };
             await before(
-                _tzip7InitialStorage.test.claimRefund(swapLockParameters),
+                _tzip7InitialStorage.test.claimRefund(swapLockParameters, swapInitiator),
                 accounts,
                 helpers
-            );
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
+            );            
         });
-
 
         it('should fail if token operations are paused', async () => {
             // call %setPause with pause guardian
@@ -47,6 +52,7 @@ contract('TZIP-7 with bridge', () => {
                 .and.have.property('message', contractErrors.tzip7.tokenOperationsPaused);
         });
 
+        // this is basically the same as a swap lock that does not exist
         it('should fail if sender is not initiator of the swap', async () => {
             await _taquitoHelpers.setSigner(accounts.thirdParty.sk);
             const operationPromise = helpers.tzip7.claimRefund(swapLockParameters.secretHash);            
@@ -54,14 +60,6 @@ contract('TZIP-7 with bridge', () => {
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
-        });
-
-        it('should fail for a swap lock that does not exist', async () => {
-            const operationPromise = helpers.tzip7.claimRefund(_cryptoHelpers.randomHash());
-            
-            await expect(operationPromise).to.be.eventually.rejected
-                .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
         });
 
         describe('effects of invoking %claimRefund', () => {
@@ -88,7 +86,7 @@ contract('TZIP-7 with bridge', () => {
             
             it('should remove swap record in contract storage', async () => {
                 // swap record not found
-                const swap = await helpers.tzip7.getSwap(swapLockParameters.secretHash);
+                const swap = await helpers.tzip7.getSwap(swapId);
                 // TODO: find better way of catching this storage read error
                 expect(swap).to.be.undefined;
             });
@@ -104,7 +102,7 @@ contract('TZIP-7 with bridge', () => {
             await helpers.tzip7.claimRefund(swapLockParameters.secretHash);
             // switch to recipient and invoke %redeem
             await _taquitoHelpers.setSigner(accounts.recipient.sk);
-            const operationPromise = helpers.tzip7.redeem(swapLockParameters.secretHash);
+            const operationPromise = helpers.tzip7.redeem(swapLockParameters.secretHash, accounts.sender.pkh);
             
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
@@ -115,16 +113,17 @@ contract('TZIP-7 with bridge', () => {
     describe('Invoke %claimRefund on bridge for a swap lock before the release time', () => {
 
         beforeEach(async () => {
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
+            const swapInitiator = accounts.sender.pkh;
             swapSecret = _cryptoHelpers.randomSecret();
             swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
             swapLockParameters.releaseTime = getDelayedISOTime(60); // time in the future, release time not reached
 
             await before(
-                _tzip7InitialStorage.test.claimRefund(swapLockParameters),
+                _tzip7InitialStorage.test.claimRefund(swapLockParameters, swapInitiator),
                 accounts,
                 helpers
             );
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
         });
 
         it('should fail for a swap lock that did not reach release time', async () => {

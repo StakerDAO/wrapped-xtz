@@ -23,7 +23,7 @@ contract('TZIP-7 with bridge', () => {
         
         beforeEach(async () => {
             await before(
-                _tzip7InitialStorage.test.lock, 
+                _tzip7InitialStorage.test.lock(), 
                 accounts,
                 helpers
             );
@@ -53,7 +53,11 @@ contract('TZIP-7 with bridge', () => {
 
             it('should create swap record in contract storage', async () => {
                 // swap entry matches lock parameters
-                const swapFromContract = await helpers.tzip7.getSwap(swapLockParameters.secretHash);
+                const swapId = {
+                    0: swapLockParameters.secretHash,
+                    1: accounts.sender.pkh // swap initiator
+                }; 
+                const swapFromContract = await helpers.tzip7.getSwap(swapId);
                 let swapRecord = swapLockParameters;
                 swapRecord.from = accounts.sender.pkh; // add this for assertion
                 delete swapRecord.secretHash; // remove this for assertion
@@ -73,8 +77,8 @@ contract('TZIP-7 with bridge', () => {
         
         it('should not allow to reuse a secret-hash', async () => {
             // call the token contract at the %lock entrypoint with an already used secretHash from initialStorage
-            swapLockParameters.secretHash = _tzip7InitialStorage.test.lock.bridge.swaps.keys().next().value
-            
+            swapLockParameters.secretHash = _tzip7InitialStorage.test.lock().bridge.swaps.keys().next().value[0]
+
             const operationPromise = helpers.tzip7.lock(swapLockParameters);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
@@ -98,15 +102,15 @@ contract('TZIP-7 with bridge', () => {
         
         beforeEach(async () => {
             await before(
-                _tzip7InitialStorage.test.lock, 
+                _tzip7InitialStorage.test.lock(), 
                 accounts,
                 helpers
             );
             await _taquitoHelpers.setSigner(accounts.sender.sk);
             // time threshold is current time + minimum time constant of 10 minutes
-            // not using 9 minutes for this test, because sandbox network does not update 
-            // network time after initialization (ganache-core)
-            swapLockParameters.releaseTime = getDelayedISOTime(5); 
+            // this test will fail when running many tests at once, because the
+            // sandbox does not update network time after initialization (ganache-core)
+            swapLockParameters.releaseTime = getDelayedISOTime(0); 
             swapLockParameters.secretHash = _cryptoHelpers.randomHash();
         });
 

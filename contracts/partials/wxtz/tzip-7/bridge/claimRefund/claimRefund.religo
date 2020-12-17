@@ -4,11 +4,14 @@
 let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, storage)): entrypointReturn => {
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);   
+
+    let swapInitiator = Tezos.sender;
+    let swapId: swapId = (claimRefundParameter.secretHash, swapInitiator);
     // check that sender of transaction has permission to confirm the swap
-    failIfSenderIsNotTheInitiator(claimRefundParameter.secretHash, storage.bridge.swaps);
+    failIfSenderIsNotTheInitiator(swapId, storage.bridge.swaps);
     
     // retrieve swap record from storage
-    let swap = getSwapLock(claimRefundParameter.secretHash, storage.bridge.swaps);
+    let swap = getSwapLock(swapId, storage.bridge.swaps);
 	// check for swap protocol time condition
     failIfSwapIsNotOver(swap);
 
@@ -31,7 +34,7 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let tokenStorage = updateLedgerByTransfer(transferFeeParameter, tokenStorage);
     
     // remove the swap record from storage
-    let bridgeStorage = removeSwapLock(claimRefundParameter.secretHash, storage.bridge);
+    let bridgeStorage = removeSwapLock(swapId, storage.bridge);
 
     // update both token ledger storage and swap records in bridge storage
     let storage = {

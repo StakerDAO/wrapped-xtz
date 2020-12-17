@@ -6,9 +6,10 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): entrypoin
     // calculate SHA-256 hash of provided secret
     let secretHash = Crypto.sha256(redeemParameter.secret);
     // continue only if swap was confirmed
-    failIfSwapIsNotConfirmed(secretHash, storage.bridge.swaps);
-    // use the calculated hash to retrieve swap record from bridge storage
-    let swap = getSwapLock(secretHash, storage.bridge.swaps);
+    let swapId: swapId = (secretHash, redeemParameter.swapInitiator);
+    failIfSwapIsNotConfirmed(swapId, storage.bridge.swaps);
+    // use the calculated hash to retrieve swap record from bridge storage with the swapId
+    let swap = getSwapLock(swapId, storage.bridge.swaps);
 
     // construct the transfer parameter to redeem locked-up tokens
     let totalValue = swap.value + swap.fee;
@@ -21,7 +22,7 @@ let redeem = ((redeemParameter, storage): (redeemParameter, storage)): entrypoin
     let tokenStorage = updateLedgerByTransfer(transferParameter, storage.token);
 
     // remove swap record from bridge storage
-    let bridgeStorage = removeSwapLock(secretHash, storage.bridge);
+    let bridgeStorage = removeSwapLock(swapId, storage.bridge);
     // save secret and secretHash as outcome in bridge storage
     let bridgeStorage = setOutcome(secretHash, redeemParameter.secret, bridgeStorage);
 

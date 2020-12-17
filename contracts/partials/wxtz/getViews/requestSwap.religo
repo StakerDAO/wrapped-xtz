@@ -10,7 +10,8 @@ let requestSwap = ((requestSwapParameter, storage): (requestSwapParameter, stora
         | None => (failwith(errorNoContract): contract(getSwapResponse))
     };
     let request: getSwapParameter = {
-        secretHash: requestSwapParameter.request,
+        secretHash: requestSwapParameter.request.secretHash,
+        swapInitiator: requestSwapParameter.request.swapInitiator,
         callback: callbackEntrypoint,
     };
     let operation = Tezos.transaction(

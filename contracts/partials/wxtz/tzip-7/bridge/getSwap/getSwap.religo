@@ -1,6 +1,7 @@
 let getSwap = ((getSwapParameter, bridgeStorage): (getSwapParameter, bridgeStorage)): bridgeEntrypointReturn => {
     // retrieve swap record from bridge storage
-    let swap = getSwapLock(getSwapParameter.secretHash, bridgeStorage.swaps);
+    let swapId: swapId = (getSwapParameter.secretHash, getSwapParameter.swapInitiator);
+    let swap = getSwapLock(swapId, bridgeStorage.swaps);
 
     let operation = Tezos.transaction(
         swap,

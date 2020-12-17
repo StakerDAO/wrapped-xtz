@@ -3,12 +3,14 @@
 let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter, bridgeStorage)): bridgeEntrypointReturn => {
     // confirm swap transaction ignores paused token operations
     
+    let swapInitiator = Tezos.sender;
+    let swapId: swapId = (confirmSwapParameter.secretHash, swapInitiator);
     // check that sender of transaction has permission to confirm the swap
-    failIfSenderIsNotTheInitiator(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    failIfSenderIsNotTheInitiator(swapId, bridgeStorage.swaps);
     // check if swap was already confirmed
-    failIfSwapIsAlreadyConfirmed(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    failIfSwapIsAlreadyConfirmed(swapId, bridgeStorage.swaps);
     // retrieve swap record from storage
-    let swap = getSwapLock(confirmSwapParameter.secretHash, bridgeStorage.swaps);
+    let swap = getSwapLock(swapId, bridgeStorage.swaps);
 
     // change confirmed value to true in swap record
     let swap = {
@@ -17,7 +19,7 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
     };
     // update swap record in bridge storage
     let swaps = updateSwapLock(
-        confirmSwapParameter.secretHash,
+        swapId,
         swap,
         bridgeStorage.swaps
     );

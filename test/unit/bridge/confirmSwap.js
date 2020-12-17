@@ -12,20 +12,26 @@ const { TezosOperationError } = require('@taquito/taquito');
 contract('TZIP-7 with bridge', () => {
     let helpers = {};
     let secretHash;
+    let swapId;
 
     describe('Invoke %confirmSwap on bridge for an unconfirmed swap', () => {
 
         beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(accounts.sender.sk);    
             secretHash = _cryptoHelpers.randomHash();
+            const swapInitiator = accounts.sender.pkh;
+            // michelson pair
+            swapId = {
+                0: secretHash,
+                1: swapInitiator
+            }
             // deploy TZIP-7 instance with specific storage
-            const initialstorage = _tzip7InitialStorage.test.confirmSwap(secretHash, false); // unconfirmed
+            const initialstorage = _tzip7InitialStorage.test.confirmSwap(swapId, false); // unconfirmed
             tzip7Instance = await tzip7.new(initialstorage);
             // display the current contract address for debugging purposes
             console.log('Originated token contract at:', tzip7Instance.address);
-    
-            await _taquitoHelpers.initialize();
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
-    
+
             helpers.tzip7 = await _tzip7Helpers.at(tzip7Instance.address);
         });
 
@@ -36,7 +42,7 @@ contract('TZIP-7 with bridge', () => {
 
         it('should change the swap property confirmed to true in storage', async () => {
             await helpers.tzip7.confirmSwap(secretHash);
-            const swap = await helpers.tzip7.getSwap(secretHash);
+            const swap = await helpers.tzip7.getSwap(swapId);
             expect(swap.confirmed).to.be.true;
         });
 
@@ -59,28 +65,25 @@ contract('TZIP-7 with bridge', () => {
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.senderIsNotTheInitiator);
         });
-        
-        it('should fail for a non-existing swap', async () => {
-            const operationPromise = helpers.tzip7.confirmSwap(_cryptoHelpers.randomHash());
-
-            await expect(operationPromise).to.be.eventually.rejected
-                .and.be.instanceOf(TezosOperationError)
-                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
-        });
     });
 
     describe('Invoke %confirmSwap on bridge for a confirmed swap', () => {
 
         beforeEach(async () => {
+            await _taquitoHelpers.initialize();
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
             secretHash = _cryptoHelpers.randomHash();
+            const swapInitiator = accounts.sender.pkh;
+            // michelson pair
+            swapId = {
+                0: secretHash,
+                1: swapInitiator
+            }
             // deploy TZIP-7 instance with specific storage
-            const initialstorage = _tzip7InitialStorage.test.confirmSwap(secretHash, true); // confirmed
+            const initialstorage = _tzip7InitialStorage.test.confirmSwap(swapId, true); // confirmed
             tzip7Instance = await tzip7.new(initialstorage);
             // display the current contract address for debugging purposes
             console.log('Originated token contract at:', tzip7Instance.address);
-
-            await _taquitoHelpers.initialize();
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
 
             helpers.tzip7 = await _tzip7Helpers.at(tzip7Instance.address);
         });

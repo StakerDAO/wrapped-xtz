@@ -13,6 +13,11 @@ type getAllowanceRequest = {
     spender: address,
 };
 
+type getSwapRequest = {
+    secretHash: secretHash,
+    swapInitiator: address,
+};
+
 type response = 
 | GetBalanceResponse(getBalanceResponse)
 | GetAllowanceResponse(getAllowanceResponse)

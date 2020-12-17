@@ -114,8 +114,8 @@ const tzip7Helpers = (instance) => {
                 .send();
             return operation.confirmation(1);
         },
-        getSwap: async function(secretHash) {
-            const swap = await (await this.getStorage()).bridge.swaps.get(secretHash);
+        getSwap: async function(swapId) {
+            const swap = await (await this.getStorage()).bridge.swaps.get(swapId);
             if (swap != undefined) {
                 swap.fee = swap.fee.toNumber();
                 swap.value = swap.value.toNumber();
@@ -128,9 +128,9 @@ const tzip7Helpers = (instance) => {
                 .send();
             return operation.confirmation(1);
         },
-        redeem: async function(secret) {
+        redeem: async function(secret, swapInitiator) {
             const operation = await instance.methods
-                .redeem(secret)
+                .redeem(secret, swapInitiator)
                 .send();
             return operation.confirmation(1);
         },

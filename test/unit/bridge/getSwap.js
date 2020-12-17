@@ -1,4 +1,3 @@
-
 const _cryptoHelpers = require('../../../helpers/crypto');
 const _tzip7InitialStorage = require('./../../../migrations/initialStorage/tzip-7');
 const _taquitoHelpers = require('../../helpers/taquito');
@@ -6,6 +5,8 @@ const getViews = artifacts.require('getViews');
 const accounts = require('./accounts');
 const getDelayedISOTime = require('../../../helpers/getDelayedISOTime');
 const { expect } = require('chai').use(require('chai-as-promised'));
+const { contractErrors } = require('./../../../helpers/constants');
+const { TezosOperationError } = require('@taquito/taquito');
 const before = require('./before');
 
 contract('TZIP-7 with bridge', () => {
@@ -41,7 +42,8 @@ contract('TZIP-7 with bridge', () => {
         
         it('should return the swap lock to the view contract', async () => {
             // invoke %getSwap on bridge through view contract
-            await getViewsInstance.requestSwap(helpers.tzip7.instance.address, swapLockParameters.secretHash);
+            const swapInititator = accounts.sender.pkh;
+            await getViewsInstance.requestSwap(helpers.tzip7.instance.address, swapLockParameters.secretHash, swapInititator);
 
             // read callback swap that was saved into storage
             const storageGetViewsInstance = await getViewsInstance.storage()
@@ -54,6 +56,19 @@ contract('TZIP-7 with bridge', () => {
             swapRecord.from = accounts.sender.pkh; // add this for assertion
             delete swapRecord.secretHash; // remove this for assertion
             expect(swapFromContract).to.include(swapRecord);
+        });
+
+        it('should fail for a non-existing swapId', async () => {
+            // invoke %getSwap on bridge through view contract
+            const swapInititator = accounts.sender.pkh;
+            const operationPromise = getViewsInstance.requestSwap(
+                helpers.tzip7.instance.address, 
+                _cryptoHelpers.randomSecret(), 
+                swapInititator
+            );
+
+            await expect(operationPromise).to.be.eventually.rejected
+                .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
         });
     });
 });

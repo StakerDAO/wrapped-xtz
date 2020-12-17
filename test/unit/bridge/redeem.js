@@ -19,43 +19,44 @@ contract('TZIP-7 with bridge', () => {
         to: accounts.recipient.pkh,
         value: 5000
     };
+    let swapInitiator;
 
     describe('Invoke %redeem on bridge for a confirmed swap', () => {
 
         beforeEach(async () => {
+            await _taquitoHelpers.setSigner(accounts.sender.sk);
+            swapInitiator = accounts.sender.pkh;
             swapSecret = _cryptoHelpers.randomSecret();
             swapLockParameters.secretHash = _cryptoHelpers.hash(swapSecret);
             swapLockParameters.confirmed = true;
-
             await before(
-                _tzip7InitialStorage.test.redeem(swapLockParameters),
+                _tzip7InitialStorage.test.redeem(swapLockParameters, swapInitiator),
                 accounts,
                 helpers
             );
-            await _taquitoHelpers.setSigner(accounts.sender.sk);
         });
 
         it('should work with correct secret', async () => {
-            const operationPromise = helpers.tzip7.redeem(swapSecret);
+            const operationPromise = helpers.tzip7.redeem(swapSecret, swapInitiator);
             await expect(operationPromise).to.be.eventually.fulfilled;
         });
 
         it('should fail to retrieve swap with the wrong secret' , async () => {
-            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret());
+            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(), swapInitiator);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.swapLockDoesNotExist);
         });
 
         it('should fail for too short secret' , async () => {
-            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(31));
+            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(31), swapInitiator);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.invalidSecretLength);
         });
 
         it('should fail for too long secret' , async () => {
-            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(33));
+            const operationPromise = helpers.tzip7.redeem(_cryptoHelpers.randomSecret(33), swapInitiator);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.invalidSecretLength);
@@ -65,7 +66,7 @@ contract('TZIP-7 with bridge', () => {
 
             beforeEach(async () => {
                 helpers.balances.senderBeforeRedeem = await helpers.tzip7.getBalance(accounts.sender.pkh);
-                await helpers.tzip7.redeem(swapSecret);
+                await helpers.tzip7.redeem(swapSecret, swapInitiator);
             });
             
             it("should reduce token balance for lockSaver", async () => {
@@ -91,7 +92,11 @@ contract('TZIP-7 with bridge', () => {
 
             it('should remove swap record in contract storage', async () => {
                 // swap record not found
-                const swap = await helpers.tzip7.getSwap(swapLockParameters.secretHash);
+                const swapId = {
+                    0: swapLockParameters.secretHash,
+                    1: swapInitiator
+                };
+                const swap = await helpers.tzip7.getSwap(swapId);
                 // TODO: find better way of catching this storage read error
                 expect(swap).to.be.undefined;
             });
@@ -108,7 +113,7 @@ contract('TZIP-7 with bridge', () => {
                 await helpers.tzip7.setPause(true);
             });
 
-            const operationPromise = helpers.tzip7.redeem(swapSecret);
+            const operationPromise = helpers.tzip7.redeem(swapSecret, swapInitiator);
 
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
@@ -133,7 +138,8 @@ contract('TZIP-7 with bridge', () => {
         });
 
         it('should fail for an unconfirmed swap', async () => {
-            const operationPromise = helpers.tzip7.redeem(swapSecret);
+            const swapInitiator = accounts.sender.pkh;
+            const operationPromise = helpers.tzip7.redeem(swapSecret, swapInitiator);
             await expect(operationPromise).to.be.eventually.rejected
                 .and.be.instanceOf(TezosOperationError)
                 .and.have.property('message', contractErrors.tzip7.swapIsNotConfirmed);
