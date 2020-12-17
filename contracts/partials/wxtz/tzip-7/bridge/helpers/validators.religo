@@ -1,6 +1,6 @@
 let isValidSecretLength = (secret: secret): bool => {
     let secretByteLength = Bytes.length(secret);
-    secretByteLength == 32n;
+    secretByteLength == fixedSecretByteLength;
 };
 
 let failIfInvalidSecretLength = (secret: secret): unit => {
