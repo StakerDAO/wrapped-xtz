@@ -1,7 +1,7 @@
 /**
  * Checks if the provided address is a trusted oven
  */
-((arbitraryValueLambdaParameter, storage): (arbitraryValueLambdaParameter, storage)): arbitraryValueLambdaReturnValue => {
+((arbitraryValueLambdaParameter, storage, lambdaExtras): (arbitraryValueLambdaParameter, storage, lambdaExtras)): arbitraryValueLambdaReturnValue => {
     // unpack the lambda parameters
     let ovenAddress: option(address) = Bytes.unpack(arbitraryValueLambdaParameter);
     let ovenAddress: address = switch (ovenAddress) {

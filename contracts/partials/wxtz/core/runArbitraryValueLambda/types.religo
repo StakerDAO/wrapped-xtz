@@ -1,7 +1,16 @@
-#include "./../runEntrypointLambda/types.religo"
+#include "../storage/storage.religo"
 type arbitraryValueLambdaParameter = bytes;
 type arbitraryValueLambdaReturnValue = (list(operation), storage, bytes);
-// TODO: refactor lambda runner type names
-type runArbitraryValueLambdaParameter = runEntrypointLambdaParameter;
-// TODO: extract the parameter into its own type
-type arbitraryValueLambda = ((arbitraryValueLambdaParameter, storage)) => arbitraryValueLambdaReturnValue;
+type lambdaName = string;
+type lambdaParameter = bytes;
+
+type lambdaExtras = {
+    selfAddress: address
+};
+            
+type runArbitraryValueLambdaParameter = {
+    lambdaName: lambdaName,
+    lambdaParameter: lambdaParameter
+};
+
+type arbitraryValueLambda = ((arbitraryValueLambdaParameter, storage, lambdaExtras)) => arbitraryValueLambdaReturnValue;

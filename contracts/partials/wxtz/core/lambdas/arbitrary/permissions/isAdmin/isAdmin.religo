@@ -1,7 +1,7 @@
 /**
  * Checks if the provided address matches the admin address from the storage
  */
-((arbitraryValueLambdaParameter, storage): (arbitraryValueLambdaParameter, storage)): arbitraryValueLambdaReturnValue => {
+((arbitraryValueLambdaParameter, storage, lambdaExtras): (arbitraryValueLambdaParameter, storage, lambdaExtras)): arbitraryValueLambdaReturnValue => {
     // unpack admin address from the storage
     // TODO: extract into a getAdminAddress function
     let admin: bytes = getArbitraryValue(("admin", storage));

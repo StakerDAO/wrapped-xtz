@@ -1,8 +1,12 @@
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
-    let (_, _, _) = runArbitraryValueLambda(({
-        lambdaName: "arbitrary/permissions/isAdmin",
-        lambdaParameter: Bytes.pack(Tezos.sender)
-    }, storage));
+    let (_, _, _) = runArbitraryValueLambda((
+        {
+            lambdaName: "arbitrary/permissions/isAdmin",
+            lambdaParameter: Bytes.pack(Tezos.sender)
+        }, 
+        storage,
+        lambdaExtras
+    ));
 
     let setAdministratorParameter: option(setAdministratorParameter) = Bytes.unpack(lambdaParameter);
     let setAdministratorParameter: setAdministratorParameter = switch (setAdministratorParameter) {

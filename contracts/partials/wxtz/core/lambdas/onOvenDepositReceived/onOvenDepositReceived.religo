@@ -3,10 +3,14 @@
  */
 ((lambdaParameter, storage, lambdaExtras): (lambdaParameter, storage, lambdaExtras)): entrypointReturn => {
     // check if the address calling this entrypoint is a trusted oven
-    let (_, _, _) = runArbitraryValueLambda(({
-        lambdaName: "arbitrary/permissions/isTrustedOven",
-        lambdaParameter: Bytes.pack(Tezos.sender)
-    }, storage));
+    let (_, _, _) = runArbitraryValueLambda((
+        {
+            lambdaName: "arbitrary/permissions/isTrustedOven",
+            lambdaParameter: Bytes.pack(Tezos.sender)
+        }, 
+        storage,
+        lambdaExtras
+    ));
 
     // send the received XTZ back to the sender
     /**
@@ -49,7 +53,8 @@
             lambdaName: "arbitrary/composeMintOperation",
             lambdaParameter: composeMintOperationParameter, 
         },
-        storage
+        storage,
+        lambdaExtras
     ));
 
     // return all the required operations
