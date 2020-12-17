@@ -2,7 +2,7 @@
 const tzip7 = artifacts.require('tzip-7');
 const { expect } = require('chai').use(require('chai-as-promised'));
 
-const { bob, carol, chuck, dave, walter } = require('../../../scripts/sandbox/accounts');
+const { alice, bob, carol, chuck, dave, walter } = require('../../../scripts/sandbox/accounts');
 const _tzip7InitialStorage = require('../../../migrations/initialStorage/tzip-7');
 const _tzip7Helpers = require('../../helpers/tzip-7');
 const _taquitoHelpers = require('../../helpers/taquito');
@@ -116,7 +116,7 @@ contract('TZIP-7 token contract %transfer entrypoint', () => {
         });
     });
 
-    describe('scenario where token spender is not token owner, but approved allowance is used', () => {
+    describe('scenario where not token owner performs transfer, but approved allowance is used', () => {
         const accounts = {
             owner: bob,
             spender: carol,
@@ -141,7 +141,7 @@ contract('TZIP-7 token contract %transfer entrypoint', () => {
             transferParameter.value = allowance.before; // full allowance
         });
 
-        describe('scenario with enough allowance and balance', () => {
+        describe('scenario with enough allowance', () => {
 
             beforeEach(async () => {
                 balances.senderBefore = await helpers.tzip7.getBalance(transferParameter.from);
@@ -163,30 +163,6 @@ contract('TZIP-7 token contract %transfer entrypoint', () => {
             it('should decrease allowance of spender', async () => {
                 allowance.after = await helpers.tzip7.getAllowance(accounts.owner.pkh, accounts.spender.pkh);
                 expect(allowance.after).to.equal(allowance.before - transferParameter.value)
-            });
-        });
-
-        describe('scenario with enough allowance, but not enough balance', () => {
-            
-            beforeEach(async () => {
-                await _taquitoHelpers.signAs(accounts.owner.sk, async () => {
-                    // drain account of token owner
-                    const transferParameterToDrainAccount = {
-                        from: transferParameter.from,
-                        to: transferParameter.to,
-                        value: await _tzip7InitialStorage.withApprovals.token.ledger.get(transferParameter.from)
-                    };
-            
-                    await helpers.tzip7.transfer(transferParameterToDrainAccount);
-                });
-            });
-
-            it('should fail for transferring above available balance of owner', async () => {
-                const operationPromise = helpers.tzip7.transfer(transferParameter);
-
-                await expect(operationPromise).to.be.eventually.rejected
-                    .be.instanceOf(TezosOperationError)
-                    .and.have.property('message', contractErrors.tzip7.notEnoughBalance);
             });
         });
       
