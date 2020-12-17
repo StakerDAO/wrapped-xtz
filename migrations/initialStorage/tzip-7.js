@@ -97,25 +97,6 @@ initialStorage.test.lock = () => {
         value: 5000
     })
     return storage;
-    // bridge: {
-    //     ...initialStorage.withApprovals.bridge,
-    //     swaps: (() => {
-    //         const map = new MichelsonMap;
-    //         map.set({
-    //             0: 'b7c1fcab1eac98de7a021c73906e2c930cb46d9cf1c90aef6bd549f0ba00f25a', 
-    //             1: bob.pkh
-    //         }, {
-    //             confirmed: false,
-    //             fee: 100,
-    //             from: bob.pkh,
-    //             releaseTime: getDelayedISOTime(60),
-    //             to: carol.pkh,
-    //             value: 5000
-    //         });
-    //         return map;
-    //     })(),
-    //     outcomes: new MichelsonMap
-    // },
 };
 
 initialStorage.test.confirmSwap = (swapId, confirmed) => {
