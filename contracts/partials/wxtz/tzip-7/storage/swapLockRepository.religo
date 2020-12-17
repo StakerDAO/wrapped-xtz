@@ -1,37 +1,37 @@
 #include "../errors.religo"
 
-let getSwapLock = ((secretHash, swaps): (secretHash, swaps)): swap => {
-    let swap = Big_map.find_opt(secretHash, swaps);
+let getSwapLock = ((swapId, swaps): (swapId, swaps)): swap => {
+    let swap = Big_map.find_opt(swapId, swaps);
 	switch (swap) {
 		| Some(swap) => swap
 		| None => (failwith(errorSwapLockDoesNotExist): swap)
 	};
 };
 
-let setSwapLock = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
+let setSwapLock = ((swapId, swap, swaps): (swapId, swap, swaps)): swaps => {
 	Big_map.add(
-		secretHash,
+		swapId,
 		swap,
 		swaps
 	);
 };
 
 // the logic is different to getSwapLock
-let failIfSwapLockExists = ((secretHash, swaps): (secretHash, swaps)): unit => {
-	let existingSwap = Big_map.find_opt(secretHash, swaps);
+let failIfSwapLockExists = ((swapId, swaps): (swapId, swaps)): unit => {
+	let existingSwap = Big_map.find_opt(swapId, swaps);
 	switch(existingSwap) {
 		| Some(swap) => (failwith(errorSwapLockAlreadyExists): unit)
 		| None => unit
 	};
 };
 
-let setNewSwapLock = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
-	failIfSwapLockExists(secretHash, swaps);
-	setSwapLock(secretHash, swap, swaps);
+let setNewSwapLock = ((swapId, swap, swaps): (swapId, swap, swaps)): swaps => {
+	failIfSwapLockExists(swapId, swaps);
+	setSwapLock(swapId, swap, swaps);
 };
 
-let removeSwapLock = ((secretHash, bridgeStorage): (secretHash, bridgeStorage)): bridgeStorage => {
-	let swaps = Big_map.remove(secretHash, bridgeStorage.swaps);
+let removeSwapLock = ((swapId, bridgeStorage): (swapId, bridgeStorage)): bridgeStorage => {
+	let swaps = Big_map.remove(swapId, bridgeStorage.swaps);
     let bridgeStorage = {
         ...bridgeStorage,
         swaps: swaps,
@@ -39,9 +39,9 @@ let removeSwapLock = ((secretHash, bridgeStorage): (secretHash, bridgeStorage)):
     bridgeStorage;
 };
 
-let updateSwapLock = ((secretHash, swap, swaps): (secretHash, swap, swaps)): swaps => {
+let updateSwapLock = ((swapId, swap, swaps): (swapId, swap, swaps)): swaps => {
     Big_map.update(
-        secretHash,
+        swapId,
         Some(swap),
         swaps
     );

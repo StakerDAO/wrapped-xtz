@@ -4,8 +4,8 @@ let isSenderInitiator = (swap: swap): bool => {
     Tezos.sender == swap.from_;
 };
 
-let failIfSenderIsNotTheInitiator = ((secretHash, swaps): (secretHash, swaps)): unit => {
-    let swap = getSwapLock(secretHash, swaps);
+let failIfSenderIsNotTheInitiator = ((swapId, swaps): (swapId, swaps)): unit => {
+    let swap = getSwapLock(swapId, swaps);
     // check that sender of the transaction has permission
     let isSenderInitiator = isSenderInitiator(swap);
     switch (isSenderInitiator) {
@@ -18,8 +18,8 @@ let isSwapConfirmed = (swap: swap): bool => {
     swap.confirmed == true;
 };
 
-let failIfSwapIsNotConfirmed = ((secretHash, swaps): (secretHash, swaps)): unit => {
-    let swap = getSwapLock(secretHash, swaps);
+let failIfSwapIsNotConfirmed = ((swapId, swaps): (swapId, swaps)): unit => {
+    let swap = getSwapLock(swapId, swaps);
     let isSwapConfirmed = isSwapConfirmed(swap);
     switch (isSwapConfirmed) {
         | true => unit
@@ -27,8 +27,8 @@ let failIfSwapIsNotConfirmed = ((secretHash, swaps): (secretHash, swaps)): unit 
     };
 };
 
-let failIfSwapIsAlreadyConfirmed = ((secretHash, swaps): (secretHash, swaps)): unit => {
-    let swap = getSwapLock(secretHash, swaps);
+let failIfSwapIsAlreadyConfirmed = ((swapId, swaps): (swapId, swaps)): unit => {
+    let swap = getSwapLock(swapId, swaps);
     let isSwapConfirmed = isSwapConfirmed(swap);
     switch (isSwapConfirmed) {
         | true => (failwith(errorSwapIsAlreadyConfirmed): unit)

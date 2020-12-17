@@ -8,7 +8,8 @@ type swap = {
     [@annot:to] to_: address,
     value: nat,
 };
-type swaps = big_map(secretHash, swap);
+type swapId = (secretHash, address);
+type swaps = big_map(swapId, swap);
 type outcomes = big_map(secretHash, secret);
 
 type ledger = big_map(address, nat);

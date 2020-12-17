@@ -41,7 +41,8 @@ contract('TZIP-7 with bridge', () => {
         
         it('should return the swap lock to the view contract', async () => {
             // invoke %getSwap on bridge through view contract
-            await getViewsInstance.requestSwap(helpers.tzip7.instance.address, swapLockParameters.secretHash);
+            const swapInititator = accounts.sender.pkh;
+            await getViewsInstance.requestSwap(helpers.tzip7.instance.address, swapLockParameters.secretHash, swapInititator);
 
             // read callback swap that was saved into storage
             const storageGetViewsInstance = await getViewsInstance.storage()

@@ -5,7 +5,9 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointRetur
 	// continue only if token operations are not paused
 	failIfPaused(storage.token);
 	// check for existing swap lock
-	failIfSwapLockExists(lockParameter.secretHash, storage.bridge.swaps);
+    let swapInitiator = Tezos.sender;
+    let swapId: swapId = (lockParameter.secretHash, swapInitiator);
+	failIfSwapLockExists(swapId, storage.bridge.swaps);
     // check that swap time input is in the future
     failIfInvalidSwapTimeInput(lockParameter.releaseTime);
 	
@@ -16,11 +18,11 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointRetur
 		releaseTime: lockParameter.releaseTime,
 		to_: lockParameter.to_,
 		value: lockParameter.value,
-		from_: Tezos.sender,
+		from_: swapInitiator,
 	};
-	// save new swap record with secretHash as key
+	// save new swap record with (secretHash, address) tuple as key
 	let swaps = setNewSwapLock(
-        lockParameter.secretHash,
+        swapId,
         swap,
         storage.bridge.swaps
     );
@@ -28,7 +30,7 @@ let lock = ((lockParameter, storage): (lockParameter, storage)): entrypointRetur
 	// lock up total swap amount, by transferring it to the smart contracts own address
 	let lockValue = lockParameter.value + lockParameter.fee;
 	let transferParameter: transferParameter = {
-		from_: Tezos.sender,
+		from_: swapInitiator,
 		to_:  storage.bridge.lockSaver,
 		value: lockValue,
 	};

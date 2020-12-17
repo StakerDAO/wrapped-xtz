@@ -71,8 +71,8 @@ initialStorage.getAllowance = {
         approvals:  (()=> {
             const map = new MichelsonMap;
             map.set({ // Pair as Key
-                0 : bob.pkh, //nat
-                1 : carol.pkh //address
+                0: bob.pkh, //nat
+                1: carol.pkh //address
               }, 100000);
             return map;
         })(),
@@ -82,27 +82,46 @@ initialStorage.getAllowance = {
 
 initialStorage.test = {};
 
-initialStorage.test.lock = {
-    ...initialStorage.withApprovals,
-    bridge: {
-        ...initialStorage.withApprovals.bridge,
-        swaps: MichelsonMap.fromLiteral({
-            'b7c1fcab1eac98de7a021c73906e2c930cb46d9cf1c90aef6bd549f0ba00f25a': {
-                confirmed: false,
-                fee: 100,
-                from: bob.pkh,
-                releaseTime: getDelayedISOTime(60),
-                to: carol.pkh,
-                value: 5000
-            },
-        }),
-        outcomes: new MichelsonMap
-    },
+initialStorage.test.lock = () => {
+    let storage = initialStorage.withApprovals;
+    const swapId = {
+        0: 'b7c1fcab1eac98de7a021c73906e2c930cb46d9cf1c90aef6bd549f0ba00f25a', 
+        1: bob.pkh
+    };
+    storage.bridge.swaps.set(swapId, {
+        confirmed: false,
+        fee: 100,
+        from: bob.pkh,
+        releaseTime: getDelayedISOTime(60),
+        to: carol.pkh,
+        value: 5000
+    })
+    return storage;
+    // bridge: {
+    //     ...initialStorage.withApprovals.bridge,
+    //     swaps: (() => {
+    //         const map = new MichelsonMap;
+    //         map.set({
+    //             0: 'b7c1fcab1eac98de7a021c73906e2c930cb46d9cf1c90aef6bd549f0ba00f25a', 
+    //             1: bob.pkh
+    //         }, {
+    //             confirmed: false,
+    //             fee: 100,
+    //             from: bob.pkh,
+    //             releaseTime: getDelayedISOTime(60),
+    //             to: carol.pkh,
+    //             value: 5000
+    //         });
+    //         return map;
+    //     })(),
+    //     outcomes: new MichelsonMap
+    // },
 };
 
-initialStorage.test.confirmSwap = (secretHash, confirmed) => {
+initialStorage.test.confirmSwap = (swapId, confirmed) => {
     let storage = initialStorage.withApprovals;
-    storage.bridge.swaps.set(secretHash, {
+
+    storage.bridge.swaps.set(swapId, {
         confirmed: confirmed,
         fee: 100,
         from: bob.pkh,
@@ -113,14 +132,19 @@ initialStorage.test.confirmSwap = (secretHash, confirmed) => {
     return storage;
 };
 
-initialStorage.test.redeem = (swapLockParameters) => {
+initialStorage.test.redeem = (swapLockParameters, swapInitiator) => {
     let storage = initialStorage.withApprovals;
-    storage.bridge.swaps.set(swapLockParameters.secretHash, {
+    // michelson pair
+    const swapId = {
+        0: swapLockParameters.secretHash,
+        1: swapInitiator
+    };
+    storage.bridge.swaps.set(swapId, {
         confirmed: swapLockParameters.confirmed,
         fee: swapLockParameters.fee,
-        from: bob.pkh,
+        from: swapInitiator,
         releaseTime: swapLockParameters.releaseTime,
-        to: carol.pkh,
+        to: swapLockParameters.to,
         value: swapLockParameters.value
     });
     // set enough balance for lockSaver account
@@ -129,8 +153,8 @@ initialStorage.test.redeem = (swapLockParameters) => {
     return storage;
 };
 
-initialStorage.test.claimRefund = (swapLockParameters) => {
-    return initialStorage.test.redeem(swapLockParameters);
+initialStorage.test.claimRefund = (swapLockParameters, swapInitiator) => {
+    return initialStorage.test.redeem(swapLockParameters, swapInitiator);
 };
 
 initialStorage.test.paused = {
