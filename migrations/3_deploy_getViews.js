@@ -1,5 +1,5 @@
 const getViews = artifacts.require('getViews');
-const { MichelsonMap, UnitValue } = require('@taquito/taquito');
+const { UnitValue } = require('@taquito/taquito');
 const saveContractAddress = require('./../helpers/saveContractAddress');
 
 const initialStorage = {
@@ -19,7 +19,11 @@ const initialStorage = {
 };
 
 module.exports = async (deployer, network, accounts) => {
-    deployer.deploy(getViews, initialStorage)
+    if (network == 'mainnet') {
+        return;
+    } else {
+        deployer.deploy(getViews, initialStorage)
         .then(contract => saveContractAddress('getViews', contract.address));
+    };
 };
 module.exports.initialStorage = initialStorage;

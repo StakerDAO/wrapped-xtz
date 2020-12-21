@@ -6,30 +6,29 @@ module.exports = {
   contracts_directory: "./contracts/main",
   networks: {
     development: {
-      host: "http://localhost",
-      port: 8732,
-      network_id: "*",
-      secretKey: alice.sk,
-      type: "tezos"
+        host: "http://localhost",
+        port: 8732,
+        network_id: "*",
+        secretKey: alice.sk,
+        type: "tezos"
     },
-    babylonnet: {
-      host: "https://babylonnet.tezos.org.ua",
-      network_id: "*",
-      secret,
-      mnemonic,
-      password,
-      email,
-      type: "tezos"
+    delphinet: {
+        host: "https://testnet-tezos.giganode.io",
+        network_id: "*",
+        secret,
+        mnemonic,
+        password,
+        email,
+        type: "tezos"
     },
-    carthagenet: {
-      host: "https://testnet-tezos.giganode.io",
-      network_id: "*",
-      secret,
-      mnemonic,
-      password,
-      email,
-      type: "tezos"
-    }
-  }
+    mainnet: {
+        host: "https://mainnet-tezos.giganode.io",
+        network_id: "*",
+        secret,
+        mnemonic,
+        password,
+        email,
+        type: "tezos"
+    },
+  },
 };
-
