@@ -1,5 +1,5 @@
 const { MichelsonMap } = require('@taquito/taquito');
-const { alice, bob, carol, trent, walter } = require('../../scripts/sandbox/accounts');
+const { alice, bob, carol, lock, walter } = require('../../scripts/sandbox/accounts');
 const initialStorage = {};
 const getDelayedISOTime = require('../../helpers/getDelayedISOTime');
 
@@ -15,7 +15,7 @@ initialStorage.base = {
     bridge: {
         swaps: new MichelsonMap,
         outcomes: new MichelsonMap,
-        lockSaver: trent.pkh, // trusted arbitrator
+        lockSaver: lock.pkh,
     },
 };
 
@@ -130,7 +130,7 @@ initialStorage.test.redeem = (swapLockParameters, swapInitiator) => {
     });
     // set enough balance for lockSaver account
     const totalValue = swapLockParameters.fee + swapLockParameters.value;
-    storage.token.ledger.set(trent.pkh, totalValue);
+    storage.token.ledger.set(lock.pkh, totalValue);
     return storage;
 };
 
