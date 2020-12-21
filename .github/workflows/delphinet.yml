@@ -17,7 +17,7 @@ jobs:
       with:
         node-version: 10.x
     - run: npm ci
-    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run fix-ligo-version 0.3.0
     - run: npm run sandbox:start &
     - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
@@ -34,7 +34,7 @@ jobs:
       with:
         node-version: 10.x
     - run: npm ci
-    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run fix-ligo-version 0.3.0
     - run: npm run sandbox:start &
     - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
@@ -51,7 +51,7 @@ jobs:
       with:
         node-version: 10.x
     - run: npm ci
-    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run fix-ligo-version 0.3.0
     - run: npm run sandbox:start &
     - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
@@ -68,7 +68,7 @@ jobs:
       with:
         node-version: 10.x
     - run: npm ci
-    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run fix-ligo-version 0.3.0
     - run: npm run sandbox:start &
     - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
@@ -85,7 +85,7 @@ jobs:
       with:
         node-version: 10.x
     - run: npm ci
-    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run fix-ligo-version 0.3.0
     - run: npm run sandbox:start &
     - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
@@ -102,7 +102,7 @@ jobs:
       with:
         node-version: 10.x
     - run: npm ci
-    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run fix-ligo-version 0.3.0
     - run: npm run sandbox:start &
     - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
