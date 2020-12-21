@@ -66,4 +66,7 @@ module.exports = {
         sk: "edsk3ZA4Uuirw4VXwGeamzLuQyn2juohC8eFYxD5fKobxUBX9HKWpu",
         pk: "edpkvXobE6tQLdsm3kPu3MYT2z2XrgVchfkK2WPB9tniNXdWSRyud3"
     },
+    lock: {
+        pkh: "tz1LockLockLockLockLockLockLocAqQgwt",
+    }
 };

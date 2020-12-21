@@ -1,4 +1,4 @@
-const { alice, bob, carol, chuck, trent, walter } = require('./../../../scripts/sandbox/accounts');
+const { alice, bob, carol, chuck, lock, walter } = require('./../../../scripts/sandbox/accounts');
 
 module.exports = {
     admin: alice,
@@ -6,5 +6,5 @@ module.exports = {
     recipient: carol,
     thirdParty: chuck, // has malicious intent
     pauseGuardian: walter, // warden
-    lockSaver: trent, // trusted arbitrator
+    lockSaver: lock,
 };
