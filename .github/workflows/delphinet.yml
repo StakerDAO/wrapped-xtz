@@ -12,67 +12,100 @@ jobs:
     steps:      
     - uses: actions/checkout@v2
   
-    - name: Use Node.js 14.x
+    - name: Use Node.js 10.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
-    - run: npm i
-    - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Wait 20 seconds for sandbox
+        node-version: 10.x
+    - run: npm ci
+    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run sandbox:start &
+    - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
-        time: '20s'
+        time: '15s'
     - run: npm run migrate
-  test-core:
-    runs-on: ubuntu-latest
-    steps:      
-    - uses: actions/checkout@v2
-  
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-    - run: npm i
-    - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Wait 20 seconds for sandbox
-      uses: jakejarvis/wait-action@master
-      with:
-        time: '20s'
-    - run: npm run test -- ./test/integration/createOven.js
-  test-tzip-7:
-    runs-on: ubuntu-latest
-    steps:      
-    - uses: actions/checkout@v2
-  
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-    - name: Remove core migration file
-      run: rm migrations/2_deploy_core.js
-    - run: npm i
-    - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Wait 20 seconds for sandbox
-      uses: jakejarvis/wait-action@master
-      with:
-        time: '20s'
-    - run: npm run test -- ./test/token/tzip-7.js
-  test-bridge:
+  unit-tzip-7:
     runs-on: ubuntu-latest
     steps:      
     - uses: actions/checkout@v2
 
-    - name: Use Node.js 14.x
+    - name: Use Node.js 10.x
       uses: actions/setup-node@v1
       with:
-        node-version: 14.x
-    - name: Remove core migration file
-      run: rm migrations/2_deploy_core.js
-    - run: npm i
-    - run: docker run --rm -p 8732:20000 --detach registry.gitlab.com/tezos/flextesa:896b2200-run delphibox start 
-    - name: Wait 20 seconds for sandbox
+        node-version: 10.x
+    - run: npm ci
+    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run sandbox:start &
+    - name: Wait 15 seconds for sandbox
       uses: jakejarvis/wait-action@master
       with:
-        time: '20s'
-    - run: npm run test -- ./test/token/bridge.js
-  
+        time: '15s'
+    - run: npm run test -- ./test/unit/tzip-7/**
+  unit-bridge:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm ci
+    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run sandbox:start &
+    - name: Wait 15 seconds for sandbox
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '15s'
+    - run: npm run test -- ./test/unit/bridge/**
+  unit-core:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm ci
+    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run sandbox:start &
+    - name: Wait 15 seconds for sandbox
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '15s'
+    - run: npm run test -- ./test/unit/core/** ./test/unit/core/lambdas/** ./test/unit/core/lambdas/tzip-7/**
+  unit-oven:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm ci
+    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run sandbox:start &
+    - name: Wait 15 seconds for sandbox
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '15s'
+    - run: npm run test -- ./test/unit/oven/**
+  integration:
+    runs-on: ubuntu-latest
+    steps:      
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm ci
+    - run: npm run fix-ligo-version 0.5.0
+    - run: npm run sandbox:start &
+    - name: Wait 15 seconds for sandbox
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '15s'
+    - run: npm run test -- ./test/integration/** ./test/integration/oven/**
