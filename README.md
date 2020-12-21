@@ -19,7 +19,7 @@ Make sure to have [Docker](https://www.docker.com) running, [node.js](https://no
 
 ```
 npm i
-npm run fix-ligo-version 0.5.0
+npm run fix-ligo-version 0.3.0
 ```
 
 ### Starting Delphinet Sandbox
