@@ -24,7 +24,8 @@ let failIfSwapIsOver = ((swapId, swaps): (swapId, swaps)): unit => {
     };
 };
 
-let failIfSwapIsNotOver = (swap: swap): unit => {
+let failIfSwapIsNotOver = ((swapId, swaps): (swapId, swaps)): unit => {
+    let swap = getSwapLock(swapId, swaps);
     let isValidSwapTime = isValidSwapTime(swap);
     switch (isValidSwapTime) {
         | true => (failwith(errorFundsLock): unit)

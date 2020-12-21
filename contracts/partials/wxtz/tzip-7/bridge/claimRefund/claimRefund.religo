@@ -9,11 +9,11 @@ let claimRefund = ((claimRefundParameter, storage): (claimRefundParameter, stora
     let swapId: swapId = (claimRefundParameter.secretHash, swapInitiator);
     // check that sender of transaction has permission to confirm the swap
     failIfSenderIsNotTheInitiator(swapId, storage.bridge.swaps);
+    // check for swap protocol time condition
+    failIfSwapIsNotOver(swapId, storage.bridge.swaps);
     
     // retrieve swap record from storage
     let swap = getSwapLock(swapId, storage.bridge.swaps);
-	// check for swap protocol time condition
-    failIfSwapIsNotOver(swap);
 
     // constructing the transfer parameter to redeem locked-up tokens
     let transferValueParameter: transferParameter = {
