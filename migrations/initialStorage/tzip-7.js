@@ -99,14 +99,14 @@ initialStorage.test.lock = () => {
     return storage;
 };
 
-initialStorage.test.confirmSwap = (swapId, confirmed) => {
+initialStorage.test.confirmSwap = (swapId, confirmed, releaseTime) => {
     let storage = initialStorage.withApprovals;
 
     storage.bridge.swaps.set(swapId, {
         confirmed: confirmed,
         fee: 100,
         from: bob.pkh,
-        releaseTime: getDelayedISOTime(60),
+        releaseTime: releaseTime,
         to: carol.pkh,
         value: 5000
     });

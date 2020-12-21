@@ -9,9 +9,11 @@ let confirmSwap = ((confirmSwapParameter, bridgeStorage): (confirmSwapParameter,
     failIfSenderIsNotTheInitiator(swapId, bridgeStorage.swaps);
     // check if swap was already confirmed
     failIfSwapIsAlreadyConfirmed(swapId, bridgeStorage.swaps);
+    // check that swap is not over
+    failIfSwapIsOver(swapId, bridgeStorage.swaps);
+
     // retrieve swap record from storage
     let swap = getSwapLock(swapId, bridgeStorage.swaps);
-
     // change confirmed value to true in swap record
     let swap = {
         ...swap,

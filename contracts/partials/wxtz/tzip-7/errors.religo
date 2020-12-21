@@ -15,3 +15,4 @@ let errorSwapIsNotConfirmed: string = "SwapIsNotConfirmed";
 let errorSenderIsNotTheInitiator: string = "SenderIsNotTheInitiator";
 let errorSwapIsAlreadyConfirmed: string = "SwapIsAlreadyConfirmed";
 let errorSwapTimeBelowThreshold: string = "SwapTimeBelowThreshold";
+let errorSwapIsOver: string = "SwapIsOver";
