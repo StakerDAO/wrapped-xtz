@@ -6,6 +6,15 @@ module.exports = {
         const rpc = "http://localhost:8732";
         Tezos.setRpcProvider(rpc);
     },
+    initializeWithRpc: async (host, port) => {
+        let rpc;
+        if (port === undefined) {
+            rpc = host
+        } else {
+            rpc = host + ':' + port
+        };
+        Tezos.setRpcProvider(rpc);
+    },
     setSigner: async (secretKey) => {
         const signer = (await InMemorySigner.fromSecretKey(secretKey));
         Tezos.setSignerProvider(signer);
