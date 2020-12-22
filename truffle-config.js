@@ -10,7 +10,8 @@ module.exports = {
         port: 8732,
         network_id: "*",
         secretKey: alice.sk,
-        type: "tezos"
+        type: "tezos",
+        finishSetup: false
     },
     delphinet: {
         host: "https://testnet-tezos.giganode.io",
